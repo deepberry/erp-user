@@ -1,0 +1,18 @@
+## 一期
+- [x] 项目secrets
+- [x] 初始化
+- [ ] SEO
+- [ ] 国际化
+- [x] 公共组件编写与实装
+- [ ] 用户模块与鉴权
+- [ ] 路由划分与页面&视图初始化
+
+## 二期
+
+
+## 三期
+- [ ] 独立oss仓库与cdn映射（.env）
+- [ ] 预览环境配置（.env,.github/workflows/build.yaml,测试机web hook接收器）
+- [ ] 线上cdn配置（.github/disabled_workflows/release.yaml)
+- [ ] 统计代码（public/index.html）
+- [ ] nginx rewrite（排除js/css/img)

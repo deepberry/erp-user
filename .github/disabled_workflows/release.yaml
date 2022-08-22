@@ -1,0 +1,42 @@
+name: Release
+on:
+    release:
+        branches:
+            - master
+jobs:
+    build-and-preview:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Use Node.js
+              uses: actions/setup-node@v3
+              with:
+                  always-auth: true
+                  node-version: "16.x"
+                  registry-url: https://npm.pkg.github.com
+                  scope: "@deepberry"
+
+            - name: Install dependencies
+              run: npm install
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+            - name: Build
+              run: npm run build
+            - name: Deploy Build
+              uses: JamesIves/github-pages-deploy-action@releases/v3
+              with:
+                  ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+                  BRANCH: dist
+                  FOLDER: dist
+                  CLEAN: true
+
+            - name: OSS&CDN
+              uses: manyuanrong/setup-ossutil@v2.0
+              with:
+                  endpoint: "oss-cn-zhangjiakou.aliyuncs.com"
+                  access-key-id: ${{secrets.OSS_ACCESSKEY_ID}}
+                  access-key-secret: ${{secrets.OSS_ACCESS_KEY_SECRET}}
+            - run: ossutil cp -rf dist oss://deepberry-io
