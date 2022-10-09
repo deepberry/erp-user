@@ -9,6 +9,11 @@ const routes = [
         component: index,
         children: [...indexRoutes],
     },
+    {
+        name: "login",
+        path: "/login",
+        component: () => import("@/views/login.vue"),
+    },
 ];
 
 const router = createRouter({

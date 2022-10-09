@@ -12,27 +12,27 @@ export default [
         son: [
             {
                 title: "作物种植",
-                path: "",
+                path: "/erp/plant",
             },
             {
                 title: "任务管理",
-                path: "",
+                path: "/erp/task",
             },
             {
                 title: "采购管理",
-                path: "",
+                path: "/erp/purchase",
             },
             {
                 title: "农资库存",
-                path: "",
+                path: "/erp/stock",
             },
             {
                 title: "申领工单",
-                path: "",
+                path: "/erp/workOrder",
             },
             {
                 title: "数据统计",
-                path: "",
+                path: "/erp/statisti",
             },
         ],
         show: false,
