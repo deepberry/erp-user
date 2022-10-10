@@ -43,11 +43,11 @@ export default [
         son: [
             {
                 title: "子账号",
-                path: "",
+                path: "/account/subAccount",
             },
             {
                 title: "角色权限",
-                path: "",
+                path: "/account/role",
             },
         ],
         show: false,

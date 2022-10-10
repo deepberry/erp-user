@@ -16,6 +16,18 @@ export default {
 <style lang="less">
 @import "@/assets/css/app.less";
 
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(184, 184, 184, 0.5);
+}
+*::-webkit-scrollbar-track {
+    background: rgba(226, 226, 226, 0.5);
+}
+
 // 自定义全局样式
 html,
 body,
@@ -27,5 +39,10 @@ body,
     background: #f6f7f8;
     font-size: 14px;
     font-family: "微软雅黑";
+}
+
+// 重置element-ui样式
+.el-badge__content.el-badge__content--danger.is-fixed {
+    transform: translateY(-50%) translateX(100%) scale(0.8);
 }
 </style>

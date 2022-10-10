@@ -11,8 +11,11 @@ import { createPinia } from "pinia";
 app.use(createPinia());
 
 import ElementPlus from "element-plus";
+import zhCn from "element-plus/es/locale/lang/zh-cn";
 import "element-plus/dist/index.css";
-app.use(ElementPlus);
+app.use(ElementPlus, {
+    locale: zhCn,
+});
 
 import TitanUI from "@deepberry/titan-web-components";
 app.use(TitanUI);

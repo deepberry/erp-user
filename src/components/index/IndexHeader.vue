@@ -25,7 +25,7 @@ export default {
     },
     methods: {
         logout() {
-            alert("退出登录");
+            this.$message.warning("已退出");
         },
     },
 };

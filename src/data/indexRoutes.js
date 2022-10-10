@@ -5,11 +5,6 @@ export default [
         component: () => import("../views/ied.vue"),
     },
     {
-        name: "my",
-        path: "/my",
-        component: () => import("../views/my.vue"),
-    },
-    {
         name: "erpPlant",
         path: "/erp/plant",
         component: () => import("../views/erp/plant.vue"),
@@ -38,5 +33,20 @@ export default [
         name: "erpStatisti",
         path: "/erp/statisti",
         component: () => import("../views/erp/statisti.vue"),
+    },
+    {
+        name: "accountSubAccount",
+        path: "/account/subAccount",
+        component: () => import("../views/account/subAccount.vue"),
+    },
+    {
+        name: "accountRole",
+        path: "/account/role",
+        component: () => import("../views/account/role.vue"),
+    },
+    {
+        name: "my",
+        path: "/my",
+        component: () => import("../views/my.vue"),
     },
 ];

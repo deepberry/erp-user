@@ -1,5 +1,5 @@
 <template>
-    <div class="ied">ied</div>
+    <div class="ied">智能设备</div>
 </template>
 
 <script>

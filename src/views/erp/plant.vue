@@ -1,5 +1,5 @@
 <template>
-    <div class="plant">plant</div>
+    <div class="plant">作物种植</div>
 </template>
 
 <script>

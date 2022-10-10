@@ -1,5 +1,5 @@
 <template>
-    <div class="statisti">statisti</div>
+    <div class="statisti">数据统计</div>
 </template>
 
 <script>
