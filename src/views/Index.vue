@@ -13,24 +13,22 @@
     </div>
 </template>
 
-<script>
+<script lang="js">
 import IndexHeader from "@/components/index/IndexHeader.vue";
 import IndexMenu from "@/components/index/IndexMenu.vue";
 export default {
     name: "Index",
-    data: function () {
-        return {};
-    },
     components: {
         IndexHeader,
         IndexMenu,
     },
-    computed: {},
-    watch: {},
-    methods: {},
-    created: function () {},
-    mounted: function () {},
-};
+    mounted (){
+        // 默认进入 智能设备 ied
+        if(this.$route.path == '/'){
+            this.$router.push('/ied');
+        }
+    }
+}
 </script>
 
 <style lang="less" scoped>

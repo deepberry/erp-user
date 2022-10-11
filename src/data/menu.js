@@ -34,6 +34,10 @@ export default [
                 title: "数据统计",
                 path: "/erp/statisti",
             },
+            {
+                title: "我的",
+                path: "/erp/my",
+            },
         ],
         show: false,
     },
@@ -50,14 +54,6 @@ export default [
                 path: "/account/role",
             },
         ],
-        show: false,
-    },
-
-    {
-        title: "我的",
-        icon: "erpwode",
-        son: [],
-        path: "/my",
         show: false,
     },
 ];

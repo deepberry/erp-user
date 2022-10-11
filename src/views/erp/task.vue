@@ -59,8 +59,8 @@
                     <div class="pages">
                         <span class="total">第 1 ~ 20 条 / 共 400 条</span>
                         <el-pagination
-                            v-model:currentPage="currentPage4"
-                            v-model:page-size="pageSize4"
+                            v-model:currentPage="currentPage"
+                            v-model:page-size="pageSize"
                             :page-sizes="[100, 200, 300, 400]"
                             background
                             layout="prev, pager, next, jumper, sizes"
@@ -81,9 +81,34 @@ export default {
             searchKey: "", // 搜索关键词
             searchLoading: false, // 搜索中状态,
             list: [], // 数据列表
+            currentPage: 1,
+            pageSize: 100,
         };
     },
-    mounted() {},
+    mounted() {
+        this.ajax
+            .post("/api/v1/adam/task/taskList", {
+                pageNum: 0,
+                pageSize: 0,
+                param: {
+                    endTime: "",
+                    executors: "",
+                    gardenId: 0,
+                    gardenTitle: "",
+                    growPlantId: 0,
+                    growPlants: [],
+                    id: 0,
+                    opinion: "",
+                    reWire: "",
+                    startTime: "",
+                    status: 0,
+                    taskContent: "",
+                },
+            })
+            .then((r) => {
+                console.log(r);
+            });
+    },
 };
 </script>
 

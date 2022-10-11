@@ -13,9 +13,14 @@
                 height: 59px;
                 padding: 0 20px;
                 line-height: 60px;
+                border-bottom: 2px solid transparent;
+                color: #6b6b6b;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            span.active {
                 border-bottom: 2px solid #1890ff;
                 color: #1890ff;
-                font-size: 16px;
             }
         }
         .ctrl {
@@ -68,23 +73,23 @@
                     align-items: center;
                     border-bottom: 1px dashed #e7e7e7;
                     p {
-                        text-indent: 20px;
+                        padding-left: 20px;
                         color: #5a5a5a;
                     }
                     p:nth-child(1) {
-                        width: 14%;
+                        width: 22%;
                     }
                     p:nth-child(2) {
                         width: 14%;
                     }
                     p:nth-child(3) {
-                        width: 10%;
+                        width: 8%;
                     }
                     p:nth-child(4) {
-                        width: 40%;
+                        width: 36%;
                     }
                     p:nth-child(5) {
-                        width: 10%;
+                        width: 8%;
                     }
                     p:nth-child(6) {
                         width: 12%;
@@ -94,6 +99,11 @@
                     max-height: 540px;
                     overflow-x: hidden;
                     overflow-y: auto;
+                    .nodata {
+                        padding: 50px 0;
+                        text-align: center;
+                        color: #a0a0a0;
+                    }
                     .item {
                         padding: 15px 0;
                         display: flex;
@@ -101,23 +111,25 @@
                         align-items: center;
                         border-bottom: 1px dashed #e7e7e7;
                         p {
-                            text-indent: 20px;
+                            padding-left: 20px;
                             color: #5a5a5a;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
                         }
                         p:nth-child(1) {
-                            width: 14%;
+                            width: 22%;
                         }
                         p:nth-child(2) {
                             width: 14%;
                         }
                         p:nth-child(3) {
-                            width: 10%;
+                            width: 8%;
                         }
                         p:nth-child(4) {
-                            width: 40%;
+                            width: 36%;
                         }
                         p:nth-child(5) {
-                            width: 10%;
+                            width: 8%;
                         }
                         p:nth-child(6) {
                             width: 12%;

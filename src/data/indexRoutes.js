@@ -35,6 +35,11 @@ export default [
         component: () => import("../views/erp/statisti.vue"),
     },
     {
+        name: "erpMy",
+        path: "/erp/my",
+        component: () => import("../views/erp/my.vue"),
+    },
+    {
         name: "accountSubAccount",
         path: "/account/subAccount",
         component: () => import("../views/account/subAccount.vue"),
@@ -43,10 +48,5 @@ export default [
         name: "accountRole",
         path: "/account/role",
         component: () => import("../views/account/role.vue"),
-    },
-    {
-        name: "my",
-        path: "/my",
-        component: () => import("../views/my.vue"),
     },
 ];

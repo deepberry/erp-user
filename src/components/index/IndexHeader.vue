@@ -5,8 +5,8 @@
         </div>
         <div class="userInfo">
             <p>
-                <a>{{ userName }}</a>
-                你好，{{ companyName }}
+                <a>{{ user.name }}</a>
+                你好，{{ user.orgzs[0].name }}
                 <i class="erp erp31xiala"></i>
             </p>
             <p class="logout" @click="logout">退出</p>
@@ -19,13 +19,38 @@ export default {
     name: "IndexHeader",
     data: function () {
         return {
-            userName: "张三",
-            companyName: "湖南xxx农业科技",
+            user: {
+                orgzs: [
+                    {
+                        name: "",
+                    },
+                ],
+            },
         };
     },
+    mounted() {
+        // 获取个人信息
+        let user = localStorage.getItem("erp_user");
+        if (user) {
+            this.user = JSON.parse(user);
+        } else {
+            this.ajax.post("/api/v1/adam/member/user-info").then((r) => {
+                this.user = r.data;
+                localStorage.setItem("erp_user", JSON.stringify(r.data));
+            });
+        }
+    },
     methods: {
+        // 退出登录
         logout() {
-            this.$message.warning("已退出");
+            // 清除缓存
+            localStorage.removeItem("erp_menu_current_index");
+            localStorage.removeItem("erp_menu_son_index");
+            localStorage.removeItem("erp_token");
+            localStorage.removeItem("erp_user");
+
+            // 跳转到登陆界面
+            this.$router.push("/login");
         },
     },
 };
