@@ -2,6 +2,32 @@
  * 全局变量
  */
 
+// 自定义样式
+*::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(184, 184, 184, 0.5);
+}
+*::-webkit-scrollbar-track {
+    background: rgba(226, 226, 226, 0.5);
+}
+
+// 自定义全局样式
+html,
+body,
+#app {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    background: #f6f7f8;
+    font-size: 14px;
+    font-family: "微软雅黑";
+}
+
 // 层级 layer
 @indexHeaderLayer: 999; // 全局顶部
 @indexMenuLayer: 999; // 全局菜单

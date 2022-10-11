@@ -18,6 +18,18 @@ export default [
         name: "erpPurchase",
         path: "/erp/purchase",
         component: () => import("../views/erp/purchase.vue"),
+        children: [
+            {
+                name: "erpPurchaseOrder",
+                path: "/erp/purchase/order",
+                component: () => import("../components/purchase/PurchaseOrder.vue"),
+            },
+            {
+                name: "erpPurchaseShop",
+                path: "/erp/purchase/shop",
+                component: () => import("../components/purchase/PurchaseShop.vue"),
+            },
+        ],
     },
     {
         name: "erpStock",

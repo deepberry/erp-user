@@ -19,7 +19,7 @@ export default [
                 path: "/erp/task",
             },
             {
-                title: "采购管理",
+                title: "农资采购",
                 path: "/erp/purchase",
             },
             {

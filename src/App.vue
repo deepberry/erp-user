@@ -7,42 +7,20 @@
     <router-view />
 </template>
 
-<script>
+<script lang="js">
 export default {
     name: "App",
-};
+}
 </script>
 
 <style lang="less">
+// 初始化样式
 @import "@/assets/css/app.less";
-
-*::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-*::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: rgba(184, 184, 184, 0.5);
-}
-*::-webkit-scrollbar-track {
-    background: rgba(226, 226, 226, 0.5);
-}
-
-// 自定义全局样式
-html,
-body,
-#app {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    overflow: hidden;
-    background: #f6f7f8;
-    font-size: 14px;
-    font-family: "微软雅黑";
-}
+@import "@/assets/css/global.less";
 
 // 重置element-ui样式
-.el-badge__content.el-badge__content--danger.is-fixed {
-    transform: translateY(-50%) translateX(100%) scale(0.8);
-}
+@import url("@/assets/css/elementui.less");
+
+// 农资采购-订单详情弹窗
+@import url("@/assets/css/purchase.order.less");
 </style>
