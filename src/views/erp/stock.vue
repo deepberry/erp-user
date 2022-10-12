@@ -2,36 +2,19 @@
     <div class="stock inner">
         <div class="box">
             <div class="head">
-                <span>农资库存</span>
-            </div>
-            <div class="ctrl">
-                <div class="search">
-                    <el-input
-                        v-model="searchKey"
-                        class="searchInput"
-                        placeholder="关键词搜索：农资类型、农资名称、厂家名称"
-                    ></el-input>
-                    <el-button type="primary" class="searchSubmit" :loading="searchLoading">查询</el-button>
-                    <el-select v-model="defaultClassify" class="searchSelect" placeholder="全部分类">
-                        <el-option label="全部分类" value="0" />
-                        <el-option label="分类一" value="1" />
-                        <el-option label="分类二" value="2" />
-                        <el-option label="分类三" value="3" />
-                    </el-select>
-                    <el-select v-model="defaultStatus" class="searchSelect" placeholder="全部显示">
-                        <el-option label="全部显示" value="0" />
-                        <el-option label="分类一" value="1" />
-                        <el-option label="分类二" value="2" />
-                        <el-option label="分类三" value="3" />
-                    </el-select>
+                <div class="head">
+                    <span
+                        @click="tabClick(index)"
+                        :class="activeTabIndex == index ? 'active' : ''"
+                        v-for="(item, index) in headTab"
+                        :key="item.title"
+                        >{{ item.title }}</span
+                    >
                 </div>
-                <div class="buttons">
-                    <el-button type="primary">批量入库</el-button>
-                    <el-button type="success">登记新农资</el-button>
-                    <el-button type="warning">出入库记录</el-button>
-                </div>
+                <router-view></router-view>
             </div>
-            <div class="tableWrap">
+
+            <!-- <div class="tableWrap">
                 <div class="table">
                     <div class="item tableHead">
                         <p>任务单号</p>
@@ -65,7 +48,7 @@
                         />
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -75,14 +58,19 @@ export default {
     name: "stock",
     data() {
         return {
-            searchKey: "", // 搜索关键词
-            searchLoading: false, // 搜索中状态,
-            list: [], // 数据列表
-            defaultClassify: "0",
-            defaultStatus: "0",
+            headTab: [
+                {
+                    title: "农资库存",
+                    path: "/erp/stock/list",
+                },
+            ],
+            activeTabIndex: 0,
         };
     },
-    mounted() {},
+    mounted() {
+        // 默认进入列表
+        this.$router.push(this.headTab[0].path);
+    },
     methods: {
         // 去采购
         gotoPurchase() {

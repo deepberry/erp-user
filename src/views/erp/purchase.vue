@@ -38,6 +38,13 @@ export default {
         if(this.$route.name == 'erpPurchase'){
             this.$router.push(this.headTab[0].path);
         }
+
+        // 菜单高亮
+        if(this.$route.name == 'erpPurchaseOrder'){
+            this.activeTabIndex = 0;
+        }else{
+            this.activeTabIndex = 1;
+        }
     },
     methods: {
         // 切换tab

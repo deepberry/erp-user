@@ -32,9 +32,21 @@ export default [
         ],
     },
     {
+        name: "erpPurchaseShopDetail",
+        path: "/erp/purchase/shop/detail",
+        component: () => import("../components/purchase/PurchaseShopDetail.vue"),
+    },
+    {
         name: "erpStock",
         path: "/erp/stock",
         component: () => import("../views/erp/stock.vue"),
+        children: [
+            {
+                name: "erpStockList",
+                path: "/erp/stock/list",
+                component: () => import("../components/stock/StockList.vue"),
+            },
+        ],
     },
     {
         name: "erpWorkOrder",
