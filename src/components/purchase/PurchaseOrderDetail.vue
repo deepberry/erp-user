@@ -10,31 +10,36 @@
         >
             <div v-loading="detailLoading" class="purchaseDetailBoxInner">
                 <div class="item">
-                    <p>订单号：ID124555454 - {{ id }}</p>
-                    <p>已完成</p>
+                    <p>订单号：{{ detail.orderUuid }}</p>
+                    <p>订单状态</p>
                 </div>
                 <div class="item">
-                    <p>提交人：张三</p>
-                    <p>提交时间：2022.09.24 12:45:21</p>
+                    <p>提交人：{{ detail.userName }}</p>
+                    <p>提交时间：{{ detail.orderTime }}</p>
                 </div>
-                <el-table :data="list" style="width: 100%">
-                    <el-table-column prop="id" label="农资名称" show-overflow-tooltip />
-                    <el-table-column prop="id" label="类型" show-overflow-tooltip />
-                    <el-table-column prop="id" label="规格" show-overflow-tooltip />
-                    <el-table-column prop="id" label="厂家" show-overflow-tooltip />
-                    <el-table-column prop="id" label="申领数量" show-overflow-tooltip />
-                    <el-table-column prop="id" label="参考单价" show-overflow-tooltip />
+                <el-table :data="detail.agriculturalCartBos" style="width: 100%; margin-top: 20px">
+                    <el-table-column prop="agriculturalBo.title" label="农资名称" show-overflow-tooltip />
+                    <el-table-column prop="agriculturalBo.agriculturalCategory" label="类型" show-overflow-tooltip />
+                    <el-table-column prop="id" label="规格" show-overflow-tooltip>
+                        <template #default="scope">
+                            ({{
+                                scope.row.agriculturalBo.unitweightid +
+                                scope.row.agriculturalBo.unitweight +
+                                "/" +
+                                scope.row.agriculturalBo.unitmeasurement
+                            }})
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="agriculturalBo.manufacturers" label="厂家" show-overflow-tooltip />
+                    <el-table-column prop="agriculturalBo.agriculturalCount" label="申领数量" show-overflow-tooltip />
+                    <el-table-column prop="agriculturalBo.agriculturalPrice" label="参考单价" show-overflow-tooltip />
                 </el-table>
                 <div class="bottom">
                     <div>合计：</div>
                     <div>
-                        <p>
-                            <span>化肥</span>
-                            <span>5000公斤</span>
-                        </p>
-                        <p>
-                            <span>化肥</span>
-                            <span>5000公斤</span>
+                        <p v-for="(item, index) in detail.totalCount" :key="index">
+                            <span>{{ item.title }}</span>
+                            <span>{{ item.agriculturalCos }}{{ item.unitweight }}</span>
                         </p>
                         <p>
                             <span>总价</span>
@@ -48,12 +53,12 @@
 </template>
 
 <script>
+import timer from "@/utils/timer.js";
 export default {
     name: "purchaseOrderDetail",
     props: ["id"],
     data() {
         return {
-            list: [],
             showDetailBox: true, // 是否显示详情弹窗
             detail: {}, // 详情数据,
             detailLoading: false, // 详情数据加载状态
@@ -67,6 +72,8 @@ export default {
             })
             .then((r) => {
                 console.log(r);
+                r.data.orderTime = timer.time("y-m-d h:i:s", r.data.orderTime);
+                this.detail = r.data;
                 this.detailLoading = false;
             });
     },

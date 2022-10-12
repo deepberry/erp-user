@@ -29,9 +29,21 @@
             <div class="table">
                 <el-table :data="list" style="width: 100%" size="large" max-height="600px">
                     <el-table-column prop="orderUuid" label="订单号" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="orderStatus" label="农资名称" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="orderStatus" label="农资类型"></el-table-column>
-                    <el-table-column prop="orderStatus" label="数量" width="180"></el-table-column>
+                    <el-table-column label="农资名称" show-overflow-tooltip>
+                        <template #default="scope">
+                            <span v-for="(item, index) in scope.row.titles" :key="index">{{ item }} <br /></span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="农资类型">
+                        <template #default="scope">
+                            <span v-for="(item, index) in scope.row.types" :key="index">{{ item }} <br /></span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="数量" width="180">
+                        <template #default="scope">
+                            <span v-for="(item, index) in scope.row.counts" :key="index">{{ item }} <br /></span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="orderStatus" label="状态" width="180">
                         <template #default="scope">
                             <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span>
@@ -133,6 +145,14 @@ export default {
                         }
                         item.orderStatus = status;
                         item.orderStatusColor = color;
+                        item.titles = [];
+                        item.types = [];
+                        item.counts = [];
+                        item.totalCount.map(t => {
+                            item.titles.push(t.title);
+                            item.types.push(t.title);
+                            item.counts.push(t.title);
+                        })
                         return item;
                     })
                     this.currentPage = r.pageNum;

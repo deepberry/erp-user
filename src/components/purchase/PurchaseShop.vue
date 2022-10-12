@@ -1,40 +1,37 @@
 <template>
-    <div class="purchaseOrder">
+    <div class="purchaseOrder" v-loading="loading">
         <div class="ctrl">
-            <div class="status">
-                <el-button
-                    @click="selectClick(item.value)"
-                    v-for="item in status"
-                    :key="item.value"
-                    class="statusItem"
-                    :type="currentStatus == item.value ? 'primary' : ''"
-                    link
-                    >{{ item.title }}</el-button
-                >
-            </div>
             <div class="search">
-                <el-input
-                    v-model="searchKey"
-                    class="searchInput"
-                    placeholder="关键词搜索：农资类型、农资名称、厂家名称"
-                ></el-input>
-                <el-button type="primary" class="searchSubmit" @click="search">查询</el-button>
-                <el-button type="primary" class="searchSubmit" @click="gotoPurchase">去采购</el-button>
-                <el-button type="primary" class="searchCreateNewTask" plain
-                    ><i class="erp erpgouwuche"></i> 购物车</el-button
-                >
+                <div>
+                    <el-input
+                        v-model="searchKey"
+                        class="searchInput"
+                        placeholder="关键词搜索：农资类型、农资名称、厂家名称"
+                    ></el-input>
+                    <el-button type="primary" class="searchSubmit" @click="search">查询</el-button>
+                </div>
+                <div>
+                    <el-button @click="showCar" type="primary" class="searchCreateNewTask" plain
+                        ><i class="erp erpgouwuche"></i> 购物车</el-button
+                    >
+                </div>
             </div>
         </div>
         <div class="tableWrap">
             <div class="table">
                 <el-table :data="list" style="width: 100%" size="large" max-height="600px">
-                    <el-table-column prop="orderUuid" label="订单号" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="orderStatus" label="农资名称" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="orderStatus" label="农资类型"></el-table-column>
-                    <el-table-column prop="orderStatus" label="数量" width="180"></el-table-column>
-                    <el-table-column prop="orderStatus" label="状态" width="180">
+                    <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="agriculturalCategory" label="农资类型"></el-table-column>
+                    <el-table-column label="规格">
                         <template #default="scope">
-                            <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span>
+                            {{ scope.row.agriculturalCount + scope.row.unitweight + "/" + scope.row.unitmeasurement }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="manufacturers" label="厂家" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="agriculturalCount" label="数量"></el-table-column>
+                    <el-table-column label="参考单价">
+                        <template #default="scope">
+                            <span style="color: rgba(224, 29, 29, 1)">￥{{ scope.row.agriculturalPrice }}元</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="180">
@@ -56,86 +53,26 @@
                 </div>
             </div>
         </div>
-
-        <!-- 详情弹窗 -->
-        <el-dialog
-            custom-class="purchaseDetailBox"
-            append-to-body
-            v-model="showDetailBox"
-            title="订单详情"
-            width="700px"
-        >
-            <div v-loading="detailLoading" class="purchaseDetailBoxInner">
-                <div class="item">
-                    <p>订单号：ID124555454</p>
-                    <p>已完成</p>
-                </div>
-                <div class="item">
-                    <p>提交人：张三</p>
-                    <p>提交时间：2022.09.24 12:45:21</p>
-                </div>
-                <el-table :data="list" style="width: 100%">
-                    <el-table-column prop="id" label="农资名称" show-overflow-tooltip />
-                    <el-table-column prop="id" label="类型" show-overflow-tooltip />
-                    <el-table-column prop="id" label="规格" show-overflow-tooltip />
-                    <el-table-column prop="id" label="厂家" show-overflow-tooltip />
-                    <el-table-column prop="id" label="申领数量" show-overflow-tooltip />
-                    <el-table-column prop="id" label="参考单价" show-overflow-tooltip />
-                </el-table>
-                <div class="bottom">
-                    <div>合计：</div>
-                    <div>
-                        <p>
-                            <span>化肥</span>
-                            <span>5000公斤</span>
-                        </p>
-                        <p>
-                            <span>化肥</span>
-                            <span>5000公斤</span>
-                        </p>
-                        <p>
-                            <span>总价</span>
-                            <span>￥100.00元</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </el-dialog>
+        <PurchaseCar v-if="showCarBox" @closeCarBox="closeCarBox"></PurchaseCar>
     </div>
 </template>
 
 <script lang="js">
+import PurchaseCar from '@/components/purchase/PurchaseCar.vue';
 export default {
     name: 'purchaseOrder',
+    components: {
+        PurchaseCar
+    },
     data (){
         return {
+            loading: false,
             searchKey: "", // 搜索关键词
-            status: [
-                {
-                    title: '全部',
-                    value: ''
-                },
-                {
-                    title: '已提交',
-                    value: '0'
-                },
-                {
-                    title: '已完成',
-                    value: '1'
-                },
-                {
-                    title: '已关闭',
-                    value: '2'
-                },
-            ],
-            currentStatus: '', // 当前选定的状态
             list: [], // 数据列表
             currentPage: 0,
             pageSize: 0,
             total: 0,
-            showDetailBox: false, // 是否显示详情弹窗
-            detail: {}, // 详情数据,
-            detailLoading: false, // 详情数据加载状态
+            showCarBox: false,
         }
     },
     mounted() {
@@ -147,12 +84,12 @@ export default {
         getData (k){
             k = this.searchKey || '';
             return new Promise ((resolve, reject) => {
-                this.ajax.post('/api/v1/adam/agricultural/order-list', {
+                this.ajax.post('/api/v1/adam/agricultural/platform-list', {
                     "pageNum": 0,
                     "pageSize": 0,
                     "param": {
                         "keyWord": k,
-                        "orderStatus": this.currentStatus
+                        "orderStatus": 0
                     }
                 }).then(r => {
                     console.log(r)
@@ -186,18 +123,19 @@ export default {
         },
         // 按条件筛选
         selectClick (status){
-            this.currentStatus = status;
             this.loading = true;
             this.getData().then(() => this.loading = false);
         },
-        // 查看详情
-        viewDetail (id){
-            this.showDetailBox = true;
-            this.detailLoading = true;
-            this.ajax.post('/api/v1/adam/agricultural/orderDetail', { id }).then(r => {
-                console.log(r)
-                this.detailLoading = false;
-            })
+        // 打开购物车
+        showCar (id){
+            this.showCarBox = true;
+        },
+        // 关闭购物车
+        closeCarBox (){
+            let timer = setTimeout(() => {
+                this.showCarBox = false;
+                clearTimeout(timer);
+            }, 500);
         }
     }
 }
@@ -220,8 +158,9 @@ export default {
         }
     }
     .search {
+        width: 100%;
         display: flex;
-        justify-content: flex-end;
+        justify-content: space-between;
         align-items: center;
         .searchInput {
             width: 360px;
