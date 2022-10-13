@@ -34,15 +34,16 @@
         <div class="tableWrap">
             <div class="table">
                 <el-table :data="list" style="width: 100%" size="large" max-height="600px">
-                    <el-table-column prop="orderStatus" label="农资名称" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="orderStatus" label="类型"></el-table-column>
-                    <el-table-column prop="orderStatus" label="生产厂家" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
+                    <el-table-column prop="type" label="类型"></el-table-column>
+                    <el-table-column prop="company" label="生产厂家" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="orderStatus" label="规格">
                         <template #default="scope">
-                            <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span>
+                            <!-- <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span> -->
+                            <span>{{ scope.row.unit }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="orderStatus" label="库存"></el-table-column>
+                    <el-table-column prop="num" label="库存"></el-table-column>
                     <el-table-column label="操作" width="260">
                         <template #default="scope">
                             <el-button link type="primary" @click="viewDetail(scope.row.id)">明细</el-button>
@@ -102,7 +103,31 @@ export default {
                     }
                 }).then(r => {
                     console.log(r)
-                    this.list = r.data;
+                    // this.list = r.data;
+                    // mock 数据
+                    this.list = [
+                        {
+                            title: '哈哈哈复合肥',
+                            type: '化肥',
+                            company: '上海xxxxx化肥厂',
+                            unit: '50kg/袋',
+                            num: 100
+                        },
+                        {
+                            title: '哈哈哈复合肥',
+                            type: '化肥',
+                            company: '上海xxxxx化肥厂',
+                            unit: '50kg/袋',
+                            num: 100
+                        },
+                        {
+                            title: '哈哈哈复合肥',
+                            type: '化肥',
+                            company: '上海xxxxx化肥厂',
+                            unit: '50kg/袋',
+                            num: 100
+                        },
+                    ]
                     this.currentPage = r.pageNum;
                     this.pageSize = r.pageSize;
                     this.total = r.total;
