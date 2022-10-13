@@ -21,7 +21,7 @@
                     <el-table-column label="规格" width="100">
                         <template #default="scope">
                             ({{
-                                scope.row.agriculturalBo.unitweightid +
+                                scope.row.agriculturalBo.agriculturalCount +
                                 scope.row.agriculturalBo.unitweight +
                                 "/" +
                                 scope.row.agriculturalBo.unitmeasurement

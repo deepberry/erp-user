@@ -8,17 +8,21 @@
                     placeholder="关键词搜索：农资类型、农资名称、厂家名称"
                 ></el-input>
                 <el-button type="primary" class="searchSubmit">查询</el-button>
-                <el-select v-model="defaultClassify" class="searchSelect" placeholder="全部分类">
+                <el-select
+                    v-model="defaultClassify"
+                    class="searchSelect"
+                    @change="selectByClassify"
+                    placeholder="全部分类"
+                >
                     <el-option label="全部分类" value="0" />
                     <el-option label="分类一" value="1" />
                     <el-option label="分类二" value="2" />
                     <el-option label="分类三" value="3" />
                 </el-select>
-                <el-select v-model="defaultStatus" class="searchSelect" placeholder="全部显示">
-                    <el-option label="全部显示" value="0" />
-                    <el-option label="分类一" value="1" />
-                    <el-option label="分类二" value="2" />
-                    <el-option label="分类三" value="3" />
+                <el-select v-model="defaultStatus" class="searchSelect" @change="selectByStatus" placeholder="全部显示">
+                    <el-option label="全部显示" value="-1" />
+                    <el-option label="无库存" value="1" />
+                    <el-option label="有库存" value="2" />
                 </el-select>
             </div>
             <div class="buttons">
@@ -73,50 +77,32 @@ export default {
             searchLoading: false, // 搜索中状态,
             list: [], // 数据列表
             defaultClassify: "0",
-            defaultStatus: "0",
+            defaultStatus: "-1",
             currentPage: 0,
             pageSize: 0,
             total: 2,
         }
     },
     mounted() {
-        // this.loading = true;
-        // this.getData().then(() => this.loading = false);
+        this.loading = true;
+        this.getData().then(() => this.loading = false);
     },
     methods: {
         // 获取数据列表
         getData (k){
             k = this.searchKey || '';
             return new Promise ((resolve, reject) => {
-                this.ajax.post('/api/v1/adam/agricultural/order-list', {
+                this.ajax.post('/api/v1/adam/farmLand/agriculturalSearch-list', {
                     "pageNum": 0,
                     "pageSize": 0,
                     "param": {
-                        "keyWord": k,
-                        "orderStatus": this.currentStatus
+                        "categoryId": 0,
+                        "inventory": this.defaultStatus,
+                        "keyWord": ""
                     }
                 }).then(r => {
                     console.log(r)
-                    this.list = r.data.map(item => {
-                        let status = '';
-                        let color = '';
-                        switch (item.orderStatus) {
-                            case 0: status = '已提交'; color = '#1890FF'; break;
-                            case 1: status = '已完成'; color = '#0DD71C'; break;
-                            case 2: status = '已关闭'; color = '#A8A8A8'; break;
-                        }
-                        item.orderStatus = status;
-                        item.orderStatusColor = color;
-                        item.titles = [];
-                        item.types = [];
-                        item.counts = [];
-                        item.totalCount.map(t => {
-                            item.titles.push(t.title);
-                            item.types.push(t.title);
-                            item.counts.push(t.title);
-                        })
-                        return item;
-                    })
+                    this.list = r.data;
                     this.currentPage = r.pageNum;
                     this.pageSize = r.pageSize;
                     this.total = r.total;
@@ -124,18 +110,20 @@ export default {
                 })
             })
         },
-        // 去采购
-        gotoPurchase() {
-            this.$message.success("跳转到采购链接。。。");
-        },
         // 查询
         search (){
             this.loading = true;
             this.getData(this.searchKey).then(() => this.loading = false);
         },
-        // 按条件筛选
-        selectClick (status){
-            this.currentStatus = status;
+        // 按库存状态筛选
+        selectByStatus (data){
+            this.defaultStatus = data;
+            this.loading = true;
+            this.getData().then(() => this.loading = false);
+        },
+        // 按分类筛选
+        selectByClassify (data){
+            this.defaultClassify = data;
             this.loading = true;
             this.getData().then(() => this.loading = false);
         },

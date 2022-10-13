@@ -23,7 +23,7 @@
                     <el-table-column prop="id" label="规格" show-overflow-tooltip>
                         <template #default="scope">
                             ({{
-                                scope.row.agriculturalBo.unitweightid +
+                                scope.row.agriculturalBo.agriculturalCount +
                                 scope.row.agriculturalBo.unitweight +
                                 "/" +
                                 scope.row.agriculturalBo.unitmeasurement

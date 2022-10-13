@@ -3,7 +3,6 @@
  */
 
 import { ElMessage } from "element-plus";
-import { MessageBox } from "element-plus";
 
 const HOST = "https://erp.deepberry.cn";
 const ajax = {};
@@ -18,17 +17,11 @@ const callback = (xhr, reslove, reject) => {
                 if (!data.data.message) {
                     reslove(data);
                 } else {
-                    ElMessage({
-                        type: "error",
-                        message: data.data.message,
-                    });
+                    ElMessage.error(data.data.message);
                     reject(data);
                 }
             } else {
-                ElMessage({
-                    type: "error",
-                    message: data.message,
-                });
+                ElMessage.error(data.message);
                 reject(data);
             }
         }
@@ -36,7 +29,7 @@ const callback = (xhr, reslove, reject) => {
 
     // 错误处理
     xhr.onerror = () => {
-        MessageBox({
+        ElMessage({
             title: "System Error: #500",
             message: "网络错误，请联系管理员！错误代码：500",
             type: "error",
@@ -65,10 +58,6 @@ ajax.post = (url, data) => {
         let xhr = new XMLHttpRequest();
 
         // 处理参数
-        // let form = new FormData();
-        // Object.keys(data).map(item => {
-        //     form.append(item, data[item]);
-        // })
         let form = JSON.stringify(data);
 
         xhr.open("POST", `${HOST}${url}`, true);
