@@ -27,7 +27,7 @@
             </div>
             <div class="buttons">
                 <el-button type="primary">批量入库</el-button>
-                <el-button type="success">登记新农资</el-button>
+                <el-button type="success" @click="showReg = true">登记新农资</el-button>
                 <el-button type="warning">出入库记录</el-button>
             </div>
         </div>
@@ -47,8 +47,8 @@
                     <el-table-column label="操作" width="260">
                         <template #default="scope">
                             <el-button link type="primary" @click="viewDetail(scope.row.id)">明细</el-button>
-                            <el-button link type="primary" @click="viewDetail(scope.row.id)">入库</el-button>
-                            <el-button link type="primary" @click="viewDetail(scope.row.id)">出库</el-button>
+                            <el-button link type="primary" @click="stock(true, scope.row.id)">入库</el-button>
+                            <el-button link type="primary" @click="stock(false, scope.row.id)">出库</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -65,12 +65,19 @@
                 </div>
             </div>
         </div>
+        <StockDetail v-if="showDetailBox" @closeDetailBox="closeDetailBox"></StockDetail>
+        <StockReg v-if="showReg" @closeReg="closeReg"></StockReg>
     </div>
 </template>
 
 <script lang="js">
+import StockDetail from '@/components/stock/StockDetail.vue';
+import StockReg from '@/components/stock/StockReg.vue';
 export default {
     name: 'purchaseOrder',
+    components: {
+        StockDetail, StockReg
+    },
     data (){
         return {
             loading: false,
@@ -82,6 +89,8 @@ export default {
             currentPage: 0,
             pageSize: 0,
             total: 2,
+            showDetailBox: false, // 是否显示库存明细弹窗
+            showReg: false, // 是否显示登记新农资的弹窗
         }
     },
     mounted() {
@@ -157,11 +166,22 @@ export default {
             this.showDetailBox = true;
             this.currentDetailId = id;
         },
+        // 出入库
+        stock (put, id){
+            this.$router.push(`/erp/stock/${put ? 'put' : 'out'}`);
+        },
         // 关闭详情
         closeDetailBox (){
             let timer = setTimeout(() => {
                 this.showDetailBox = false;
                 this.currentDetailId = '';
+                clearTimeout(timer);
+            }, 500);
+        },
+        // 关闭登记新农资的弹窗
+        closeReg (){
+            let timer = setTimeout(() => {
+                this.showReg = false;
                 clearTimeout(timer);
             }, 500);
         },

@@ -49,6 +49,16 @@ export default [
         ],
     },
     {
+        name: "erpStockOut",
+        path: "/erp/stock/out",
+        component: () => import("../components/stock/StockOut.vue"),
+    },
+    {
+        name: "erpStockPut",
+        path: "/erp/stock/put",
+        component: () => import("../components/stock/StockPut.vue"),
+    },
+    {
         name: "erpWorkOrder",
         path: "/erp/workOrder",
         component: () => import("../views/erp/workOrder.vue"),
