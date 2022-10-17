@@ -20,7 +20,4 @@ export default {
 
 // 重置element-ui样式
 @import url("@/assets/css/elementui.less");
-
-// 农资采购-订单详情弹窗
-@import url("@/assets/css/purchase.order.less");
 </style>

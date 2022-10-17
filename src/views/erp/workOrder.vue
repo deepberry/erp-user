@@ -41,8 +41,8 @@
                         <el-table-column prop="user" label="申领人"></el-table-column>
                         <el-table-column label="操作" width="260">
                             <template #default="scope">
-                                <el-button link type="primary" @click="viewDetail(scope.row.id)">查看详情</el-button>
-                                <el-button link type="primary" @click="stock(false, scope.row.id)">一键出库</el-button>
+                                <el-button link type="primary" @click="showDetail(scope.row.id)">查看详情</el-button>
+                                <el-button link type="primary" @click="out(scope.row.id)">一键出库</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -60,10 +60,13 @@
                 </div>
             </div>
         </div>
+        <WorkOrderDetail v-if="showDetailBox" @onCloseDetail="onCloseDetail"></WorkOrderDetail>
     </div>
 </template>
 
 <script>
+import { ElMessage, ElMessageBox } from "element-plus";
+import WorkOrderDetail from "@/components/workOrder/WorkOrderDetail.vue";
 export default {
     name: "workOrder",
     data() {
@@ -137,9 +140,52 @@ export default {
             currentPage: 1,
             pageSize: 100,
             total: 4,
+            showDetailBox: false, // 是否显示详情弹窗
         };
     },
+    components: {
+        WorkOrderDetail,
+    },
     mounted() {},
+    methods: {
+        // 打开详情
+        showDetail(id) {
+            console.log(this.showDetailBox);
+            this.showDetailBox = true;
+        },
+        // 关闭详情
+        onCloseDetail() {
+            let timer = setTimeout(() => {
+                this.showDetailBox = false;
+                clearTimeout(timer);
+            }, 500);
+        },
+        // 出库
+        out(id) {
+            ElMessageBox.confirm(
+                "农资名称：史丹利复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、百草枯2号 <br> 确定要出库吗？",
+                "一键出库",
+                {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning",
+                    dangerouslyUseHTMLString: true,
+                }
+            )
+                .then(() => {
+                    ElMessage({
+                        type: "success",
+                        message: "Delete completed",
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: "info",
+                        message: "Delete canceled",
+                    });
+                });
+        },
+    },
 };
 </script>
 
