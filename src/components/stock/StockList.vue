@@ -26,9 +26,9 @@
                 </el-select>
             </div>
             <div class="buttons">
-                <el-button type="primary">批量入库</el-button>
+                <el-button type="primary" @click="showBatch = true">批量入库</el-button>
                 <el-button type="success" @click="showReg = true">登记新农资</el-button>
-                <el-button type="warning">出入库记录</el-button>
+                <el-button type="warning" @click="gotoRecord">出入库记录</el-button>
             </div>
         </div>
         <div class="tableWrap">
@@ -67,16 +67,18 @@
         </div>
         <StockDetail v-if="showDetailBox" @closeDetailBox="closeDetailBox"></StockDetail>
         <StockReg v-if="showReg" @closeReg="closeReg"></StockReg>
+        <StockPutBatch v-if="showBatch" @closeBatch="closeBatch"> </StockPutBatch>
     </div>
 </template>
 
 <script lang="js">
 import StockDetail from '@/components/stock/StockDetail.vue';
 import StockReg from '@/components/stock/StockReg.vue';
+import StockPutBatch from '@/components/stock/StockPutBatch.vue';
 export default {
     name: 'purchaseOrder',
     components: {
-        StockDetail, StockReg
+        StockDetail, StockReg, StockPutBatch
     },
     data (){
         return {
@@ -86,11 +88,12 @@ export default {
             list: [], // 数据列表
             defaultClassify: "0",
             defaultStatus: "-1",
-            currentPage: 0,
-            pageSize: 0,
+            currentPage: 1,
+            pageSize: 10,
             total: 2,
             showDetailBox: false, // 是否显示库存明细弹窗
             showReg: false, // 是否显示登记新农资的弹窗
+            showBatch: false, // 是否显示批量入库的弹窗
         }
     },
     mounted() {
@@ -195,6 +198,17 @@ export default {
                 this.showCarBox = false;
                 clearTimeout(timer);
             }, 500);
+        },
+        // 关闭批量入库
+        closeBatch (){
+            let timer = setTimeout(() => {
+                this.showBatch = false;
+                clearTimeout(timer);
+            }, 500);
+        },
+        // gotoRecord
+        gotoRecord (){
+            this.$router.push('/erp/stock/record');
         }
     }
 }

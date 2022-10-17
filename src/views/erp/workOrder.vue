@@ -6,20 +6,16 @@
             </div>
             <div class="ctrl">
                 <div class="status">
-                    <el-badge class="statusItem" :value="12">
-                        <el-button type="primary" link>全部</el-button>
-                    </el-badge>
-                    <el-badge class="statusItem" :value="0">
-                        <el-button link>待执行</el-button>
-                    </el-badge>
-                    <el-badge class="statusItem" :value="12">
-                        <el-button link>待检查</el-button>
-                    </el-badge>
-                    <el-badge class="statusItem" :value="12">
-                        <el-button link>合格</el-button>
-                    </el-badge>
-                    <el-badge class="statusItem" :value="12">
-                        <el-button link>不合格</el-button>
+                    <el-badge
+                        class="statusItem"
+                        :value="item.sup > 0 ? item.sup : ''"
+                        @click="selectClick(item.value)"
+                        v-for="item in status"
+                        :key="item.value"
+                    >
+                        <el-button :type="currentStatus == item.value ? 'primary' : ''" link>{{
+                            item.title
+                        }}</el-button>
                     </el-badge>
                 </div>
                 <div class="search">
@@ -36,35 +32,29 @@
             </div>
             <div class="tableWrap">
                 <div class="table">
-                    <div class="item tableHead">
-                        <p>任务单号</p>
-                        <p>所属棚区</p>
-                        <p>执行人</p>
-                        <p>任务内容</p>
-                        <p>状态</p>
-                        <p>操作</p>
-                    </div>
-                    <div class="list">
-                        <div class="item" v-for="item in 20" :key="item">
-                            <p>ID124555454</p>
-                            <p>张三棚区-蓝莓-B区</p>
-                            <p>张三</p>
-                            <p>任务内容任务内容任务内容任务内容任务内容任务内容任务内容任务内容</p>
-                            <p>待执行</p>
-                            <p>
-                                <el-button type="primary" link>查看详情</el-button>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="pages">
-                        <span class="total">第 1 ~ 20 条 / 共 400 条</span>
+                    <el-table :data="list" style="width: 100%" size="large" max-height="600px">
+                        <el-table-column prop="id" label="工单号" show-overflow-tooltip></el-table-column>
+                        <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
+                        <el-table-column prop="type" label="农资类型"></el-table-column>
+                        <el-table-column prop="num" label="数量"></el-table-column>
+                        <el-table-column prop="status" label="状态"></el-table-column>
+                        <el-table-column prop="user" label="申领人"></el-table-column>
+                        <el-table-column label="操作" width="260">
+                            <template #default="scope">
+                                <el-button link type="primary" @click="viewDetail(scope.row.id)">查看详情</el-button>
+                                <el-button link type="primary" @click="stock(false, scope.row.id)">一键出库</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <div class="pages" v-if="list.length > 0">
+                        <span class="total">共 {{ total }} 条</span>
                         <el-pagination
-                            v-model:currentPage="currentPage4"
-                            v-model:page-size="pageSize4"
+                            v-model:currentPage="currentPage"
+                            v-model:page-size="pageSize"
                             :page-sizes="[100, 200, 300, 400]"
                             background
-                            layout="prev, pager, next, jumper, sizes"
-                            :total="400"
+                            layout="prev, pager, next, jumper"
+                            :total="total"
                         />
                     </div>
                 </div>
@@ -78,9 +68,75 @@ export default {
     name: "workOrder",
     data() {
         return {
+            status: [
+                // 状态列表
+                {
+                    title: "全部",
+                    value: "",
+                    sup: 10,
+                },
+                {
+                    title: "待审核",
+                    value: "0",
+                    sup: 0,
+                },
+                {
+                    title: "已通过",
+                    value: "1",
+                    sup: 0,
+                },
+                {
+                    title: "不通过",
+                    value: "2",
+                    sup: 0,
+                },
+                {
+                    title: "已出库",
+                    value: "2",
+                    sup: 0,
+                },
+            ],
+            currentStatus: "", // 当前选定的状态
             searchKey: "", // 搜索关键词
             searchLoading: false, // 搜索中状态,
-            list: [], // 数据列表
+            list: [
+                // 数据列表
+                {
+                    id: "1477125",
+                    title: "硝酸铵复合肥",
+                    type: "化肥",
+                    num: 100,
+                    status: "已出库",
+                    user: "Mins",
+                },
+                {
+                    id: "1477125",
+                    title: "硝酸铵复合肥",
+                    type: "化肥",
+                    num: 100,
+                    status: "已出库",
+                    user: "Mins",
+                },
+                {
+                    id: "1477125",
+                    title: "硝酸铵复合肥",
+                    type: "化肥",
+                    num: 100,
+                    status: "已出库",
+                    user: "Mins",
+                },
+                {
+                    id: "1477125",
+                    title: "硝酸铵复合肥",
+                    type: "化肥",
+                    num: 100,
+                    status: "已出库",
+                    user: "Mins",
+                },
+            ],
+            currentPage: 1,
+            pageSize: 100,
+            total: 4,
         };
     },
     mounted() {},
