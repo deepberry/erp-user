@@ -1,10 +1,17 @@
 <template>
-    <div class="purchase inner">
+    <div class="stock inner">
         <div class="box">
             <div class="head">
-                <span class="active">产量统计</span>
-                <span>出入库统计</span>
-                <span>工时统计</span>
+                <div class="head">
+                    <span
+                        @click="tabClick(index)"
+                        :class="activeTabIndex == index ? 'active' : ''"
+                        v-for="(item, index) in headTab"
+                        :key="item.title"
+                        >{{ item.title }}</span
+                    >
+                </div>
+                <router-view></router-view>
             </div>
         </div>
     </div>
@@ -12,21 +19,46 @@
 
 <script>
 export default {
-    name: "statisti",
+    name: "stock",
     data() {
         return {
-            searchKey: "", // 搜索关键词
-            searchLoading: false, // 搜索中状态,
-            list: [], // 数据列表
-            currentPage: 1,
-            pageSize: 200,
+            headTab: [
+                {
+                    title: "产量统计",
+                    path: "/erp/statisti/product",
+                },
+                {
+                    title: "出入库统计",
+                    path: "/erp/statisti/stock",
+                },
+                {
+                    title: "工时统计",
+                    path: "/erp/statisti/work",
+                },
+            ],
+            activeTabIndex: 0,
         };
     },
-    mounted() {},
-    methods: {},
+    mounted() {
+        // 默认进入列表
+        this.$router.push(this.headTab[0].path);
+    },
+    methods: {
+        // 去采购
+        gotoPurchase() {
+            this.$message.success("跳转到采购链接。。。");
+        },
+        tabClick(index) {
+            this.activeTabIndex = index;
+            this.$router.push(this.headTab[index].path);
+        },
+    },
 };
 </script>
 
 <style lang="less" scoped>
 @import url("@/assets/css/inner.less");
+.inner .box .ctrl .search .searchInput {
+    width: 320px;
+}
 </style>

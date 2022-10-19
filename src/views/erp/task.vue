@@ -2,7 +2,7 @@
     <div class="task inner">
         <div class="box">
             <div class="head">
-                <span>任务列表</span>
+                <span class="active">任务列表</span>
             </div>
             <div class="ctrl">
                 <div class="status">
@@ -136,7 +136,7 @@ export default {
             pageSize: 100,
             total: 4,
             showDetailBox: false, // 是否显示详情弹窗
-            showCreateBox: true,
+            showCreateBox: false,
         };
     },
     components: {

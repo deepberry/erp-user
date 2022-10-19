@@ -72,11 +72,55 @@ export default [
         name: "erpStatisti",
         path: "/erp/statisti",
         component: () => import("../views/erp/statisti.vue"),
+        children: [
+            {
+                name: "erpStatistiProduct",
+                path: "/erp/statisti/product",
+                component: () => import("../components/statisti/StatistiProduct.vue"),
+            },
+            {
+                name: "erpStatistiStock",
+                path: "/erp/statisti/stock",
+                component: () => import("../components/statisti/StatistiStock.vue"),
+            },
+            {
+                name: "erpStatistiWork",
+                path: "/erp/statisti/work",
+                component: () => import("../components/statisti/StatistiWork.vue"),
+            },
+        ],
     },
     {
         name: "erpMy",
         path: "/erp/my",
         component: () => import("../views/erp/my.vue"),
+        children: [
+            {
+                name: "erpMyProduct",
+                path: "/erp/my/product",
+                component: () => import("../components/my/MyProduct.vue"),
+            },
+            {
+                name: "erpMyWork",
+                path: "/erp/my/work",
+                component: () => import("../components/my/MyWork.vue"),
+            },
+        ],
+    },
+    {
+        name: "erpMyStartGet",
+        path: "/erp/my/get",
+        component: () => import("../components/my/MyStartGet.vue"),
+    },
+    {
+        name: "erpMyGetRecord",
+        path: "/erp/my/record",
+        component: () => import("../components/my/MyGetRecord.vue"),
+    },
+    {
+        name: "erpMyWorkTime",
+        path: "/erp/my/work",
+        component: () => import("../components/my/MyWorkTime.vue"),
     },
     {
         name: "accountSubAccount",

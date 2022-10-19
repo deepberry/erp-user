@@ -120,3 +120,7 @@ export default {
     },
 };
 </script>
+
+<style lang="less" scoped>
+@import url("@/assets/css/purchase.order.less");
+</style>

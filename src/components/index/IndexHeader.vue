@@ -44,8 +44,8 @@ export default {
         // 退出登录
         logout() {
             // 清除缓存
-            localStorage.removeItem("erp_menu_current_index");
-            localStorage.removeItem("erp_menu_son_index");
+            sessionStorage.removeItem("erp_menu_current_index");
+            sessionStorage.removeItem("erp_menu_son_index");
             localStorage.removeItem("erp_token");
             localStorage.removeItem("erp_user");
 

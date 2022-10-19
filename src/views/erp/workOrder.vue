@@ -25,9 +25,6 @@
                         placeholder="关键词搜索：农资类型、农资名称..."
                     ></el-input>
                     <el-button type="primary" class="searchSubmit" :loading="searchLoading">查询</el-button>
-                    <el-button type="primary" class="searchCreateNewTask"
-                        ><i class="erp erpjiufuqianbaoicon06"></i> 创建任务</el-button
-                    >
                 </div>
             </div>
             <div class="tableWrap">

@@ -44,9 +44,9 @@ export default {
     },
     mounted() {
         // 刷新时菜单高亮
-        this.activeMenuIndex = localStorage.getItem("erp_menu_current_index") || 0;
+        this.activeMenuIndex = sessionStorage.getItem("erp_menu_current_index") || 0;
         this.menu[this.activeMenuIndex].show = true;
-        this.activeMenuIndexSon = localStorage.getItem("erp_menu_son_index") || 0;
+        this.activeMenuIndexSon = sessionStorage.getItem("erp_menu_son_index") || 0;
     },
     methods: {
         // 点击菜单标题，展开子菜单
@@ -61,8 +61,8 @@ export default {
                 this.activeMenuIndex = index;
                 this.activeMenuIndexSon = 0;
                 this.$router.push(item.path);
-                localStorage.setItem("erp_menu_current_index", index);
-                localStorage.setItem("erp_menu_son_index", 0);
+                sessionStorage.setItem("erp_menu_current_index", index);
+                sessionStorage.setItem("erp_menu_son_index", 0);
             }
         },
         // 点击子菜单选项
@@ -70,8 +70,8 @@ export default {
             // 菜单高亮
             this.activeMenuIndex = index;
             this.activeMenuIndexSon = indexSon;
-            localStorage.setItem("erp_menu_current_index", index);
-            localStorage.setItem("erp_menu_son_index", indexSon);
+            sessionStorage.setItem("erp_menu_current_index", index);
+            sessionStorage.setItem("erp_menu_son_index", indexSon);
 
             // 跳转到指定路由
             let path = this.menu[index].son[indexSon].path;
