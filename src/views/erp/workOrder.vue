@@ -2,7 +2,7 @@
     <div class="workOrder inner">
         <div class="box">
             <div class="head">
-                <span>工单列表</span>
+                <span class="active">工单列表</span>
             </div>
             <div class="ctrl">
                 <div class="status">

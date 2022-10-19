@@ -1,0 +1,211 @@
+<template>
+    <div class="taskDetail purchaseDetailBox">
+        <el-dialog
+            custom-class="taskDetail purchaseDetailBox"
+            :before-close="onClose"
+            append-to-body
+            v-model="showDetailBox"
+            title="工单详情"
+            width="700px"
+        >
+            <div v-loading="detailLoading" class="taskDetailInner purchaseDetailBoxInner">
+                <div class="id wrap">任务单号：22222222</div>
+                <div class="create wrap">
+                    <div>任务创建</div>
+                    <div>
+                        <p>创建人：Mins</p>
+                        <p>创建时间：2022.10.19 14:33:01</p>
+                    </div>
+                    <div>任务内容</div>
+                    <div class="taskContent">
+                        <div>
+                            <p>园区：A区B棚</p>
+                            <p>作物：蓝莓</p>
+                        </div>
+                        <div>
+                            <p>内容：修枝</p>
+                            <div>
+                                <p>操作视频：</p>
+                                <img src="../../assets/img/ds.png" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div>指定执行人：张三</div>
+                    <div>开始时间：2022.10.19 14:35:01</div>
+                    <div>截止时间：2022.10.19 14:35:01</div>
+                </div>
+                <div class="todo wrap">
+                    <div>任务执行</div>
+                    <div>执行提交时间：2022.10.19 14:35:01</div>
+                    <div>执行提交人：张三</div>
+                    <div class="todoContent">
+                        <div>
+                            <p class="a">施肥</p>
+                            <p>2022.10.19</p>
+                        </div>
+                        <div style="display: block">
+                            <p>这次是施肥</p>
+                            <p>这次是施肥</p>
+                            <p>这次是施肥</p>
+                        </div>
+                        <div>
+                            <p class="b">复合肥-5号 500公斤</p>
+                            <p>张三</p>
+                        </div>
+                    </div>
+                </div>
+                <el-button
+                    @click="showTextArea = true"
+                    v-if="!showTextArea"
+                    type="primary"
+                    link
+                    style="margin-top: 20px"
+                >
+                    <i class="erp erptianxie" style="margin-right: 5px; font-size: 12px"></i> 填写检查意见</el-button
+                >
+                <div class="form wrap" v-if="showTextArea">
+                    <div>填写检查意见</div>
+                    <div>
+                        <div>
+                            是否合格：
+                            <el-radio-group v-model="isPass" class="ml-4">
+                                <el-radio label="1">合格</el-radio>
+                                <el-radio label="0">不合格</el-radio>
+                            </el-radio-group>
+                        </div>
+                    </div>
+                    <div class="formTextarea">
+                        <p>意见建议：</p>
+                        <el-input v-model="textarea" :rows="5" type="textarea" placeholder="输入检查意见" />
+                    </div>
+                </div>
+                <div class="btns" v-if="showTextArea">
+                    <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
+                    <el-button type="primary">确定</el-button>
+                </div>
+            </div>
+        </el-dialog>
+    </div>
+</template>
+
+<script>
+export default {
+    name: "taskDetail",
+    props: ["id"],
+    data() {
+        return {
+            detailLoading: false,
+            showDetailBox: true, // 是否显示详情弹窗
+            detail: "",
+            showTextArea: false,
+            textarea: "",
+            isPass: "1",
+        };
+    },
+    mounted() {},
+    methods: {
+        onClose() {
+            this.$emit("onCloseDetail", 0);
+            this.showDetailBox = false;
+        },
+    },
+};
+</script>
+
+<style lang="less" scoped>
+@import url("@/assets/css/inner.less");
+@import url("@/assets/css/purchase.order.less");
+.taskDetailInner {
+    position: relative;
+    top: -10px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.09);
+    .wrap {
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+        > div {
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            p {
+                width: 50%;
+                text-align: left;
+            }
+        }
+    }
+    .create {
+        .taskContent {
+            background: rgba(244, 248, 251, 1);
+            padding: 8px;
+            display: block;
+            > div {
+                padding: 8px 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                > div {
+                    width: 50%;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: flex-start;
+                    p {
+                        width: auto;
+                    }
+                    img {
+                        width: 200px;
+                        margin-left: 10px;
+                        border-radius: 10px;
+                    }
+                }
+            }
+        }
+    }
+    .id {
+        padding-top: 0px;
+    }
+    .todo {
+        .todoContent {
+            display: block;
+            padding: 8px;
+            background: rgba(244, 248, 251, 1);
+            > div {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: 5px 0;
+                p {
+                    width: auto;
+                    color: rgba(166, 166, 166, 1);
+                }
+                p.a {
+                    color: rgba(80, 80, 80, 1);
+                }
+                p.b {
+                    color: rgba(232, 161, 69, 1);
+                }
+            }
+        }
+    }
+    .form {
+        > div {
+            padding: 5px 0;
+        }
+        .formTextarea {
+            margin-top: 5px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            p {
+                width: 85px;
+            }
+        }
+    }
+    .btns {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 20px;
+    }
+}
+</style>
