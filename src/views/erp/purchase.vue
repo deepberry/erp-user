@@ -40,7 +40,7 @@ export default {
         }
 
         // 菜单高亮
-        if(this.$route.name == 'erpPurchaseOrder'){
+        if(this.$route.name == 'erpPurchaseOrder' || this.$route.name == 'erpPurchase'){
             this.activeTabIndex = 0;
         }else{
             this.activeTabIndex = 1;

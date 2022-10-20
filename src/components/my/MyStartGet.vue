@@ -83,7 +83,7 @@ export default {
     methods: {
         // 返回列表
         back() {
-            this.$router.push("/erp/stock");
+            this.$router.push("/erp/my/product");
         },
     },
 }

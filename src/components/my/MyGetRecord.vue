@@ -9,7 +9,7 @@
                     ></i>
                     返回</el-button
                 >
-                <span style="position: relative; top: 2px; font-size: 15px">农资入库</span>
+                <span style="position: relative; top: 2px; font-size: 15px">申领记录</span>
             </div>
             <div class="content">
                 <div class="item">
@@ -83,7 +83,7 @@ export default {
     methods: {
         // 返回列表
         back() {
-            this.$router.push("/erp/stock");
+            this.$router.push("/erp/my/product");
         },
     },
 }
