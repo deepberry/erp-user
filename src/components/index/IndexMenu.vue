@@ -67,6 +67,10 @@ export default {
         },
         // 点击子菜单选项
         itemSonClick(index, indexSon) {
+            if (this.activeMenuIndex == index && this.activeMenuIndexSon == indexSon) {
+                return;
+            }
+
             // 菜单高亮
             this.activeMenuIndex = index;
             this.activeMenuIndexSon = indexSon;

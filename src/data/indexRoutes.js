@@ -8,6 +8,13 @@ export default [
         name: "erpPlant",
         path: "/erp/plant",
         component: () => import("../views/erp/plant.vue"),
+        children: [
+            {
+                name: "erpPlantList",
+                path: "/erp/plant/list",
+                component: () => import("../components/plant/PlantList.vue"),
+            },
+        ],
     },
     {
         name: "erpTask",
@@ -119,7 +126,7 @@ export default [
     },
     {
         name: "erpMyWorkTime",
-        path: "/erp/my/work",
+        path: "/erp/my/workTime",
         component: () => import("../components/my/MyWorkTime.vue"),
     },
     {

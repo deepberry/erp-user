@@ -36,8 +36,17 @@ export default {
         };
     },
     mounted() {
-        // 默认进入列表
-        this.$router.push(this.headTab[0].path);
+        // 默认进入订单列表
+        if (this.$route.name == "erpMy") {
+            this.$router.push(this.headTab[0].path);
+        }
+
+        // 菜单高亮
+        if (this.$route.name == "erpMy" || this.$route.name == "erpMyProduct") {
+            this.activeTabIndex = 0;
+        } else {
+            this.activeTabIndex = 1;
+        }
     },
     methods: {
         tabClick(index) {

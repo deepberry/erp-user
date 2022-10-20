@@ -6,7 +6,7 @@
                 <el-button type="primary" style="margin-left: 10px">查询</el-button>
             </div>
             <div>
-                <el-button type="success" style="margin-left: 10px" @click="$router.push('/erp/my/work')"
+                <el-button type="success" style="margin-left: 10px" @click="$router.push('/erp/my/workTime')"
                     >工时统计</el-button
                 >
             </div>
