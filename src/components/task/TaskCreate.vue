@@ -11,20 +11,35 @@
             <div v-loading="detailLoading" class="taskDetailInner purchaseDetailBoxInner">
                 <div class="item">
                     <p class="title">园区：</p>
-                    <el-select v-model="value" style="width: 650px" class="m-2" placeholder="请选择园区">
-                        <el-option label="item.label" value="item.value" />
-                        <el-option label="item.label" value="item.value" />
-                        <el-option label="item.label" value="item.value" />
-                        <el-option label="item.label" value="item.value" />
+                    <el-select v-model="selectedGarden" style="width: 650px" class="m-2" placeholder="请选择园区">
+                        <el-option
+                            v-for="(item, gardenIndex) in gardenList"
+                            :key="gardenIndex"
+                            :label="item.title"
+                            :value="item.id"
+                        />
                     </el-select>
                 </div>
                 <div class="item">
                     <p class="title">作物：</p>
-                    <el-input v-model="input" style="width: 650px" placeholder="请输入作物" />
+                    <!-- <el-select
+                        style="width: 650px"
+                        v-model="crop"
+                        multiple
+                        filterable
+                        remote
+                        reserve-keyword
+                        placeholder="请输入作物"
+                        :remote-method="searchCrop"
+                        :loading="searchCropLoading"
+                    >
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select> -->
+                    <el-input v-model="crop" style="width: 650px" placeholder="请输入作物" />
                 </div>
                 <div class="item">
                     <p class="title">具体内容：</p>
-                    <el-input v-model="input" style="width: 650px" placeholder="请输入内容" />
+                    <el-input v-model="taskContent" style="width: 650px" placeholder="请输入内容" />
                 </div>
                 <div class="item">
                     <p class="title">操作指导：</p>
@@ -41,32 +56,20 @@
                 </div>
                 <div class="item">
                     <p class="title">执行人：</p>
-                    <el-input v-model="input" style="width: 650px" placeholder="请输入内容" />
+                    <el-input v-model="user" style="width: 650px" placeholder="请输入执行人，多个以顿号分隔" />
                 </div>
                 <div class="item">
                     <p class="title">开始时间：</p>
-                    <el-date-picker
-                        style="width: 650px"
-                        v-model="value1"
-                        type="date"
-                        placeholder="请选择开始时间"
-                        :size="size"
-                    />
+                    <el-date-picker style="width: 650px" v-model="startTime" type="date" placeholder="请选择开始时间" />
                 </div>
                 <div class="item">
                     <p class="title">截止时间：</p>
-                    <el-date-picker
-                        style="width: 650px"
-                        v-model="value1"
-                        type="date"
-                        placeholder="请选择截止时间"
-                        :size="size"
-                    />
+                    <el-date-picker style="width: 650px" v-model="endTime" type="date" placeholder="请选择截止时间" />
                 </div>
             </div>
             <div class="btns">
                 <el-button plain>取消</el-button>
-                <el-button type="primary">确定</el-button>
+                <el-button type="primary" @click="submit">确定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -84,13 +87,70 @@ export default {
             showTextArea: false,
             textarea: "",
             isPass: "1",
+            selectedGarden: "", // 当前选择的园区
+            gardenList: [], // 园区列表
+            crop: "", // 作物
+            taskContent: "", // 任务内容
+            user: "",
+            startTime: "",
+            endTime: "",
+            searchCropLoading: false, // 作物搜索中
+            cropList: [], // 作物列表
         };
     },
-    mounted() {},
+    mounted() {
+        this.getGardenList();
+    },
     methods: {
+        // 获取园区列表
+        getGardenList() {
+            this.ajax
+                .post("/api/v1/adam/garden/list", {
+                    pageNum: 1,
+                    pageSize: 100,
+                    param: {},
+                })
+                .then((r) => {
+                    this.gardenList = r.data;
+                });
+        },
         onClose() {
             this.$emit("onCloseDetail", 0);
             this.showDetailBox = false;
+        },
+        // 搜索作物
+        searchCrop() {},
+        // 提交表单
+        submit() {
+            console.log(this.selectedGarden);
+
+            let gardenTitle = "";
+            this.gardenList.map((item) => {
+                if (item.id == this.selectedGarden) {
+                    gardenTitle = item.title;
+                }
+            });
+
+            let executors = this.user.split("、");
+
+            this.ajax
+                .post("/api/v1/adam/task/createTask", {
+                    endTime: this.endTime,
+                    executors: JSON.stringify(executors),
+                    gardenId: this.selectedGarden,
+                    gardenTitle: gardenTitle,
+                    growPlants: [],
+                    opinion: "11",
+                    reWire: "11",
+                    startTime: this.startTime,
+                    taskContent: this.taskContent,
+                })
+                .then((r) => {
+                    if (r.code == 200 && r.data == true) {
+                        this.$emit("onCloseDetail", 0);
+                        this.showDetailBox = false;
+                    }
+                });
         },
     },
 };

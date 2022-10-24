@@ -9,7 +9,7 @@
                     <el-badge
                         class="statusItem"
                         :value="item.sup > 0 ? item.sup : ''"
-                        @click="selectClick(item.value)"
+                        @click="statusClick(item.value)"
                         v-for="item in status"
                         :key="item.value"
                     >
@@ -32,7 +32,7 @@
             </div>
             <div class="tableWrap">
                 <div class="table">
-                    <el-table :data="list" style="width: 100%" size="large" max-height="600px">
+                    <el-table :data="list" style="width: 100%" size="large" max-height="600px" v-loading="loading">
                         <el-table-column prop="id" label="任务单号" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="title" label="所属棚区" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="type" label="执行人"></el-table-column>
@@ -74,8 +74,8 @@ export default {
                 // 状态列表
                 {
                     title: "全部",
-                    value: "",
-                    sup: 10,
+                    value: "-1",
+                    sup: 0,
                 },
                 {
                     title: "待执行",
@@ -94,46 +94,17 @@ export default {
                 },
                 {
                     title: "不合格",
-                    value: "2",
+                    value: "3",
                     sup: 0,
                 },
             ],
-            currentStatus: "", // 当前选定的状态
+            loading: false,
+            currentStatus: "-1", // 当前选定的状态
             searchKey: "", // 搜索关键词
             searchLoading: false, // 搜索中状态,
-            list: [
-                // 数据列表
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-            ],
+            list: [],
             currentPage: 1,
-            pageSize: 100,
+            pageSize: 20,
             total: 4,
             showDetailBox: false, // 是否显示详情弹窗
             showCreateBox: false,
@@ -143,8 +114,35 @@ export default {
         TaskDetail,
         TaskCreate,
     },
-    mounted() {},
+    mounted() {
+        this.getData();
+    },
     methods: {
+        // 切换状态
+        statusClick(v) {
+            if (this.currentStatus == v) return;
+            this.currentStatus = v;
+            this.getData();
+        },
+        // 获取数据
+        getData() {
+            this.loading = true;
+            this.ajax
+                .post("/api/v1/adam/task/taskList", {
+                    pageNum: 0,
+                    pageSize: 0,
+                    param: {
+                        gardenId: 0,
+                        growPlantId: 0,
+                        status: this.currentStatus,
+                    },
+                })
+                .then((r) => {
+                    console.log(r);
+                    this.list = r.data;
+                    this.loading = false;
+                });
+        },
         // 打开详情
         showDetail(id) {
             console.log(this.showDetailBox);
@@ -157,9 +155,11 @@ export default {
                 clearTimeout(timer);
             }, 500);
         },
+        // 创建任务弹窗关闭时
         onCloseCreate() {
             let timer = setTimeout(() => {
                 this.showCreateBox = false;
+                this.getData();
                 clearTimeout(timer);
             }, 500);
         },

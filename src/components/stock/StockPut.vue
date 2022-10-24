@@ -11,49 +11,69 @@
                 >
                 <span style="position: relative; top: 2px; font-size: 15px">农资入库</span>
             </div>
-            <div class="content">
-                <div class="item">
+            <div class="content" v-loading="loading">
+                <div class="item" v-for="(item, index) in list" :key="index">
                     <div class="info">
                         <p>
-                            <span>硝酸复合肥</span>
-                            <span class="tag">化肥</span>
+                            <span>{{ item.agriculturalBo.title }}</span>
+                            <span class="tag">{{ item.agriculturalBo.agriculturalCategory }}</span>
                         </p>
-                        <p>内蒙古xx化肥有限公司</p>
-                        <p>规格：50公斤/袋</p>
+                        <p>{{ item.agriculturalBo.manufacturers }}</p>
+                        <p>
+                            规格：{{ item.agriculturalBo.agriculturalCount }}{{ item.agriculturalBo.unitweight }}/{{
+                                item.agriculturalBo.unitmeasurement
+                            }}
+                        </p>
                     </div>
                     <div class="info">
-                        <p>库存：20袋 (共1000公斤)</p>
                         <p>
-                            <span>出库数量：</span>
-                            <el-input size="small" style="width: 70px; margin-right: 10px" v-model="input" />
-                            <span>公斤</span>
+                            库存：{{ item.agriculturalUnit }}{{ item.agriculturalBo.unitmeasurement }} (共{{
+                                item.agriculturalCount
+                            }}{{ item.agriculturalBo.unitweight }})
                         </p>
                         <p>
-                            <el-button size="small" type="primary">
+                            <span>入库数量：</span>
+                            <el-input size="small" style="width: 70px; margin-right: 10px" v-model="num" />
+                            <span>{{ item.agriculturalBo.unitweight }}</span>
+                        </p>
+                        <p v-if="index == 0">
+                            <el-button size="small" type="primary" @click="showReg = true">
                                 <i style="font-size: 12px; margin-right: 5px" class="erp erpicon_tianjia"></i> 添加
                             </el-button>
                         </p>
                     </div>
                 </div>
                 <div class="item log">
-                    <p><span class="must">*</span> 出库类型：领用出库</p>
-                    <p><span class="must">*</span> 出库时间：2022年10月14日 15:02:11</p>
-                    <p><span class="must">*</span> 领取人：法外狂徒张三</p>
+                    <p>
+                        <span class="must">*</span> 入库类型：
+                        <el-select v-model="defaultType" class="m-2" style="width: 220px" placeholder="请选择入库类型">
+                            <el-option v-for="item in typeList" :key="item.id" :label="item.title" :value="item.id" />
+                        </el-select>
+                    </p>
+                    <p>
+                        <span class="must">*</span> 入库时间：
+                        <el-date-picker v-model="outInTime" type="datetime" placeholder="请选择时间" />
+                    </p>
+                    <p>
+                        <span class="must">*</span> 操作人：<el-input
+                            style="width: 220px; margin-left: 17px"
+                            v-model="userName"
+                            placeholder="请输入操作人"
+                        />
+                    </p>
                 </div>
                 <div class="item">
                     <p class="title"><span class="must">*</span> 单据、凭证、照片：</p>
                     <div class="pics">
-                        <div class="img">
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <i class="erp erpguanbi"></i>
+                        <div class="img" v-for="(item, imgIndex) in imgs" :key="imgIndex">
+                            <img :src="item" alt="" />
+                            <i class="erp erpguanbi" @click="removeImg(imgIndex)"></i>
                         </div>
-                        <div class="img">
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <i class="erp erpguanbi"></i>
-                        </div>
-                        <div class="upload">
-                            <p><i class="erp erpshangchuan"></i></p>
-                            <p>点击上传单据、凭证、照片</p>
+                        <div class="upload" v-if="imgs.length < 2">
+                            <input v-if="!uploading" @change="uploadFile" ref="file" type="file" />
+                            <p v-if="!uploading"><i class="erp erpshangchuan"></i></p>
+                            <p v-if="!uploading">点击上传单据、凭证、照片</p>
+                            <el-progress v-if="uploading" width="90" type="circle" :percentage="percentage" />
                         </div>
                     </div>
                 </div>
@@ -62,29 +82,141 @@
                     <el-input v-model="note" :rows="5" type="textarea" placeholder="输入备注内容" />
                 </div>
                 <div class="item">
-                    <el-button type="primary">提交</el-button>
+                    <el-button type="primary" @click="submit">提交</el-button>
                 </div>
             </div>
         </div>
+        <StockReg v-if="showReg" default="1" @closeReg="closeReg"></StockReg>
     </div>
 </template>
 
 <script lang="js">
-import timer from "@/utils/timer.js";
+import StockReg from '@/components/stock/StockReg.vue';
 export default {
     name: "stockPut",
-    props: ["id"],
     data() {
         return {
-            note: ''
+            loading: false,
+            list: [],
+            defaultType: '',
+            typeList: [], // 入库类型
+            userName: '',
+            num: '', // 出库数量
+            outInTime: '',
+            note: '',
+            showReg: false,
+            uploading: false,
+            imgs: [],
+            percentage: 0, // 上传进度
         }
     },
-    mounted() {},
+    components: {
+        StockReg
+    },
+    mounted() {
+        // 获取详情数据
+        this.loading = true;
+        this.ajax.post('/api/v1/adam/farmLand/agricultural-detail', {
+            id: this.$route.query.id
+        }).then(r => {
+            this.list.push(r.data);
+            this.loading = false;
+        })
+        this.getPutTypeList();
+    },
     methods: {
+        // 获取入库类型
+        getPutTypeList (){
+            this.ajax.post('/api/v1/adam/farmLand/getStorageType').then(r => {
+                console.log(r)
+                this.typeList = r.data;
+            })
+        },
         // 返回列表
         back() {
             this.$router.push("/erp/stock");
         },
+        // 关闭登记新农资的弹窗
+        closeReg (){
+            let timer = setTimeout(() => {
+                this.showReg = false;
+                clearTimeout(timer);
+            }, 500);
+        },
+        // 上传图片
+        uploadFile (){
+            this.uploading = true;
+            let file = this.$refs.file.files[0];
+            this.ajax.upload('/api/v1/adam/upload', {
+                file
+            }, (num) => {
+                this.percentage = parseInt(num);
+            }).then(r => {
+                this.imgs.push(r.data.imageUrl);
+                this.uploading = false;
+                this.percentage = 0;
+            })
+        },
+        // 移除图片
+        removeImg (index){
+            console.log(index)
+            this.imgs.splice(index, 1);
+        },
+        // 提交入库
+        submit (){
+            // 处理参数
+            if(!this.num){
+                this.$message.warning('请输入入库数量');
+                return;
+            }
+            if(!this.type){
+                this.$message.warning('请选择入库类型');
+                return;
+            }
+            if(!this.outInTime){
+                this.$message.warning('请选择入库时间');
+                return;
+            }
+            if(!this.userName){
+                this.$message.warning('请输入操作人');
+                return;
+            }
+            if(!this.image){
+                this.$message.warning('请上传凭证');
+                return;
+            }
+            let workTypeName = '';
+            this.typeList.map(item => {
+                if(item.id == this.defaultType){
+                    workTypeName = item.title;
+                }
+            })
+            this.ajax.post('/api/v1/adam/farmLand/saveAgriculturalStorage', {
+                agriculturalOutInBos: [
+                    {
+                        agriculturalCount: this.num,
+                        id: this.list[0].agriculturalBo.id
+                    }
+                ],
+                image: this.imgs.join(','),
+                outInTime: this.outInTime,
+                remark: this.note,
+                type: 0,
+                username: this.userName,
+                workType: this.defaultType,
+                workTypeName: workTypeName
+            }).then(r => {
+                if(r.code == 200){
+                    this.$message.success('入库成功！');
+                    let t = setTimeout(() => {
+                        this.$router.push("/erp/stock");
+                        clearTimeout(t);
+                    }, 800)
+                }else{
+                    this.$message.error('操作失败，请联系管理员！');
+                }
+            })
+        }
     },
 }
 </script>
@@ -167,6 +299,7 @@ export default {
                 font-size: 12px;
                 color: rgba(107, 145, 242, 1);
                 cursor: pointer;
+                position: relative;
                 p {
                     width: 100%;
                     text-align: center;
@@ -174,6 +307,21 @@ export default {
                     i {
                         font-size: 22px;
                     }
+                }
+                input {
+                    width: 180px;
+                    height: 100px;
+                    background: rgba(0, 0, 0, 0.5);
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    cursor: pointer;
+                    opacity: 0;
+                }
+                .el-progress--circle {
+                    position: absolute;
+                    top: 5px;
+                    z-index: 10;
                 }
             }
         }

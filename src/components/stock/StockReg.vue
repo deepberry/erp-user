@@ -83,7 +83,7 @@
                     />
                     <el-button style="margin-left: 10px" type="primary" plain>查询</el-button>
                 </div>
-                <el-table :data="tableData" style="width: 100%">
+                <el-table :data="tableData" style="width: 100%" v-loading="loading">
                     <el-table-column type="selection" width="55" />
                     <el-table-column prop="title" label="农资名称" />
                     <el-table-column prop="type" label="农资类型" width="150" />
@@ -101,8 +101,10 @@
 <script lang="js">
 export default {
     name: 'stockReg',
+    props: ['default'],
     data (){
         return {
+            loading: false,
             showDetailBox: true,
             showInput: false,
             showImport: false,
@@ -114,26 +116,12 @@ export default {
         }
     },
     mounted (){
-        this.tableData = [
-            {
-                title: '哈哈哈复合肥',
-                type: '化肥',
-                company: '嫩蒙古黄河大合唱化肥厂',
-                unit: '50kg/包'
-            },
-            {
-                title: '哈哈哈复合肥',
-                type: '化肥',
-                company: '嫩蒙古黄河大合唱化肥厂',
-                unit: '50kg/包'
-            },
-            {
-                title: '哈哈哈复合肥',
-                type: '化肥',
-                company: '嫩蒙古黄河大合唱化肥厂',
-                unit: '50kg/包'
-            },
-        ]
+        if(this.default == 0){
+            this.input();
+        }
+        if(this.default == 1){
+            this._import();
+        }
     },
     methods: {
         onClose (){
@@ -151,6 +139,11 @@ export default {
             this.showDetailBox = false;
             this.showInput = false;
             this.showImport = true;
+            this.loading = true;
+            this.ajax.post('/api/v1/adam/farmLand/agriculturalSearch-list', {}).then(r => {
+                this.loading = false;
+                this.tableData = r.data;
+            })
         }
     }
 }

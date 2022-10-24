@@ -8,13 +8,19 @@
             title="库存明细"
             width="600px"
         >
-            <div class="stockDetailBoxInner">
+            <div class="stockDetailBoxInner" v-loading="loading">
                 <div class="head">
-                    <p>硝酸复合肥</p>
-                    <p>20袋 (共1000公斤)</p>
-                    <p><span>化肥</span></p>
-                    <p>内蒙古xx化肥有限公司</p>
-                    <p>(50公斤/袋)</p>
+                    <p>{{ detail.agriculturalBo.title }}</p>
+                    <p>{{ detail.agriculturalUnit }}袋 (共{{ detail.agriculturalCount }}公斤)</p>
+                    <p>
+                        <span>{{ detail.agriculturalBo.agriculturalCategory }}</span>
+                    </p>
+                    <p>{{ detail.agriculturalBo.manufacturers }}</p>
+                    <p>
+                        ({{ detail.agriculturalBo.agriculturalCount }}{{ detail.agriculturalBo.unitweight }}/{{
+                            detail.agriculturalBo.unitmeasurement
+                        }})
+                    </p>
                 </div>
                 <div class="card">
                     <div>
@@ -43,13 +49,31 @@
 
 <script lang="js">
 export default {
+    props: ['id'],
     name: 'stockDetail',
     data (){
         return {
+            loading: false,
+            detail: {
+                agriculturalBo: {}
+            },
             showDetailBox: true
         }
     },
+    mounted (){
+        this.getDetail();
+    },
     methods: {
+        // 获取详情数据
+        getDetail (){
+            this.loading = true;
+            this.ajax.post('/api/v1/adam/farmLand/agricultural-detail', {
+                id: this.id
+            }).then(r => {
+                this.detail = r.data;
+                this.loading = false;
+            })
+        },
         onClose (){
             this.$emit("closeDetailBox", 0);
             this.showDetailBox = false;

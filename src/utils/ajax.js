@@ -2,8 +2,6 @@
  * ajax 封装
  */
 
-import { ElMessage } from "element-plus";
-
 const HOST = "https://erp.deepberry.cn";
 const ajax = {};
 
@@ -13,32 +11,21 @@ const callback = (xhr, reslove, reject) => {
     xhr.onreadystatechange = () => {
         if (xhr.status == 200 && xhr.readyState == 4) {
             let data = JSON.parse(xhr.response);
-            if (data.code == 200) {
-                if (!data.data.message) {
-                    reslove(data);
-                } else {
-                    ElMessage.error(data.data.message);
-                    reject(data);
-                }
-            } else {
-                ElMessage.error(data.message);
-                reject(data);
-            }
+            // if (data.code == 200) {
+            //     if (!data.data.message) {
+            //         reslove(data);
+            //     } else {
+            //         reject(data);
+            //     }
+            // } else {
+            //     reject(data);
+            // }
+            reslove(data);
         }
     };
 
     // 错误处理
-    xhr.onerror = () => {
-        ElMessage({
-            title: "System Error: #500",
-            message: "网络错误，请联系管理员！错误代码：500",
-            type: "error",
-            closeOnPressEscape: false,
-            closeOnClickModal: false,
-            showClose: false,
-            confirmButtonClass: "el-button--danger",
-        });
-    };
+    xhr.onerror = () => {};
 };
 
 // get请求
