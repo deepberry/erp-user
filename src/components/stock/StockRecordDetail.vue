@@ -10,34 +10,41 @@
         >
             <div v-loading="detailLoading" class="stockRecordDetailInner">
                 <div>
-                    <p>硝酸复合肥</p>
-                    <p class="add">+1000公斤</p>
+                    <p>{{ detail.agriculturalBo.title }}</p>
+                    <p :class="detail.type == 0 ? 'add' : 'minus'">
+                        {{ detail.type == 0 ? "+" : "-" }}{{ detail.agriculturalCount
+                        }}{{ detail.agriculturalBo.unitweight }}
+                    </p>
                 </div>
                 <div>
                     <p>
-                        <span class="tag">化肥</span>
+                        <span class="tag">{{ detail.agriculturalBo.agriculturalCategory }}</span>
                     </p>
                     <p></p>
                 </div>
                 <div class="item">
-                    <p>内蒙古xxx肥料有限公司</p>
-                    <p class="unit">规格：50公斤/袋</p>
+                    <p>{{ detail.agriculturalBo.manufacturers }}</p>
+                    <p class="unit">
+                        规格：{{ detail.agriculturalBo.agriculturalCount }}{{ detail.agriculturalBo.unitweight }}/{{
+                            detail.agriculturalBo.unitmeasurement
+                        }}
+                    </p>
                 </div>
                 <div class="item">
                     <p>出入库类型：</p>
-                    <p>已领用退回</p>
+                    <p>{{ detail.workTypeName }}</p>
                 </div>
                 <div class="item">
                     <p>出入库时间：</p>
-                    <p>2022.10.17</p>
+                    <p>{{ detail.outInTime }}</p>
                 </div>
                 <div class="item">
                     <p>操作时间：</p>
-                    <p>2022.10.17 14:40</p>
+                    <p>{{ detail.workTime }}</p>
                 </div>
                 <div class="item">
                     <p>操作人：</p>
-                    <p>张三</p>
+                    <p>{{ detail.username }}</p>
                 </div>
             </div>
         </el-dialog>
@@ -50,10 +57,25 @@ export default {
     props: ["id"],
     data() {
         return {
+            detailLoading: false,
             showDetailBox: true, // 是否显示详情弹窗
+            detail: {
+                agriculturalBo: {},
+            },
         };
     },
-    mounted() {},
+    mounted() {
+        // 获取数据
+        this.detailLoading = true;
+        this.ajax
+            .post("/api/v1/adam/farmLand/outStorage-detail", {
+                id: this.id,
+            })
+            .then((r) => {
+                this.detail = r.data;
+                this.detailLoading = false;
+            });
+    },
     methods: {
         onClose() {
             this.$emit("close", 0);
@@ -81,7 +103,7 @@ export default {
         p.add {
             color: rgba(61, 201, 71, 1);
         }
-        p.miuns {
+        p.minus {
             color: rgba(243, 95, 95, 1);
         }
         span {
