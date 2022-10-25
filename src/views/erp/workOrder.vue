@@ -24,12 +24,12 @@
                         class="searchInput"
                         placeholder="关键词搜索：农资类型、农资名称..."
                     ></el-input>
-                    <el-button type="primary" class="searchSubmit" :loading="searchLoading">查询</el-button>
+                    <el-button type="primary" class="searchSubmit" @click="getData">查询</el-button>
                 </div>
             </div>
             <div class="tableWrap">
                 <div class="table">
-                    <el-table :data="list" style="width: 100%" size="large" max-height="600px">
+                    <el-table :data="list" v-loading="loading" style="width: 100%" size="large" max-height="600px">
                         <el-table-column prop="id" label="工单号" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="type" label="农资类型"></el-table-column>
@@ -47,8 +47,6 @@
                         <span class="total">共 {{ total }} 条</span>
                         <el-pagination
                             v-model:currentPage="currentPage"
-                            v-model:page-size="pageSize"
-                            :page-sizes="[100, 200, 300, 400]"
                             background
                             layout="prev, pager, next, jumper"
                             :total="total"
@@ -72,7 +70,7 @@ export default {
                 // 状态列表
                 {
                     title: "全部",
-                    value: "",
+                    value: "-1",
                     sup: 10,
                 },
                 {
@@ -96,44 +94,10 @@ export default {
                     sup: 0,
                 },
             ],
-            currentStatus: "", // 当前选定的状态
+            currentStatus: "-1", // 当前选定的状态
             searchKey: "", // 搜索关键词
-            searchLoading: false, // 搜索中状态,
-            list: [
-                // 数据列表
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-            ],
+            loading: false,
+            list: [],
             currentPage: 1,
             pageSize: 100,
             total: 4,
@@ -143,8 +107,32 @@ export default {
     components: {
         WorkOrderDetail,
     },
-    mounted() {},
+    mounted() {
+        this.getData();
+    },
     methods: {
+        // 切换状态
+        selectClick(v) {
+            this.currentStatus = v;
+            this.getData();
+        },
+        // 获取数据
+        getData() {
+            this.loading = true;
+            this.ajax
+                .post("/api/v1/adam/workOrder/workOrder-list", {
+                    pageNum: this.currentPage,
+                    pageSize: 10,
+                    param: {
+                        keyWord: this.searchKey,
+                        orderStatus: this.currentStatus,
+                    },
+                })
+                .then((r) => {
+                    this.loading = false;
+                    this.list = r.data;
+                });
+        },
         // 打开详情
         showDetail(id) {
             console.log(this.showDetailBox);

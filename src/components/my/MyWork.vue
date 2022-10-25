@@ -2,8 +2,8 @@
     <div class="StatistiProduct">
         <div class="head">
             <div>
-                <el-input style="width: 300px" v-model="input" placeholder="关键字搜索：农资类型、农资名称" />
-                <el-button type="primary" style="margin-left: 10px">查询</el-button>
+                <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农资类型、农资名称" />
+                <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
             </div>
             <div>
                 <el-button type="success" style="margin-left: 10px" @click="$router.push('/erp/my/workTime')"
@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="table">
-            <el-table :data="list" style="width: 100%">
+            <el-table :data="list" style="width: 100%" v-loading="loading">
                 <el-table-column prop="time" label="时间" />
                 <el-table-column prop="title" label="农资名称" />
                 <el-table-column prop="type" label="农事类型" />
@@ -27,7 +27,6 @@
             <el-pagination
                 v-model:currentPage="currentPage"
                 v-model:page-size="pageSize"
-                :page-sizes="[100, 200, 300, 400]"
                 background
                 layout="prev, pager, next, jumper"
                 :total="total"
@@ -41,48 +40,34 @@ export default {
     name: "StatistiProduct",
     data() {
         return {
-            list: [
-                {
-                    time: "2022.10.19",
-                    title: "蓝莓",
-                    type: "施肥",
-                    num: 1000,
-                    area: "A区B棚",
-                    user: "Mins",
-                    timenum: 8,
-                },
-                {
-                    time: "2022.10.19",
-                    title: "蓝莓",
-                    type: "施肥",
-                    num: 1000,
-                    area: "A区B棚",
-                    user: "Mins",
-                    timenum: 8,
-                },
-                {
-                    time: "2022.10.19",
-                    title: "蓝莓",
-                    type: "施肥",
-                    num: 1000,
-                    area: "A区B棚",
-                    user: "Mins",
-                    timenum: 8,
-                },
-                {
-                    time: "2022.10.19",
-                    title: "蓝莓",
-                    type: "施肥",
-                    num: 1000,
-                    area: "A区B棚",
-                    user: "Mins",
-                    timenum: 8,
-                },
-            ],
+            list: [],
             currentPage: 1,
             pageSize: 10,
             total: 2,
+            searchKey: "",
+            loading: false,
         };
+    },
+    mounted() {
+        this.getData();
+    },
+    methods: {
+        // 获取数据
+        getData() {
+            this.loading = true;
+            this.ajax
+                .post("/api/v1/adam/farm/getMyWorkTime", {
+                    endTime: "",
+                    keyWord: this.searchKey,
+                    startTime: "",
+                })
+                .then((r) => {
+                    this.loading = false;
+                    if (r.code == 200) {
+                        this.list = r.data;
+                    }
+                });
+        },
     },
 };
 </script>

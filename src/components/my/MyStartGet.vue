@@ -12,58 +12,178 @@
                 <span style="position: relative; top: 2px; font-size: 15px">发起申领</span>
             </div>
             <div class="content">
-                <el-button plain type="primary">
+                <el-button plain type="primary" style="margin-bottom: 20px" @click="showChose = true">
                     <i style="font-size: 14px; margin-right: 5px" class="erp erpicon_tianjia"></i> 添加
                 </el-button>
-                <div class="item">
-                    <p class="title">硝酸复合肥</p>
+                <div class="item" v-for="(item, index) in list" :key="index">
+                    <p class="title">{{ item.agriculturalBo.title }}</p>
                     <p class="tagBox">
-                        <span class="tag">化肥</span>
+                        <span class="tag">{{ item.agriculturalBo.agriculturalCategory }}</span>
                     </p>
                     <div class="unit">
-                        <p>内蒙古xxx肥料厂</p>
-                        <p>（50公斤/袋）</p>
+                        <p>{{ item.agriculturalBo.manufacturers }}</p>
+                        <p>
+                            ({{ item.agriculturalBo.agriculturalCount }}{{ item.agriculturalBo.unitweight }}/{{
+                                item.agriculturalBo.unitmeasurement
+                            }})
+                        </p>
                     </div>
                     <div class="num">
                         <p>出库数量：</p>
-                        <el-input style="width: 120px; margin: 0 10px" v-model="input" placeholder="请输入数量" />
-                        <p>公斤</p>
+                        <el-input style="width: 120px; margin: 0 10px" v-model="item.num" placeholder="请输入数量" />
+                        <p>{{ item.agriculturalBo.unitweight }}</p>
                     </div>
                 </div>
                 <div class="step">
                     <p class="title">审核流程</p>
-                    <div>
-                        <el-tag closable>张三</el-tag>
-                        <i class="erp erpxiangyou1"></i>
-                        <el-tag closable>李四</el-tag>
-                        <i class="erp erpxiangyou1"></i>
-                        <el-button type="primary" style="width: 28px" plain size="small"
-                            ><i class="erp erpicon_tianjia"></i
-                        ></el-button>
+                    <div class="stepList">
+                        <template v-for="(item, uindex) in userChosed" :key="uindex">
+                            <el-tag closable @close="delUser(uindex)">{{ item.name }}</el-tag>
+                            <i class="erp erpxiangyou1"></i>
+                        </template>
+                        <el-button
+                            type="primary"
+                            style="width: 28px"
+                            plain
+                            size="small"
+                            v-if="!showSelect"
+                            @click="showSelect = true"
+                        >
+                            <i class="erp erpicon_tianjia"></i>
+                        </el-button>
+                        <el-select
+                            v-if="showSelect"
+                            @change="select"
+                            v-model="currentChose"
+                            size="small"
+                            style="margin-right: 10px"
+                            placeholder="请选择用户"
+                        >
+                            <el-option
+                                v-for="item in userlist"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id"
+                            ></el-option>
+                        </el-select>
                     </div>
                 </div>
-                <el-button type="primary" style="margin-top: 20px">提交</el-button>
+                <el-button type="primary" style="margin-top: 20px" @click="submit" :loading="submitting"
+                    >提交</el-button
+                >
             </div>
         </div>
+        <MyStartChose v-if="showChose" @onClose="closeReg" @submit="chose"></MyStartChose>
     </div>
 </template>
 
 <script lang="js">
+import MyStartChose from '@/components/my/MyStartChose';
 import timer from "@/utils/timer.js";
 export default {
     name: "stockPut",
     props: ["id"],
     data() {
         return {
-            note: ''
+            list: [], // 已选择的列表
+            userlist: [], // 用户列表
+            userChosed: [], // 已添加到流程的用户
+            currentChose: '', // 当前选择的用户，只用于下拉框临时存值
+            showSelect: false, // 是否显示下拉框
+            note: '',
+            showChose: false,
+            input: '',
+            submitting: false
         }
     },
-    mounted() {},
+    mounted() {
+        this.getUserlist();
+    },
+    components: {
+        MyStartChose
+    },
     methods: {
+        // 获取用户列表
+        getUserlist (){
+            this.ajax.post('/api/v1/adam/task/getOrganizationUsers').then(r => {
+                this.userlist = r.data;
+            })
+        },
         // 返回列表
         back() {
             this.$router.push("/erp/my/product");
         },
+        // 关闭登记新农资的弹窗
+        closeReg (){
+            let timer = setTimeout(() => {
+                this.showChose = false;
+                clearTimeout(timer);
+            }, 500);
+        },
+        // 选择农资
+        chose (v){
+            this.list.push(v);
+        },
+        // 选择用户
+        select (v){
+            this.userlist.map(item => {
+                if(item.id == v){
+                    this.userChosed.push(item);
+                }
+            })
+            this.currentChose = '';
+            this.showSelect = false;
+        },
+        // 移除筛选
+        delUser (index){
+            console.log(index)
+            this.userChosed.splice(index, 1);
+        },
+        // 提交工单
+        submit (){
+            if(this.list.length == 0){
+                this.$message.warning('请选择农资');
+                return;
+            }
+            if(this.userChosed.length == 0){
+                this.$message.warning('请选择审核人');
+                return;
+            }
+            let orderManagerBoList = this.userChosed.map(item => {
+                return {
+                    aid: item.id,
+                    username: item.name
+                }
+            })
+            let orderWorkBoList = this.list.map(item => {
+                return {
+                    agriculturalId: item.id,
+                    orderCount: item.num
+                }
+            })
+            console.log(orderWorkBoList)
+            let empty = false;
+            orderWorkBoList.map(item => {
+                if(!item.orderCount) empty = true;
+            })
+            if(empty){
+                this.$message.warning('请输入农资数量');
+                return;
+            }
+            this.submitting = true;
+            this.ajax.post('/api/v1/adam/workOrder/saveWorkOrder', {
+                orderManagerBoList, orderWorkBoList
+            }).then(r => {
+                this.submitting = false;
+                if(r.code == 200){
+                    this.$message.success('提交成功！');
+                    let t = setTimeout(() => {
+                        this.$router.push('/erp/my/product');
+                        clearTimeout(t);
+                    }, 500)
+                }
+            })
+        }
     },
 }
 </script>
@@ -113,8 +233,8 @@ export default {
     .step {
         border-bottom: 1px solid rgba(0, 0, 0, 0.09);
         border-top: 1px solid rgba(0, 0, 0, 0.09);
-        padding: 20px;
-        div {
+        padding: 20px 0;
+        .stepList {
             display: flex;
             justify-content: flex-start;
             align-items: center;

@@ -77,6 +77,7 @@ export default {
             total: 2,
         };
     },
+    mounted() {},
 };
 </script>
 
