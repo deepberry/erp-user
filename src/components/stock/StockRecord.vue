@@ -78,7 +78,7 @@ export default {
             list: [],
             space: 0,
             showDetailBox: false,
-            showStatBox: true,
+            showStatBox: false,
             currentPage: 1,
             pageSize: 12,
             total: 2,

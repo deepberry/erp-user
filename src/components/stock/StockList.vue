@@ -84,8 +84,8 @@
             </div>
         </div>
         <StockDetail v-if="showDetailBox" :id="currentDetailId" @closeDetailBox="closeDetailBox"></StockDetail>
-        <StockReg v-if="showReg" @closeReg="closeReg"></StockReg>
-        <StockPutBatch v-if="showBatch" @closeBatch="closeBatch"> </StockPutBatch>
+        <StockReg v-if="showReg" needSubmit @onSave="onRegSave" @closeReg="closeReg"></StockReg>
+        <StockPutBatch v-if="showBatch" @closeBathBox="closeBathBox"> </StockPutBatch>
     </div>
 </template>
 
@@ -117,34 +117,46 @@ export default {
         }
     },
     mounted() {
-        this.getData();
-        this.getClassify();
+        // 获取详情数据
+        let t = this;
+        const ajax = async function (){
+            await t.getData();
+            await t.getClassify();
+        }
+        ajax();
     },
     methods: {
         // 获取数据列表
         getData (){
-            this.loading = true;
-            this.ajax.post('/api/v1/adam/farmLand/agricultural-list', {
-                "pageNum": this.currentPage,
-                "pageSize": this.pageSize,
-                "param": {
-                    "categoryId": this.defaultClassify,
-                    "inventory": this.defaultStatus,
-                    "keyWord": this.searchKey
-                }
-            }).then(r => {
-                console.log(r)
-                this.list = r.data;
-                this.currentPage = r.pageNum;
-                this.pageSize = r.pageSize;
-                this.total = r.total;
-                this.loading = false;
+            return new Promise ((a,b) => {
+                this.loading = true;
+                this.ajax.post('/api/v1/adam/farmLand/agriculturalSearch-list', {
+                    "pageNum": this.currentPage,
+                    "pageSize": this.pageSize,
+                    "param": {
+                        "categoryId": this.defaultClassify,
+                        "inventory": this.defaultStatus,
+                        "keyWord": this.searchKey
+                    }
+                }).then(r => {
+                    this.list = r.data;
+                    this.currentPage = r.pageNum;
+                    this.pageSize = r.pageSize;
+                    this.total = r.total;
+                    this.loading = false;
+                    a();
+                })
             })
         },
         // 获取分类列表
         getClassify (){
-            this.ajax.post('/api/v1/adam/farmLand/getAgriculturalCategory').then(r => {
-                this.classifyList = r.data;
+            return new Promise ((a,b) => {
+                this.loading = true;
+                this.ajax.post('/api/v1/adam/farmLand/getAgriculturalCategory').then(r => {
+                    this.classifyList = r.data;
+                    this.loading = false;
+                    a();
+                })
             })
         },
         // 按库存状态筛选
@@ -186,6 +198,10 @@ export default {
                 clearTimeout(timer);
             }, 500);
         },
+        // 保存农资触发
+        onRegSave (){
+            this.getData();
+        },
         // 打开购物车
         showCar (id){
             this.showCarBox = true;
@@ -198,7 +214,7 @@ export default {
             }, 500);
         },
         // 关闭批量入库
-        closeBatch (){
+        closeBathBox (){
             let timer = setTimeout(() => {
                 this.showBatch = false;
                 clearTimeout(timer);

@@ -33,7 +33,7 @@
                         </p>
                         <p>
                             <span>入库数量：</span>
-                            <el-input size="small" style="width: 70px; margin-right: 10px" v-model="num" />
+                            <el-input size="small" style="width: 70px; margin-right: 10px" v-model="item.num" />
                             <span>{{ item.agriculturalBo.unitweight }}</span>
                         </p>
                         <p v-if="index == 0">
@@ -54,12 +54,16 @@
                         <span class="must">*</span> 入库时间：
                         <el-date-picker v-model="outInTime" type="datetime" placeholder="请选择时间" />
                     </p>
-                    <p>
-                        <span class="must">*</span> 操作人：<el-input
-                            style="width: 220px; margin-left: 17px"
+                    <p v-show="defaultType == backUser">
+                        <span class="must">*</span> 退回人：
+                        <el-select
                             v-model="userName"
-                            placeholder="请输入操作人"
-                        />
+                            class="m-2"
+                            style="width: 220px; margin-left: 14px"
+                            placeholder="请选择退回人"
+                        >
+                            <el-option v-for="item in userlist" :key="item.id" :label="item.name" :value="item.id" />
+                        </el-select>
                     </p>
                 </div>
                 <div class="item">
@@ -82,11 +86,11 @@
                     <el-input v-model="note" :rows="5" type="textarea" placeholder="输入备注内容" />
                 </div>
                 <div class="item">
-                    <el-button type="primary" @click="submit">提交</el-button>
+                    <el-button type="primary" @click="submit" :loading="submitting">提交</el-button>
                 </div>
             </div>
         </div>
-        <StockReg v-if="showReg" default="1" @closeReg="closeReg"></StockReg>
+        <StockReg v-if="showReg" default="1" @onSubmit="onRegSubmit" @closeReg="closeReg"></StockReg>
     </div>
 </template>
 
@@ -99,7 +103,9 @@ export default {
             loading: false,
             list: [],
             defaultType: '',
+            backUser: '', // 入库类型为【已领用退回】的值
             typeList: [], // 入库类型
+            userlist: [], // 用户列表
             userName: '',
             num: '', // 出库数量
             outInTime: '',
@@ -108,6 +114,7 @@ export default {
             uploading: false,
             imgs: [],
             percentage: 0, // 上传进度
+            submitting: false
         }
     },
     components: {
@@ -115,21 +122,50 @@ export default {
     },
     mounted() {
         // 获取详情数据
-        this.loading = true;
-        this.ajax.post('/api/v1/adam/farmLand/agricultural-detail', {
-            id: this.$route.query.id
-        }).then(r => {
-            this.list.push(r.data);
-            this.loading = false;
-        })
-        this.getPutTypeList();
+        let t = this;
+        const ajax = async function (){
+            t.loading = true;
+            await t.getDetail();
+            await t.getPutTypeList();
+            await t.getUserList();
+            t.loading = false;
+        }
+        ajax();
     },
     methods: {
+        // 获取详情
+        getDetail (){
+            return new Promise ((a,b) => {
+                this.ajax.post('/api/v1/adam/farmLand/agricultural-detail', {
+                    id: this.$route.query.id
+                }).then(r => {
+                    r.data.num = '';
+                    this.list.push(r.data);
+                    a();
+                })
+            })
+        },
         // 获取入库类型
         getPutTypeList (){
-            this.ajax.post('/api/v1/adam/farmLand/getStorageType').then(r => {
-                console.log(r)
-                this.typeList = r.data;
+            return new Promise ((a,b) => {
+                this.ajax.post('/api/v1/adam/farmLand/getStorageType').then(r => {
+                    this.typeList = r.data;
+                    r.data.map(item => {
+                        if(item.title == '已领用退回'){
+                            this.backUser = item.id;
+                        }
+                    })
+                    a();
+                })
+            })
+        },
+        // 获取用户列表
+        getUserList (){
+            return new Promise ((a,b) => {
+                this.ajax.post('/api/v1/adam/task/getOrganizationUsers').then(r => {
+                    this.userlist = r.data;
+                    a();
+                })
             })
         },
         // 返回列表
@@ -142,6 +178,9 @@ export default {
                 this.showReg = false;
                 clearTimeout(timer);
             }, 500);
+        },
+        onRegSubmit (v){
+            this.list = [...this.list, ...v];
         },
         // 上传图片
         uploadFile (){
@@ -165,11 +204,23 @@ export default {
         // 提交入库
         submit (){
             // 处理参数
-            if(!this.num){
-                this.$message.warning('请输入入库数量');
+            let haveEmptyNum = -1;
+            let emptyNumName = '';
+            let agriculturalOutInBos = this.list.map((item, index) => {
+                if(!item.num && haveEmptyNum == -1){
+                    haveEmptyNum = index;
+                    emptyNumName = item.agriculturalBo.title;
+                }
+                return {
+                    agriculturalCount: item.num,
+                    id: item.id
+                }
+            })
+            if(haveEmptyNum > -1){
+                this.$message.warning(`请输入 [ ${emptyNumName} ] 的入库数量`);
                 return;
             }
-            if(!this.type){
+            if(!this.defaultType){
                 this.$message.warning('请选择入库类型');
                 return;
             }
@@ -177,11 +228,11 @@ export default {
                 this.$message.warning('请选择入库时间');
                 return;
             }
-            if(!this.userName){
-                this.$message.warning('请输入操作人');
+            if(this.defaultType == this.backUser && !this.userName){
+                this.$message.warning('请输入退回人');
                 return;
             }
-            if(!this.image){
+            if(this.imgs.length <= 0){
                 this.$message.warning('请上传凭证');
                 return;
             }
@@ -191,20 +242,25 @@ export default {
                     workTypeName = item.title;
                 }
             })
-            this.ajax.post('/api/v1/adam/farmLand/saveAgriculturalStorage', {
-                agriculturalOutInBos: [
-                    {
-                        agriculturalCount: this.num,
-                        id: this.list[0].agriculturalBo.id
+            let username = '';
+            if(this.userName){
+                this.userlist.map(item => {
+                    if(item.id == this.userName){
+                        username = item.name;
                     }
-                ],
+                })
+            }
+            this.submitting = true;
+            this.ajax.post('/api/v1/adam/farmLand/saveAgriculturalStorage', {
+                agriculturalOutInBos,
                 image: this.imgs.join(','),
                 outInTime: this.outInTime,
                 remark: this.note,
                 type: 0,
-                username: this.userName,
+                workAid: this.userName,
+                username,
                 workType: this.defaultType,
-                workTypeName: workTypeName
+                workTypeName
             }).then(r => {
                 if(r.code == 200){
                     this.$message.success('入库成功！');

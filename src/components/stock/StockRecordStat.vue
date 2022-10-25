@@ -10,15 +10,29 @@
         >
             <div v-loading="detailLoading" class="stockRecordDetailInner">
                 <div class="search">
-                    <el-input style="width: 360px" v-model="keyWord" placeholder="关键字搜索：农资名称、出入库日期" />
-                    <el-button type="primary" plain style="margin-left: 10px">查询</el-button>
+                    <el-input style="width: 360px" v-model="keyWord" placeholder="关键字搜索：农资名称" />
+                    <el-button type="primary" plain style="margin-left: 10px" @click="getData">查询</el-button>
                 </div>
                 <div class="table">
-                    <el-table :data="list">
-                        <el-table-column prop="date" label="农资名称" />
-                        <el-table-column prop="date" label="生产厂家" />
-                        <el-table-column prop="date" label="入库量" />
-                        <el-table-column prop="date" label="出库量" />
+                    <el-table :data="list" max-height="500">
+                        <el-table-column prop="agriculturalBo.title" label="农资名称" width="200" />
+                        <el-table-column prop="agriculturalBo.manufacturers" width="260" label="生产厂家" />
+                        <el-table-column label="入库量">
+                            <template #default="scope">
+                                <span class="und" v-if="scope.row.inAgriculturalCount"
+                                    >{{ scope.row.inAgriculturalCount }}{{ scope.row.agriculturalBo.unitweight }}</span
+                                >
+                                <span v-if="!scope.row.inAgriculturalCount">-</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="出库量">
+                            <template #default="scope">
+                                <span class="und" v-if="scope.row.outAgriculturalCount"
+                                    >{{ scope.row.outAgriculturalCount }}{{ scope.row.agriculturalBo.unitweight }}</span
+                                >
+                                <span v-if="!scope.row.outAgriculturalCount">-</span>
+                            </template>
+                        </el-table-column>
                     </el-table>
                 </div>
             </div>
@@ -40,20 +54,23 @@ export default {
     },
     mounted() {
         // 获取数据
-        this.detailLoading = true;
-        this.ajax
-            .post("/api/v1/adam/farmLand/outInStorageCount", {
-                endTime: "",
-                id: 0,
-                keyWord: this.keyWord,
-                startTime: "",
-            })
-            .then((r) => {
-                this.list = r.data;
-                this.detailLoading = false;
-            });
+        this.getData();
     },
     methods: {
+        getData() {
+            this.detailLoading = true;
+            this.ajax
+                .post("/api/v1/adam/farmLand/outInStorageCount", {
+                    endTime: "",
+                    id: 0,
+                    keyWord: this.keyWord,
+                    startTime: "",
+                })
+                .then((r) => {
+                    this.list = r.data;
+                    this.detailLoading = false;
+                });
+        },
         onClose() {
             this.$emit("close", 0);
             this.showDetailBox = false;
@@ -74,6 +91,11 @@ export default {
     }
     .table {
         margin-top: 20px;
+        .und {
+            text-decoration: underline;
+            color: rgba(83, 141, 255, 1);
+            font-size: 12px;
+        }
     }
 }
 </style>
