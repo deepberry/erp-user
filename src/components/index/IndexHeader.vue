@@ -35,6 +35,13 @@ export default {
             this.user = JSON.parse(user);
         } else {
             this.ajax.post("/api/v1/adam/member/user-info").then((r) => {
+                if (r.data.orgzs.length == 0) {
+                    r.data.orgzs = [
+                        {
+                            name: "苏州xxx化肥厂",
+                        },
+                    ];
+                }
                 this.user = r.data;
                 localStorage.setItem("erp_user", JSON.stringify(r.data));
             });
