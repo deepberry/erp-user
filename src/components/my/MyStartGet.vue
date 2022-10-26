@@ -157,7 +157,8 @@ export default {
             })
             let orderWorkBoList = this.list.map(item => {
                 return {
-                    agriculturalId: item.id,
+                    agriculturalId: item.agriculturalBo.id,
+                    id: item.id,
                     orderCount: item.num
                 }
             })
@@ -181,6 +182,8 @@ export default {
                         this.$router.push('/erp/my/product');
                         clearTimeout(t);
                     }, 500)
+                }else{
+                    this.$message.error(r.message);
                 }
             })
         }

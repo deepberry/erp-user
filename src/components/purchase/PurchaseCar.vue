@@ -9,7 +9,7 @@
             width="700px"
         >
             <div v-loading="carLoading" class="purchaseDetailBoxInner">
-                <el-table :data="list" style="width: 100%">
+                <el-table size="large" :data="list" style="width: 100%">
                     <el-table-column type="selection" width="40" />
                     <el-table-column prop="agriculturalBo.title" label="农资名称" show-overflow-tooltip />
                     <el-table-column

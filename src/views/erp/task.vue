@@ -32,7 +32,7 @@
             </div>
             <div class="tableWrap">
                 <div class="table">
-                    <el-table :data="list" style="width: 100%" size="large" max-height="600px" v-loading="loading">
+                    <el-table size="large" :data="list" style="width: 100%" max-height="600px" v-loading="loading">
                         <el-table-column prop="id" label="任务单号" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="title" label="所属棚区" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="type" label="执行人"></el-table-column>

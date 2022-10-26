@@ -36,7 +36,7 @@
         </div>
         <div class="tableWrap">
             <div class="table">
-                <el-table :data="list" style="width: 100%" size="large" max-height="600px">
+                <el-table size="large" :data="list" style="width: 100%" max-height="600px">
                     <el-table-column
                         prop="agriculturalBo.title"
                         label="农资名称"
@@ -151,10 +151,8 @@ export default {
         // 获取分类列表
         getClassify (){
             return new Promise ((a,b) => {
-                this.loading = true;
                 this.ajax.post('/api/v1/adam/farmLand/getAgriculturalCategory').then(r => {
                     this.classifyList = r.data;
-                    this.loading = false;
                     a();
                 })
             })

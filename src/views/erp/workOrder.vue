@@ -29,7 +29,7 @@
             </div>
             <div class="tableWrap">
                 <div class="table">
-                    <el-table :data="list" v-loading="loading" style="width: 100%" size="large" max-height="600px">
+                    <el-table size="large" :data="list" v-loading="loading" style="width: 100%" max-height="600px">
                         <el-table-column prop="id" label="工单号" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
                         <el-table-column prop="type" label="农资类型"></el-table-column>
@@ -71,7 +71,7 @@ export default {
                 {
                     title: "全部",
                     value: "-1",
-                    sup: 10,
+                    sup: 0,
                 },
                 {
                     title: "待审核",
@@ -108,7 +108,11 @@ export default {
         WorkOrderDetail,
     },
     mounted() {
-        this.getData();
+        const ajax = async () => {
+            await this.getData();
+            await this.getStatus_1();
+        };
+        ajax();
     },
     methods: {
         // 切换状态
@@ -118,20 +122,41 @@ export default {
         },
         // 获取数据
         getData() {
-            this.loading = true;
-            this.ajax
-                .post("/api/v1/adam/workOrder/workOrder-list", {
-                    pageNum: this.currentPage,
-                    pageSize: 10,
-                    param: {
-                        keyWord: this.searchKey,
-                        orderStatus: this.currentStatus,
-                    },
-                })
-                .then((r) => {
-                    this.loading = false;
-                    this.list = r.data;
-                });
+            return new Promise((a, b) => {
+                this.loading = true;
+                this.ajax
+                    .post("/api/v1/adam/workOrder/workOrder-list", {
+                        pageNum: this.currentPage,
+                        pageSize: 10,
+                        param: {
+                            keyWord: this.searchKey,
+                            orderStatus: this.currentStatus,
+                        },
+                    })
+                    .then((r) => {
+                        this.loading = false;
+                        this.list = r.data;
+                        a();
+                    });
+            });
+        },
+        // 获取待审核的数量
+        getStatus_1() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/workOrder/workOrder-list", {
+                        pageNum: this.currentPage,
+                        pageSize: 10,
+                        param: {
+                            keyWord: this.searchKey,
+                            orderStatus: 1,
+                        },
+                    })
+                    .then((r) => {
+                        this.status[1].sup = r.total;
+                        a();
+                    });
+            });
         },
         // 打开详情
         showDetail(id) {

@@ -18,7 +18,7 @@
                         <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
                     </div>
                     <div class="table">
-                        <el-table :data="list" style="width: 100%" v-loading="loading">
+                        <el-table size="large" :data="list" style="width: 100%" v-loading="loading">
                             <el-table-column prop="agricultural" label="农资类型" width="250" />
                             <el-table-column prop="agriculturalCount" label="工时" />
                         </el-table>

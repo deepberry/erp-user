@@ -27,7 +27,7 @@
         </div>
         <div class="tableWrap">
             <div class="table">
-                <el-table :data="list" style="width: 100%" size="large" max-height="600px">
+                <el-table size="large" :data="list" style="width: 100%" max-height="600px">
                     <el-table-column prop="orderUuid" label="订单号" show-overflow-tooltip></el-table-column>
                     <el-table-column label="农资名称" show-overflow-tooltip>
                         <template #default="scope">

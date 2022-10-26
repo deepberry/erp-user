@@ -95,7 +95,14 @@
                     />
                     <el-button style="margin-left: 10px" type="primary" plain @click="getData">查询</el-button>
                 </div>
-                <el-table :data="tableData" ref="table" max-height="500" style="width: 100%" v-loading="loading">
+                <el-table
+                    size="large"
+                    :data="tableData"
+                    ref="table"
+                    max-height="500"
+                    style="width: 100%"
+                    v-loading="loading"
+                >
                     <el-table-column type="selection" width="55" />
                     <el-table-column prop="agriculturalBo.title" label="农资名称" />
                     <el-table-column prop="agriculturalBo.agriculturalCategory" label="农资类型" width="150" />

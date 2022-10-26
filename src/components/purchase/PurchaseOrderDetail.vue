@@ -17,7 +17,7 @@
                     <p>提交人：{{ detail.userName }}</p>
                     <p>提交时间：{{ detail.orderTime }}</p>
                 </div>
-                <el-table :data="detail.agriculturalCartBos" style="width: 100%; margin-top: 20px">
+                <el-table size="large" :data="detail.agriculturalCartBos" style="width: 100%; margin-top: 20px">
                     <el-table-column prop="agriculturalBo.title" label="农资名称" show-overflow-tooltip />
                     <el-table-column prop="agriculturalBo.agriculturalCategory" label="类型" show-overflow-tooltip />
                     <el-table-column prop="id" label="规格" show-overflow-tooltip>

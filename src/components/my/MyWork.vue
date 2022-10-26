@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="table">
-            <el-table :data="list" style="width: 100%" v-loading="loading">
+            <el-table size="large" :data="list" style="width: 100%" v-loading="loading">
                 <el-table-column prop="time" label="时间" />
                 <el-table-column prop="title" label="农资名称" />
                 <el-table-column prop="type" label="农事类型" />

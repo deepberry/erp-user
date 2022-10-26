@@ -17,7 +17,7 @@
                     <p>提交人：mins</p>
                     <p>提交时间：2022-10-17 12:00:00</p>
                 </div>
-                <el-table :data="detail" style="width: 100%; margin-top: 20px">
+                <el-table size="large" :data="detail" style="width: 100%; margin-top: 20px">
                     <el-table-column prop="agriculturalBo" label="农资名称" show-overflow-tooltip />
                     <el-table-column prop="agriculturalBo" label="类型" show-overflow-tooltip />
                     <el-table-column prop="id" label="规格" show-overflow-tooltip>

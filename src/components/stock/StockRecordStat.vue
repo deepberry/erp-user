@@ -14,7 +14,7 @@
                     <el-button type="primary" plain style="margin-left: 10px" @click="getData">查询</el-button>
                 </div>
                 <div class="table">
-                    <el-table :data="list" max-height="500">
+                    <el-table size="large" :data="list" max-height="500">
                         <el-table-column prop="agriculturalBo.title" label="农资名称" width="200" />
                         <el-table-column prop="agriculturalBo.manufacturers" width="260" label="生产厂家" />
                         <el-table-column label="入库量">

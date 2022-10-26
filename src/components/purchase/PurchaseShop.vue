@@ -19,7 +19,7 @@
         </div>
         <div class="tableWrap">
             <div class="table">
-                <el-table :data="list" style="width: 100%" size="large" max-height="600px">
+                <el-table size="large" :data="list" style="width: 100%" max-height="600px">
                     <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="agriculturalCategory" label="农资类型"></el-table-column>
                     <el-table-column label="规格">

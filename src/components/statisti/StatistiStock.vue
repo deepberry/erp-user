@@ -1,14 +1,14 @@
 <template>
     <div class="StatistiProduct">
         <div class="head">
-            <el-input style="width: 300px" v-model="input" placeholder="关键字搜索：农资名称、厂家名称、日期" />
-            <el-button type="primary" style="margin-left: 10px">查询</el-button>
+            <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农资名称、厂家名称" />
+            <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
         </div>
-        <div class="table">
-            <el-table :data="list" style="width: 100%">
-                <el-table-column prop="title" label="农资" />
-                <el-table-column prop="put" label="入库量" />
-                <el-table-column prop="out" label="出库量" />
+        <div class="table" v-loading="loading">
+            <el-table size="large" :data="list" style="width: 100%">
+                <el-table-column prop="type" label="农资" width="280" />
+                <el-table-column prop="type" label="入库量" width="280" />
+                <el-table-column prop="num" label="出库量" />
             </el-table>
         </div>
         <div class="pages" v-if="list.length > 0">
@@ -16,7 +16,6 @@
             <el-pagination
                 v-model:currentPage="currentPage"
                 v-model:page-size="pageSize"
-                :page-sizes="[100, 200, 300, 400]"
                 background
                 layout="prev, pager, next, jumper"
                 :total="total"
@@ -30,32 +29,35 @@ export default {
     name: "StatistiProduct",
     data() {
         return {
-            list: [
-                {
-                    title: "蓝莓",
-                    put: 1000,
-                    out: 500,
-                },
-                {
-                    title: "蓝莓",
-                    put: 1000,
-                    out: 500,
-                },
-                {
-                    title: "蓝莓",
-                    put: 1000,
-                    out: 500,
-                },
-                {
-                    title: "蓝莓",
-                    put: 1000,
-                    out: 500,
-                },
-            ],
+            loading: false,
+            list: [],
             currentPage: 1,
             pageSize: 10,
-            total: 2,
+            total: 0,
+            searchKey: "",
         };
+    },
+    mounted() {
+        this.getData();
+    },
+    methods: {
+        getData() {
+            this.loading = true;
+            this.ajax
+                .post("/api/v1/adam/task/outputDetailSta", {
+                    outboundQuantity: 0,
+                    scheduledReceipt: 0,
+                    totalHours: 0,
+                    totalOutput: 0,
+                })
+                .then((r) => {
+                    this.loading = false;
+                    if (r.code == 200) {
+                        // this.list = r.data;
+                        // this.total = r.total;
+                    }
+                });
+        },
     },
 };
 </script>

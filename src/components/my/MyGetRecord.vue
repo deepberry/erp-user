@@ -11,32 +11,49 @@
                 >
                 <span style="position: relative; top: 2px; font-size: 15px">申领记录</span>
             </div>
-            <div class="content">
+            <div class="content" v-loading="loading">
                 <div class="StatistiProduct">
                     <div class="head">
-                        <el-input style="width: 300px" v-model="input" placeholder="关键字搜索：农资类型、农资名称" />
-                        <el-button type="primary" style="margin-left: 10px">查询</el-button>
-                        <el-select v-model="value" class="m-2" placeholder="全部状态" style="margin-left: 20px">
-                            <el-option label="item.label" value="item.value"></el-option>
-                            <el-option label="item.label" value="item.value"></el-option>
+                        <el-input
+                            style="width: 300px"
+                            v-model="searchKey"
+                            placeholder="关键字搜索：农资类型、农资名称"
+                        />
+                        <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
+                        <el-select
+                            @change="getData"
+                            v-model="currentStatus"
+                            placeholder="全部状态"
+                            style="margin-left: 20px"
+                        >
+                            <el-option v-for="item in status" :key="item.v" :label="item.k" :value="item.v"></el-option>
                         </el-select>
                     </div>
                     <div class="table">
-                        <el-table :data="list" style="width: 100%">
-                            <el-table-column prop="type" label="工单号" />
-                            <el-table-column prop="num" label="农资名称" />
-                            <el-table-column prop="num" label="农资类型" />
-                            <el-table-column prop="num" label="数量" />
-                            <el-table-column prop="num" label="状态" />
-                            <el-table-column prop="num" label="申请人" />
+                        <el-table size="large" :data="list" style="width: 100%">
+                            <el-table-column prop="orderUuid" label="工单号" />
+                            <el-table-column prop="totalCount[0].variety" label="农资名称" />
+                            <el-table-column prop="totalCount[0].title" label="农资类型" />
+                            <el-table-column label="数量">
+                                <template #default="scope">
+                                    {{ scope.row.totalCount[0].agriculturalCos
+                                    }}{{ scope.row.totalCount[0].unitweight }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="createTime" label="申请日期" />
+                            <el-table-column label="状态">
+                                <template #default="scope">
+                                    <span>{{ scope.row.orderStatusString }}</span>
+                                </template>
+                            </el-table-column>
                         </el-table>
                     </div>
                     <div class="pages" v-if="list.length > 0">
                         <span class="total">共 {{ total }} 条</span>
                         <el-pagination
+                            @current-change="getData"
                             v-model:currentPage="currentPage"
                             v-model:page-size="pageSize"
-                            :page-sizes="[100, 200, 300, 400]"
                             background
                             layout="prev, pager, next, jumper"
                             :total="total"
@@ -55,31 +72,51 @@ export default {
     props: ["id"],
     data() {
         return {
-            list: [
-                {
-                    type: "蓝莓",
-                    num: 1000,
-                },
-                {
-                    type: "蓝莓",
-                    num: 1000,
-                },
-                {
-                    type: "蓝莓",
-                    num: 1000,
-                },
-                {
-                    type: "蓝莓",
-                    num: 1000,
-                },
+            loading: false,
+            searchKey: '',
+            status: [
+                { k: '全部状态', v: -1 },
+                { k: '待审核', v: 0 },
+                { k: '已通过', v: 1 },
+                { k: '不通过', v: 2 },
+                { k: '已出库', v: 3 },
             ],
+            currentStatus: -1,
+            list: [],
             currentPage: 1,
-            pageSize: 10,
-            total: 2,
+            pageSize: 100,
+            total: 0,
         }
     },
-    mounted() {},
+    mounted() {
+        this.getData();
+    },
     methods: {
+        // 获取数据
+        getData (){
+            this.loading = true;
+            this.ajax.post('/api/v1/adam/workOrder/my-workOrder-list', {
+                "pageNum": this.currentPage,
+                "pageSize": 10,
+                "param": {
+                    "keyWord": this.searchKey,
+                    "orderStatus": this.currentStatus
+                }
+            }).then(r => {
+                this.loading = false;
+                if(r.code == 200){
+                    this.list = r.data.map(item => {
+                        this.status.map(i => {
+                            if(item.orderStatus == i.v) item.orderStatusString = i.k;
+                        })
+                        return item;
+                    });
+                    this.total = r.total;
+                }else{
+                    this.$message.error(r.message);
+                }
+            })
+        },
         // 返回列表
         back() {
             this.$router.push("/erp/my/product");
