@@ -120,7 +120,6 @@ export default {
     methods: {
         // 切换状态
         statusClick(v) {
-            if (this.currentStatus == v) return;
             this.currentStatus = v;
             this.getData();
         },
@@ -129,8 +128,8 @@ export default {
             this.loading = true;
             this.ajax
                 .post("/api/v1/adam/task/taskList", {
-                    pageNum: 0,
-                    pageSize: 0,
+                    pageNum: this.currentPage,
+                    pageSize: 10,
                     param: {
                         gardenId: 0,
                         growPlantId: 0,
@@ -138,7 +137,6 @@ export default {
                     },
                 })
                 .then((r) => {
-                    console.log(r);
                     this.list = r.data;
                     this.loading = false;
                 });

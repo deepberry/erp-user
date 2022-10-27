@@ -3,7 +3,7 @@
         <div class="ctrl">
             <div class="status">
                 <el-button
-                    @click="getData"
+                    @click="changeStatus(item)"
                     v-for="item in status"
                     :key="item.value"
                     class="statusItem"
@@ -37,7 +37,7 @@
                     <el-table-column label="农资名称" show-overflow-tooltip>
                         <template #default="scope">
                             <span v-for="(item, index) in scope.row.totalCount" :key="index"
-                                >{{ item.title }} <br
+                                >{{ item.titleVerity }} <br
                             /></span>
                         </template>
                     </el-table-column>
@@ -50,9 +50,9 @@
                     </el-table-column>
                     <el-table-column label="数量">
                         <template #default="scope">
-                            <span v-for="(item, index) in scope.row.totalCount" :key="index"
-                                >{{ item.agriculturalCos }}{{ item.unitweight }} <br
-                            /></span>
+                            <span v-for="(item, index) in scope.row.totalCount" :key="index">
+                                {{ item.agriculturalCos }}{{ item.unitweight }}<br />
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column prop="orderStatus" label="状态">
@@ -131,7 +131,7 @@ export default {
         this.getData();
     },
     methods: {
-        // 获取数据列表
+        // 获取数据列表  这个接口数据有问题，和需求不一致，后期再改
         getData (){
             this.loading = true;
             this.ajax.post('/api/v1/adam/agricultural/order-list', {
@@ -157,6 +157,10 @@ export default {
                 this.total = r.total;
                 this.loading = false;
             })
+        },
+        changeStatus (item){
+            this.currentStatus = item.value;
+            this.getData();
         },
         // 去采购
         gotoPurchase() {

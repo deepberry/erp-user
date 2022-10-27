@@ -9,7 +9,7 @@
                     <el-badge
                         class="statusItem"
                         :value="item.sup > 0 ? item.sup : ''"
-                        @click="selectClick(item.value)"
+                        @click="changeStatus(item)"
                         v-for="item in status"
                         :key="item.value"
                     >
@@ -30,11 +30,33 @@
             <div class="tableWrap">
                 <div class="table">
                     <el-table size="large" :data="list" v-loading="loading" style="width: 100%" max-height="600px">
-                        <el-table-column prop="id" label="工单号" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="type" label="农资类型"></el-table-column>
-                        <el-table-column prop="num" label="数量"></el-table-column>
-                        <el-table-column prop="status" label="状态"></el-table-column>
+                        <el-table-column prop="orderUuid" label="工单号" show-overflow-tooltip></el-table-column>
+                        <el-table-column label="农资名称" show-overflow-tooltip>
+                            <template #default="scope">
+                                <span v-for="(item, index) in scope.row.totalCount" :key="index"
+                                    >{{ item.variety }} <br
+                                /></span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="type" label="农资类型">
+                            <template #default="scope">
+                                <span v-for="(item, index) in scope.row.totalCount" :key="index"
+                                    >{{ item.title }} <br
+                                /></span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="num" label="数量">
+                            <template #default="scope">
+                                <span v-for="(item, index) in scope.row.totalCount" :key="index"
+                                    >{{ item.agriculturalCos }} {{ item.unitweight }} <br
+                                /></span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="状态">
+                            <template #default="scope">
+                                <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span>
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="user" label="申领人"></el-table-column>
                         <el-table-column label="操作" width="260">
                             <template #default="scope">
@@ -55,7 +77,7 @@
                 </div>
             </div>
         </div>
-        <WorkOrderDetail v-if="showDetailBox" @onCloseDetail="onCloseDetail"></WorkOrderDetail>
+        <WorkOrderDetail v-if="showDetailBox" :id="currentDetailId" @onCloseDetail="onCloseDetail"></WorkOrderDetail>
     </div>
 </template>
 
@@ -90,7 +112,7 @@ export default {
                 },
                 {
                     title: "已出库",
-                    value: "2",
+                    value: "3",
                     sup: 0,
                 },
             ],
@@ -100,8 +122,9 @@ export default {
             list: [],
             currentPage: 1,
             pageSize: 100,
-            total: 4,
+            total: 0,
             showDetailBox: false, // 是否显示详情弹窗
+            currentDetailId: "", // 查看详情的ID
         };
     },
     components: {
@@ -115,11 +138,6 @@ export default {
         ajax();
     },
     methods: {
-        // 切换状态
-        selectClick(v) {
-            this.currentStatus = v;
-            this.getData();
-        },
         // 获取数据
         getData() {
             return new Promise((a, b) => {
@@ -135,7 +153,28 @@ export default {
                     })
                     .then((r) => {
                         this.loading = false;
-                        this.list = r.data;
+                        this.list = r.data.map((item) => {
+                            let status = "";
+                            let color = "";
+                            switch (item.orderStatus) {
+                                case 0:
+                                    status = "已提交";
+                                    color = "#1890FF";
+                                    break;
+                                case 1:
+                                    status = "已完成";
+                                    color = "#0DD71C";
+                                    break;
+                                case 2:
+                                    status = "已关闭";
+                                    color = "#A8A8A8";
+                                    break;
+                            }
+                            item.orderStatus = status;
+                            item.orderStatusColor = color;
+                            return item;
+                        });
+                        this.total = r.total;
                         a();
                     });
             });
@@ -158,9 +197,14 @@ export default {
                     });
             });
         },
+        changeStatus(item) {
+            this.currentStatus = item.value;
+            this.getData();
+        },
         // 打开详情
         showDetail(id) {
             console.log(this.showDetailBox);
+            this.currentDetailId = id;
             this.showDetailBox = true;
         },
         // 关闭详情

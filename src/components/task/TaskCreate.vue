@@ -22,20 +22,20 @@
                 </div>
                 <div class="item">
                     <p class="title">作物：</p>
-                    <!-- <el-select
-                        style="width: 650px"
-                        v-model="crop"
+                    <el-select
+                        v-model="selectedPlant"
                         multiple
-                        filterable
-                        remote
-                        reserve-keyword
-                        placeholder="请输入作物"
-                        :remote-method="searchCrop"
-                        :loading="searchCropLoading"
+                        style="width: 650px"
+                        class="m-2"
+                        placeholder="请选择作物"
                     >
-                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                    </el-select> -->
-                    <el-input v-model="crop" style="width: 650px" placeholder="请输入作物" />
+                        <el-option
+                            v-for="(item, plantIndex) in getPlantList"
+                            :key="plantIndex"
+                            :label="item.title"
+                            :value="item.id"
+                        />
+                    </el-select>
                 </div>
                 <div class="item">
                     <p class="title">具体内容：</p>
@@ -44,8 +44,8 @@
                 <div class="item">
                     <p class="title">操作指导：</p>
                     <div class="pics">
-                        <div class="img">
-                            <img src="../../assets/img/ds.png" alt="" />
+                        <div class="img" v-for="(item, index) in videoCover" :key="index">
+                            <img :src="item" alt="" />
                             <i class="erp erpguanbi"></i>
                         </div>
                         <div class="upload">
@@ -56,7 +56,20 @@
                 </div>
                 <div class="item">
                     <p class="title">执行人：</p>
-                    <el-input v-model="user" style="width: 650px" placeholder="请输入执行人，多个以顿号分隔" />
+                    <el-select
+                        v-model="selectedUser"
+                        multiple
+                        style="width: 650px"
+                        class="m-2"
+                        placeholder="请选择执行人"
+                    >
+                        <el-option
+                            v-for="(item, userIndex) in userlist"
+                            :key="userIndex"
+                            :label="item.name"
+                            :value="item.id"
+                        />
+                    </el-select>
                 </div>
                 <div class="item">
                     <p class="title">开始时间：</p>
@@ -68,7 +81,7 @@
                 </div>
             </div>
             <div class="btns">
-                <el-button plain>取消</el-button>
+                <el-button plain @click="onClose">取消</el-button>
                 <el-button type="primary" @click="submit">确定</el-button>
             </div>
         </el-dialog>
@@ -88,31 +101,75 @@ export default {
             textarea: "",
             isPass: "1",
             selectedGarden: "", // 当前选择的园区
+            selectedPlant: [], // 当前选择的作物
+            selectedUser: [], // 当前选择的人员
             gardenList: [], // 园区列表
-            crop: "", // 作物
+            plantList: [], // 作物列表
+            userlist: [], // 用户列表
             taskContent: "", // 任务内容
-            user: "",
             startTime: "",
             endTime: "",
+            video: [],
+            videoCover: [
+                "https://guanglin-b2c.oss-cn-shanghai.aliyuncs.com/avatar/20221027/56c9d7da-a3e8-40ef-a0dd-c3f151750490.png",
+            ],
             searchCropLoading: false, // 作物搜索中
-            cropList: [], // 作物列表
         };
     },
     mounted() {
-        this.getGardenList();
+        let t = this;
+        let ajax = async function () {
+            await t.getGardenList();
+            await t.getPlantList();
+            await t.getUserlist();
+        };
+        ajax();
     },
     methods: {
         // 获取园区列表
         getGardenList() {
-            this.ajax
-                .post("/api/v1/adam/garden/list", {
-                    pageNum: 1,
-                    pageSize: 100,
-                    param: {},
-                })
-                .then((r) => {
-                    this.gardenList = r.data;
-                });
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/garden/list", {
+                        pageNum: 1,
+                        pageSize: 100,
+                        param: {},
+                    })
+                    .then((r) => {
+                        this.gardenList = r.data;
+                        a();
+                    });
+            });
+        },
+        // 获取作物列表
+        getPlantList() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/task/getPlantsByGarden", {
+                        pageNum: 1,
+                        pageSize: 100,
+                        param: {},
+                    })
+                    .then((r) => {
+                        this.plantList = r.data;
+                        a();
+                    });
+            });
+        },
+        // 获取人员列表
+        getUserlist() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/task/getOrganizationUsers", {
+                        pageNum: 1,
+                        pageSize: 100,
+                        param: {},
+                    })
+                    .then((r) => {
+                        this.userlist = r.data;
+                        a();
+                    });
+            });
         },
         onClose() {
             this.$emit("onCloseDetail", 0);
@@ -122,8 +179,6 @@ export default {
         searchCrop() {},
         // 提交表单
         submit() {
-            console.log(this.selectedGarden);
-
             let gardenTitle = "";
             this.gardenList.map((item) => {
                 if (item.id == this.selectedGarden) {
@@ -131,15 +186,13 @@ export default {
                 }
             });
 
-            let executors = this.user.split("、");
-
             this.ajax
                 .post("/api/v1/adam/task/createTask", {
                     endTime: this.endTime,
-                    executors: JSON.stringify(executors),
+                    executors: JSON.stringify(this.userlist),
                     gardenId: this.selectedGarden,
                     gardenTitle: gardenTitle,
-                    growPlants: [],
+                    growPlants: this.plantList,
                     opinion: "11",
                     reWire: "11",
                     startTime: this.startTime,
