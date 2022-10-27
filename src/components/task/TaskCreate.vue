@@ -30,9 +30,9 @@
                         placeholder="请选择作物"
                     >
                         <el-option
-                            v-for="(item, plantIndex) in getPlantList"
+                            v-for="(item, plantIndex) in plantList"
                             :key="plantIndex"
-                            :label="item.title"
+                            :label="item.categoryTitle"
                             :value="item.id"
                         />
                     </el-select>
@@ -82,7 +82,7 @@
             </div>
             <div class="btns">
                 <el-button plain @click="onClose">取消</el-button>
-                <el-button type="primary" @click="submit">确定</el-button>
+                <el-button type="primary" @click="submit" :loading="submitting">确定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -114,16 +114,30 @@ export default {
                 "https://guanglin-b2c.oss-cn-shanghai.aliyuncs.com/avatar/20221027/56c9d7da-a3e8-40ef-a0dd-c3f151750490.png",
             ],
             searchCropLoading: false, // 作物搜索中
+            submitting: false,
         };
     },
     mounted() {
         let t = this;
         let ajax = async function () {
             await t.getGardenList();
-            await t.getPlantList();
             await t.getUserlist();
         };
         ajax();
+    },
+    watch: {
+        selectedGarden() {
+            this.plantList = [];
+            this.selectedPlant = "";
+            this.ajax
+                .post("/api/v1/adam/task/getPlantsByGarden", {
+                    gardenId: this.selectedGarden,
+                })
+                .then((r) => {
+                    console.log(r.data);
+                    this.plantList = r.data;
+                });
+        },
     },
     methods: {
         // 获取园区列表
@@ -137,21 +151,6 @@ export default {
                     })
                     .then((r) => {
                         this.gardenList = r.data;
-                        a();
-                    });
-            });
-        },
-        // 获取作物列表
-        getPlantList() {
-            return new Promise((a, b) => {
-                this.ajax
-                    .post("/api/v1/adam/task/getPlantsByGarden", {
-                        pageNum: 1,
-                        pageSize: 100,
-                        param: {},
-                    })
-                    .then((r) => {
-                        this.plantList = r.data;
                         a();
                     });
             });
@@ -186,22 +185,55 @@ export default {
                 }
             });
 
+            if (!this.selectedGarden) {
+                this.$message.warning("请选择园区");
+                return;
+            }
+            if (this.selectedPlant.length == 0) {
+                this.$message.warning("请选择作物");
+                return;
+            }
+            if (!this.taskContent) {
+                this.$message.warning("请输入具体内容");
+                return;
+            }
+            if (this.selectedUser.length == 0) {
+                this.$message.warning("请选择执行人");
+                return;
+            }
+            if (!this.startTime) {
+                this.$message.warning("请选择开始时间");
+                return;
+            }
+            if (!this.endTime) {
+                this.$message.warning("请选择截止时间");
+                return;
+            }
+
+            this.submitting = true;
             this.ajax
                 .post("/api/v1/adam/task/createTask", {
                     endTime: this.endTime,
-                    executors: JSON.stringify(this.userlist),
+                    executors: this.selectedUser.join(","),
                     gardenId: this.selectedGarden,
                     gardenTitle: gardenTitle,
-                    growPlants: this.plantList,
+                    growPlants: this.plantList
+                        .map((item) => {
+                            return item.id;
+                        })
+                        .join(","),
                     opinion: "11",
-                    reWire: "11",
+                    reWire: this.videoCover.join(","),
                     startTime: this.startTime,
                     taskContent: this.taskContent,
                 })
                 .then((r) => {
+                    this.submitting = false;
                     if (r.code == 200 && r.data == true) {
                         this.$emit("onCloseDetail", 0);
                         this.showDetailBox = false;
+                    } else {
+                        this.$message.error(r.message);
                     }
                 });
         },

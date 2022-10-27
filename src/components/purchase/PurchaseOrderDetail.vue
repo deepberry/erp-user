@@ -6,7 +6,7 @@
             append-to-body
             v-model="showDetailBox"
             title="订单详情"
-            width="700px"
+            width="800px"
         >
             <div v-loading="detailLoading" class="purchaseDetailBoxInner">
                 <div class="item">

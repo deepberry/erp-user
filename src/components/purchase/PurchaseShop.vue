@@ -108,10 +108,6 @@ export default {
                 this.loading = false;
             })
         },
-        // 去采购
-        gotoPurchase() {
-            this.$message.success("跳转到采购链接。。。");
-        },
         // 查看详情
         viewDetail (id){
             this.$router.push({

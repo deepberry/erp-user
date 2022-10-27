@@ -16,6 +16,10 @@
                 </div>
                 <router-view></router-view>
             </div>
+            <div class="btn">
+                <i class="erp erphtmal5icon45"></i>
+                <p>园区列表</p>
+            </div>
         </div>
     </div>
 </template>
@@ -58,5 +62,24 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+.btn {
+    width: 94px;
+    height: 50px;
+    padding: 0 20px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.18);
+    border-radius: 100px 0px 0px 100px;
+    color: #538dff;
+    i {
+        display: inline-block;
+        transform: rotate(180deg);
+    }
 }
 </style>

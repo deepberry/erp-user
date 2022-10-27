@@ -24,7 +24,9 @@
                         class="searchInput"
                         placeholder="关键词搜索：任务内容、检查建议..."
                     ></el-input>
-                    <el-button type="primary" class="searchSubmit" :loading="searchLoading">查询</el-button>
+                    <el-button type="primary" class="searchSubmit" @click="getData" :loading="searchLoading"
+                        >查询</el-button
+                    >
                     <el-button type="primary" class="searchCreateNewTask" @click="showCreateBox = true"
                         ><i class="erp erpjiufuqianbaoicon06"></i> 创建任务</el-button
                     >
@@ -34,11 +36,24 @@
                 <div class="table">
                     <el-table size="large" :data="list" style="width: 100%" max-height="600px" v-loading="loading">
                         <el-table-column prop="id" label="任务单号" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="title" label="所属棚区" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="type" label="执行人"></el-table-column>
-                        <el-table-column prop="num" label="任务内容"></el-table-column>
-                        <el-table-column prop="status" label="状态"></el-table-column>
-                        <el-table-column label="操作" width="260">
+                        <el-table-column
+                            prop="gardenTitle"
+                            width="200"
+                            label="所属棚区"
+                            show-overflow-tooltip
+                        ></el-table-column>
+                        <el-table-column label="执行人" width="200">
+                            <template #default="scope">
+                                <p v-for="item in scope.row.executors" :key="item.id">{{ item.name }}</p>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="taskContent" label="任务内容"></el-table-column>
+                        <el-table-column label="状态" width="200">
+                            <template #default="scope">
+                                <span :style="{ color: scope.row.color }">{{ scope.row.statusText }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="200">
                             <template #default="scope">
                                 <el-button link type="primary" @click="showDetail(scope.row.id)">查看详情</el-button>
                             </template>
@@ -127,17 +142,38 @@ export default {
         getData() {
             this.loading = true;
             this.ajax
-                .post("/api/v1/adam/task/taskList", {
+                .post("/api/v1/adam/task/manageTaskList", {
                     pageNum: this.currentPage,
                     pageSize: 10,
                     param: {
-                        gardenId: 0,
-                        growPlantId: 0,
+                        gardenId: -1,
+                        growPlantId: -1,
                         status: this.currentStatus,
                     },
                 })
                 .then((r) => {
-                    this.list = r.data;
+                    this.list = r.data.map((item) => {
+                        item.executors = JSON.parse(item.executors);
+                        switch (item.status) {
+                            case 0:
+                                item.statusText = "待执行";
+                                item.color = "#A8A8A8";
+                                break;
+                            case 1:
+                                item.statusText = "待检查";
+                                item.color = "#1890FF";
+                                break;
+                            case 2:
+                                item.statusText = "合格";
+                                item.color = "#0DD71C";
+                                break;
+                            case 3:
+                                item.statusText = "不合格";
+                                item.color = "#FF4949";
+                                break;
+                        }
+                        return item;
+                    });
                     this.loading = false;
                 });
         },

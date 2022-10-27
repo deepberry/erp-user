@@ -33,6 +33,16 @@ export default {
             activeTabIndex: 0
         }
     },
+    watch: {
+        $route: {
+            handler: function (v) {
+                if(v.path == this.headTab[1].path){
+                    this.activeTabIndex = 1;
+                }
+            },
+            deep: true
+        }
+    },
     mounted (){
         // 默认进入订单列表
         if(this.$route.name == 'erpPurchase'){

@@ -164,7 +164,7 @@ export default {
         },
         // 去采购
         gotoPurchase() {
-            this.$message.success("跳转到采购链接。。。");
+            this.$router.push('/erp/purchase/shop');
         },
         // 查看详情
         viewDetail (id){
