@@ -17,7 +17,7 @@
                 <router-view></router-view>
             </div>
             <div class="btn">
-                <i class="erp erphtmal5icon45"></i>
+                <i class="erp erpanniu_jiantouxiangzuo_o"></i>
                 <p>园区列表</p>
             </div>
         </div>
@@ -68,9 +68,10 @@ export default {
     height: 50px;
     padding: 0 20px;
     position: absolute;
-    top: 0;
+    top: 10px;
     right: 0;
     display: flex;
+    cursor: pointer;
     justify-content: space-between;
     align-items: center;
     background: #ffffff;
@@ -79,7 +80,7 @@ export default {
     color: #538dff;
     i {
         display: inline-block;
-        transform: rotate(180deg);
+        font-size: 18px;
     }
 }
 </style>
