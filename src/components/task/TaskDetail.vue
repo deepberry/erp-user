@@ -9,7 +9,7 @@
             width="700px"
         >
             <div v-loading="detailLoading" class="taskDetailInner purchaseDetailBoxInner">
-                <div class="id wrap">任务单号：22222222</div>
+                <div class="id wrap">任务单号：{{ detail.id }}</div>
                 <div class="create wrap">
                     <div>任务创建</div>
                     <div>
