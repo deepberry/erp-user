@@ -35,7 +35,7 @@
             <div class="tableWrap">
                 <div class="table">
                     <el-table size="large" :data="list" style="width: 100%" max-height="600px" v-loading="loading">
-                        <el-table-column prop="id" label="任务单号" show-overflow-tooltip></el-table-column>
+                        <el-table-column prop="id" label="任务单号" width="300" show-overflow-tooltip></el-table-column>
                         <el-table-column
                             prop="gardenTitle"
                             width="200"
@@ -73,8 +73,8 @@
                 </div>
             </div>
         </div>
-        <TaskDetail v-if="showDetailBox" @onCloseDetail="onCloseDetail"></TaskDetail>
-        <TaskCreate v-if="showCreateBox" @onCloseDetail="onCloseCreate"></TaskCreate>
+        <TaskDetail v-if="showDetailBox" :id="currentId" @onCloseDetail="onCloseDetail"></TaskDetail>
+        <TaskCreate v-if="showCreateBox" @onCloseCreate="onCloseCreate"></TaskCreate>
     </div>
 </template>
 
@@ -123,6 +123,7 @@ export default {
             total: 4,
             showDetailBox: false, // 是否显示详情弹窗
             showCreateBox: false,
+            currentId: "", // 显示详情的ID
         };
     },
     components: {
@@ -179,11 +180,14 @@ export default {
         },
         // 打开详情
         showDetail(id) {
-            console.log(this.showDetailBox);
+            this.currentId = id;
             this.showDetailBox = true;
         },
         // 关闭详情
-        onCloseDetail() {
+        onCloseDetail(params) {
+            if (params == 1) {
+                this.getData();
+            }
             let timer = setTimeout(() => {
                 this.showDetailBox = false;
                 clearTimeout(timer);

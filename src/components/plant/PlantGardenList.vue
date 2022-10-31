@@ -1,6 +1,6 @@
 <template>
     <div class="PlantGardenList">
-        <el-drawer v-model="showDrawer" title="I am the title" direction="rtl" :before-close="onClose"></el-drawer>
+        <el-drawer v-model="showDrawer" title="I am the title" direction="rtl" :before-close="onClose"> </el-drawer>
     </div>
 </template>
 
@@ -12,6 +12,7 @@ export default {
             showDrawer: true,
         };
     },
+    mounted() {},
     methods: {
         onClose() {},
     },

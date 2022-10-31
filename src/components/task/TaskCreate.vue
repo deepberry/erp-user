@@ -171,7 +171,7 @@ export default {
             });
         },
         onClose() {
-            this.$emit("onCloseDetail", 0);
+            this.$emit("onCloseCreate", 0);
             this.showDetailBox = false;
         },
         // 搜索作物
@@ -210,18 +210,32 @@ export default {
                 return;
             }
 
+            let executors = this.selectedUser.map((item) => {
+                let json = {};
+                this.userlist.map((i) => {
+                    if (item == i.id) {
+                        json = i;
+                    }
+                });
+                return json;
+            });
+            let growPlants = this.selectedPlant.map((item) => {
+                let json = {};
+                this.plantList.map((i) => {
+                    if (item == i.id) {
+                        json = i;
+                    }
+                });
+                return json;
+            });
             this.submitting = true;
             this.ajax
                 .post("/api/v1/adam/task/createTask", {
                     endTime: this.endTime,
-                    executors: this.selectedUser.join(","),
+                    executors: JSON.stringify(executors),
                     gardenId: this.selectedGarden,
                     gardenTitle: gardenTitle,
-                    growPlants: this.plantList
-                        .map((item) => {
-                            return item.id;
-                        })
-                        .join(","),
+                    growPlants: JSON.stringify(growPlants),
                     opinion: "11",
                     reWire: this.videoCover.join(","),
                     startTime: this.startTime,

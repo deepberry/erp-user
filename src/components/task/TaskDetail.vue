@@ -19,20 +19,26 @@
                     <div>任务内容</div>
                     <div class="taskContent">
                         <div>
-                            <p>园区：A区B棚</p>
+                            <p>园区：{{ detail.gardenTitle }}</p>
                             <p>作物：蓝莓</p>
                         </div>
                         <div>
-                            <p>内容：修枝</p>
+                            <p>内容：{{ detail.taskContent }}</p>
                             <div>
                                 <p>操作视频：</p>
-                                <img src="../../assets/img/ds.png" alt="" />
+                                <img :src="detail.reWire" alt="" />
                             </div>
                         </div>
                     </div>
-                    <div>指定执行人：张三</div>
-                    <div>开始时间：2022.10.19 14:35:01</div>
-                    <div>截止时间：2022.10.19 14:35:01</div>
+                    <div>
+                        <p>
+                            指定执行人：<span style="margin: 0 5px" v-for="item in detail.executors" :key="item.id">{{
+                                item.name
+                            }}</span>
+                        </p>
+                    </div>
+                    <div>开始时间：{{ detail.startTime }}</div>
+                    <div>截止时间：{{ detail.endTime }}</div>
                 </div>
                 <div class="todo wrap">
                     <div>任务执行</div>
@@ -56,7 +62,7 @@
                 </div>
                 <el-button
                     @click="showTextArea = true"
-                    v-if="!showTextArea"
+                    v-if="!showTextArea && detail.status == 1"
                     type="primary"
                     link
                     style="margin-top: 20px"
@@ -69,8 +75,8 @@
                         <div>
                             是否合格：
                             <el-radio-group v-model="isPass" class="ml-4">
-                                <el-radio label="1">合格</el-radio>
-                                <el-radio label="0">不合格</el-radio>
+                                <el-radio label="2">合格</el-radio>
+                                <el-radio label="3">不合格</el-radio>
                             </el-radio-group>
                         </div>
                     </div>
@@ -81,7 +87,7 @@
                 </div>
                 <div class="btns" v-if="showTextArea">
                     <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
-                    <el-button type="primary">确定</el-button>
+                    <el-button type="primary" @click="submitCheck" :loading="submitting">确定</el-button>
                 </div>
             </div>
         </el-dialog>
@@ -89,6 +95,7 @@
 </template>
 
 <script>
+import timer from "@/utils/timer";
 export default {
     name: "taskDetail",
     props: ["id"],
@@ -99,14 +106,48 @@ export default {
             detail: "",
             showTextArea: false,
             textarea: "",
-            isPass: "1",
+            isPass: "2",
+            submitting: false,
         };
     },
-    mounted() {},
+    mounted() {
+        this.getData();
+    },
     methods: {
-        onClose() {
-            this.$emit("onCloseDetail", 0);
+        getData() {
+            this.detailLoading = true;
+            this.ajax
+                .post("/api/v1/adam/task/taskDetail", {
+                    taskId: this.id,
+                })
+                .then((r) => {
+                    this.detailLoading = false;
+                    r.data.startTime = timer.time("y-m-d h:is", r.data.startTime);
+                    r.data.endTime = timer.time("y-m-d h:is", r.data.endTime);
+                    r.data.executors = JSON.parse(r.data.executors);
+                    this.detail = r.data;
+                });
+        },
+        onClose(params) {
+            if (typeof params == "function") {
+                params = null;
+            }
+            this.$emit("onCloseDetail", params);
             this.showDetailBox = false;
+        },
+        submitCheck() {
+            this.submitting = true;
+            this.ajax
+                .post("/api/v1/adam/task/taskCheck", {
+                    checkStatus: this.isPass,
+                    taskId: this.id,
+                    taskOpinion: "",
+                })
+                .then((r) => {
+                    this.submitting = false;
+                    this.$message.success("提交成功");
+                    this.onClose(1);
+                });
         },
     },
 };
@@ -154,6 +195,7 @@ export default {
                     }
                     img {
                         width: 200px;
+                        height: 130px;
                         margin-left: 10px;
                         border-radius: 10px;
                     }

@@ -4,11 +4,22 @@
             <img src="../../assets/img/img-logo.png" alt="" />
         </div>
         <div class="userInfo">
-            <p>
+            <p class="un">
                 <a>{{ user.name }}</a>
-                你好，{{ user.orgzs[0].name }}
-                <i class="erp erp31xiala"></i>
             </p>
+            <el-dropdown size="large" trigger="click">
+                <p class="group">
+                    你好，{{ user.organization.name }}
+                    <i class="erp erp31xiala"></i>
+                </p>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item v-for="(item, index) in user.orgzs" :key="index">{{
+                            item.name
+                        }}</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
             <p class="logout" @click="logout">退出</p>
         </div>
     </div>
@@ -20,11 +31,8 @@ export default {
     data: function () {
         return {
             user: {
-                orgzs: [
-                    {
-                        name: "",
-                    },
-                ],
+                organization: {},
+                orgzs: [],
             },
         };
     },
@@ -91,9 +99,16 @@ export default {
         align-items: center;
         padding-right: 50px;
         font-size: 14px;
+        .un {
+            margin-right: 5px;
+            position: relative;
+            top: -1px;
+        }
+        p.group {
+            cursor: pointer;
+        }
         a {
             color: #538dff;
-            cursor: pointer;
         }
         i {
             font-size: 14px;
