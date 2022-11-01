@@ -64,7 +64,7 @@
                         <el-pagination
                             v-model:currentPage="currentPage"
                             v-model:page-size="pageSize"
-                            :page-sizes="[100, 200, 300, 400]"
+                            @current-change="getData"
                             background
                             layout="prev, pager, next, jumper"
                             :total="total"
@@ -119,8 +119,8 @@ export default {
             searchLoading: false, // 搜索中状态,
             list: [],
             currentPage: 1,
-            pageSize: 20,
-            total: 4,
+            pageSize: 10,
+            total: 0,
             showDetailBox: false, // 是否显示详情弹窗
             showCreateBox: false,
             currentId: "", // 显示详情的ID
@@ -175,6 +175,7 @@ export default {
                         }
                         return item;
                     });
+                    this.total = r.total;
                     this.loading = false;
                 });
         },
