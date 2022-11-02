@@ -33,7 +33,7 @@
                             <i class="erp erpanniu_jiantouxiangzuo_o"></i>
                             园区列表
                         </p>
-                        <el-button type="primary">新增园区</el-button>
+                        <el-button type="primary" @click="showAddBox = true">新增园区</el-button>
                     </div>
                     <div class="list">
                         <div
@@ -45,7 +45,9 @@
                             <img :src="item.listImage" alt="" />
                             <div class="c">
                                 <p>{{ item.title }}</p>
-                                <p>蓝莓</p>
+                                <p>
+                                    <span v-for="plant in item.tagList" :key="plant.id">{{ plant.title }}</span>
+                                </p>
                             </div>
                             <i class="erp erpcaidan" @click.stop="item.showMenu = true"></i>
                             <transition name="el-zoom-in-top">
@@ -61,10 +63,12 @@
                 </div>
             </el-drawer>
         </div>
+        <plant-add v-if="showAddBox" :onClose="onCloseAdd"></plant-add>
     </div>
 </template>
 
 <script>
+import PlantAdd from "@/components/plant/PlantAdd";
 export default {
     name: "stock",
     data() {
@@ -80,7 +84,11 @@ export default {
             currentGarden: 0,
             loading: false,
             showGardenList: false,
+            showAddBox: false, // 显示新增园区的弹窗
         };
+    },
+    components: {
+        PlantAdd,
     },
     mounted() {
         // 默认进入订单列表
@@ -115,6 +123,13 @@ export default {
         tabClick(index) {
             this.activeTabIndex = index;
             this.$router.push(this.headTab[index].path);
+        },
+        // 关闭创建弹窗
+        onCloseAdd() {
+            this.getGardenList();
+            setTimeout(() => {
+                this.showAddBox = false;
+            }, 500);
         },
     },
 };
@@ -208,6 +223,9 @@ export default {
                 p {
                     width: 100%;
                     color: #4c4c4c;
+                    span {
+                        margin-right: 5px;
+                    }
                 }
                 p:last-child {
                     font-size: 12px;

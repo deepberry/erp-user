@@ -96,7 +96,7 @@
                                 <input v-if="!uploading" @change="uploadFile" ref="file" type="file" />
                                 <p v-if="!uploading"><i class="erp erpshangchuan"></i></p>
                                 <p v-if="!uploading">点击上传单据、凭证、照片</p>
-                                <el-progress v-if="uploading" width="90" type="circle" :percentage="percentage" />
+                                <el-progress v-if="uploading" :width="90" type="circle" :percentage="percentage" />
                             </div>
                         </div>
                     </div>
