@@ -10,9 +10,9 @@ export default [
         component: () => import("../views/erp/plant.vue"),
         children: [
             {
-                name: "erpPlantList",
-                path: "/erp/plant/list",
-                component: () => import("../components/plant/PlantList.vue"),
+                name: "erpPlantDetail",
+                path: "/erp/plant/detail",
+                component: () => import("../components/plant/PlantDetail.vue"),
             },
         ],
     },

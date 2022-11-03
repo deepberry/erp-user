@@ -1,5 +1,11 @@
 <template>
-    <el-dialog v-model="showAddBox" title="新增园区" width="600px" :before-close="handleClose" append-to-body>
+    <el-dialog
+        v-model="showAddBox"
+        :title="isEdit ? '编辑园区' : '新增园区'"
+        width="600px"
+        :before-close="onClose"
+        append-to-body
+    >
         <div class="plantAdd" v-loading="loading">
             <div class="item">
                 <p class="itemLabel"><span>*</span>园区名称：</p>
@@ -9,6 +15,7 @@
                 <p class="itemLabel"><span>*</span>园区图片：</p>
                 <div class="upload">
                     <img v-if="form.img" :src="form.img" alt="" />
+                    <i class="erp erpguanbi" @click="form.img = ''" v-if="form.img"></i>
                     <div class="uploadBox" v-if="!form.img">
                         <input v-if="!form.uploading" @change="uploadFile" ref="file" type="file" />
                         <p v-if="!form.uploading"><i class="erp erpshangchuan"></i></p>
@@ -38,9 +45,11 @@
     </el-dialog>
 </template>
 
-<script>
+<script lang="js">
 export default {
     name: "plantAdd",
+    props: ['isEdit', 'id'],
+    emits: ['onCloseAdd'],
     data() {
         return {
             loading: false,
@@ -57,21 +66,51 @@ export default {
         };
     },
     mounted() {
-        this.getUserList();
+        let t = this;
+        let ajax = async function (){
+            t.loading = true;
+            await t.getData();
+            await t.getUserList();
+            t.loading = false;
+        }
+        let ajax2 = async function (){
+            t.loading = true;
+            await t.getUserList();
+            t.loading = false;
+        }
+        if(t.isEdit) ajax(); else ajax2();
     },
     methods: {
+        // 获取数据
+        getData (){
+            return new Promise((a ,b) => {
+                this.ajax.post("/api/v1/adam/garden/details", {
+                    id: this.id
+                }).then((r) => {
+                    r.data.img = r.data.detailImage;
+                    r.data.user = r.data.gardenManagerBoList.map(item => String(item.aid));
+                    this.form = r.data;
+                    a();
+                })
+            })
+        },
         // 关闭新增弹窗
-        handleClose() {
+        onClose(params = null) {
+            if (typeof params == "function") {
+                params = null;
+            }
+            console.log(params)
+            this.$emit("onCloseAdd", params);
             this.showAddBox = false;
-            this.$emit("onClose", 0);
         },
         // 获取人员列表
         getUserList() {
-            this.loading = true;
-            this.ajax.post("/api/v1/adam/garden/getManager").then((r) => {
-                this.userList = r.data;
-                this.loading = false;
-            });
+            return new Promise((a ,b) => {
+                this.ajax.post("/api/v1/adam/garden/getManager").then((r) => {
+                    this.userList = r.data;
+                    a();
+                })
+            })
         },
         // 上传图片
         uploadFile() {
@@ -149,13 +188,13 @@ export default {
                             weightAll: 0,
                         },
                     ],
-                    id: 0,
+                    id: this.id,
                     title: this.form.title,
                 })
                 .then((r) => {
                     this.submitting = false;
                     this.$message.success("提交成功");
-                    this.handleClose(1);
+                    this.onClose(1);
                 });
         },
     },
@@ -190,6 +229,18 @@ export default {
                 width: 180px;
                 height: 100px;
                 border-radius: 10px;
+            }
+            .erpguanbi {
+                position: absolute;
+                top: 0;
+                right: 0;
+                z-index: 999;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 5px;
+                font-size: 12px;
+                border-top-right-radius: 5px;
+                color: #ffffff;
+                cursor: pointer;
             }
             .uploadBox {
                 width: 180px;

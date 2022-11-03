@@ -1,5 +1,5 @@
 <template>
-    <div class="plantList">
+    <div class="plantDetail">
         <div class="list">
             <div class="item" v-for="(item, index) in list" :key="index">
                 <div class="head">
@@ -42,7 +42,7 @@
 
 <script>
 export default {
-    name: "plantList",
+    name: "plantDetail",
     data() {
         return {
             list: [1, 2, 3, 4, 5, 6, 7, 8],
@@ -79,7 +79,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.plantList {
+.plantDetail {
     .list {
         width: calc(100% - 360px);
         padding: 40px 0;

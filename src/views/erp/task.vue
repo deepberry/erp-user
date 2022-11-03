@@ -195,10 +195,12 @@ export default {
             }, 500);
         },
         // 创建任务弹窗关闭时
-        onCloseCreate() {
+        onCloseCreate(params) {
+            if (params == 1) {
+                this.getData();
+            }
             let timer = setTimeout(() => {
                 this.showCreateBox = false;
-                this.getData();
                 clearTimeout(timer);
             }, 500);
         },

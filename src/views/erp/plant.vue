@@ -4,13 +4,7 @@
             <div class="head">
                 <div class="headBox">
                     <div>
-                        <span
-                            @click="tabClick(index)"
-                            :class="activeTabIndex == index ? 'active' : ''"
-                            v-for="(item, index) in headTab"
-                            :key="item.title"
-                            >{{ item.title }}</span
-                        >
+                        <span class="active">{{ gardenList[currentGarden].title }}</span>
                     </div>
                     <el-button type="primary">新增作物</el-button>
                 </div>
@@ -33,12 +27,12 @@
                             <i class="erp erpanniu_jiantouxiangzuo_o"></i>
                             园区列表
                         </p>
-                        <el-button type="primary" @click="showAddBox = true">新增园区</el-button>
+                        <el-button type="primary" @click="addGarden">新增园区</el-button>
                     </div>
                     <div class="list">
                         <div
                             class="item"
-                            @click="showGardenList = false"
+                            @click="gardenListClick(index)"
                             v-for="(item, index) in gardenList"
                             :key="index"
                         >
@@ -54,8 +48,8 @@
                                 <div v-if="item.showMenu" class="menu" @mouseleave="item.showMenu = false">
                                     <div class="menuPoint"></div>
                                     <p @click.stop="">历史种植</p>
-                                    <p @click.stop="">编辑园区</p>
-                                    <p @click.stop="">删除园区</p>
+                                    <p @click.stop="edit(item.id, index)">编辑园区</p>
+                                    <p @click.stop="del(item.id, index)">删除园区</p>
                                 </div>
                             </transition>
                         </div>
@@ -63,7 +57,7 @@
                 </div>
             </el-drawer>
         </div>
-        <plant-add v-if="showAddBox" :onClose="onCloseAdd"></plant-add>
+        <PlantAdd :isEdit="isEdit" :id="editId" v-if="showAddBox" @onCloseAdd="onCloseAdd"></PlantAdd>
     </div>
 </template>
 
@@ -73,18 +67,13 @@ export default {
     name: "stock",
     data() {
         return {
-            headTab: [
-                {
-                    title: "张三园区",
-                    path: "/erp/plant/list",
-                },
-            ],
-            activeTabIndex: 0,
-            gardenList: [], // 园区列表
+            gardenList: [{ title: "" }], // 园区列表
             currentGarden: 0,
             loading: false,
             showGardenList: false,
             showAddBox: false, // 显示新增园区的弹窗
+            isEdit: false, // 是否是编辑状态
+            editId: 0,
         };
     },
     components: {
@@ -93,12 +82,39 @@ export default {
     mounted() {
         // 默认进入订单列表
         if (this.$route.name == "erpPlant") {
-            this.$router.push(this.headTab[0].path);
+            this.$router.push("/erp/plant/detail");
         }
 
         this.getGardenList();
     },
     methods: {
+        // 编辑园区
+        edit(id, index) {
+            this.showAddBox = true;
+            this.isEdit = true;
+            this.editId = id;
+        },
+        // 添加园区
+        addGarden() {
+            this.showAddBox = true;
+            this.isEdit = false;
+        },
+        // 删除园区
+        del(id, index) {
+            this.ajax
+                .post("/api/v1/adam/garden/deleteGarden", {
+                    id,
+                })
+                .then((r) => {
+                    this.$message.success("删除成功");
+                    this.gardenList.splice(index, 1);
+                });
+        },
+        // 点击园区
+        gardenListClick(index) {
+            this.currentGarden = index;
+            this.showGardenList = false;
+        },
         // 获取园区列表
         getGardenList() {
             this.loading = true;
@@ -120,13 +136,12 @@ export default {
         onCloseGardenList(done) {
             done();
         },
-        tabClick(index) {
-            this.activeTabIndex = index;
-            this.$router.push(this.headTab[index].path);
-        },
         // 关闭创建弹窗
-        onCloseAdd() {
-            this.getGardenList();
+        onCloseAdd(params) {
+            console.log(params);
+            if (params == 1) {
+                this.getGardenList();
+            }
             setTimeout(() => {
                 this.showAddBox = false;
             }, 500);

@@ -170,8 +170,11 @@ export default {
                     });
             });
         },
-        onClose() {
-            this.$emit("onCloseCreate", 0);
+        onClose(params = null) {
+            if (typeof params == "function") {
+                params = null;
+            }
+            this.$emit("onCloseCreate", params);
             this.showDetailBox = false;
         },
         // 搜索作物
@@ -244,7 +247,7 @@ export default {
                 .then((r) => {
                     this.submitting = false;
                     if (r.code == 200 && r.data == true) {
-                        this.$emit("onCloseDetail", 0);
+                        this.$emit("onCloseDetail", 1);
                         this.showDetailBox = false;
                     } else {
                         this.$message.error(r.message);

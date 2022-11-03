@@ -128,7 +128,7 @@ export default {
                     this.detail = r.data;
                 });
         },
-        onClose(params) {
+        onClose(params = null) {
             if (typeof params == "function") {
                 params = null;
             }
