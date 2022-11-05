@@ -80,11 +80,6 @@ export default {
         PlantAdd,
     },
     mounted() {
-        // 默认进入订单列表
-        if (this.$route.name == "erpPlant") {
-            this.$router.push("/erp/plant/detail");
-        }
-
         this.getGardenList();
     },
     methods: {
@@ -128,6 +123,12 @@ export default {
                     this.gardenList = r.data.map((i) => {
                         i.showMenu = false;
                         return i;
+                    });
+                    this.$router.push({
+                        path: "/erp/plant/detail",
+                        query: {
+                            id: r.data[0].id,
+                        },
                     });
                     this.loading = false;
                 });

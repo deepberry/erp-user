@@ -4,18 +4,18 @@
             <div class="item" v-for="(item, index) in list" :key="index">
                 <div class="head">
                     <div class="left">
-                        <img src="../../assets/img/ds.png" alt="" />
-                        <p>蓝莓</p>
+                        <img :src="item.image" alt="" />
+                        <p>{{ item.varietyTitle }}</p>
                     </div>
-                    <div class="right">第101天</div>
+                    <div class="right">第{{ item.count }}天</div>
                 </div>
                 <div class="content">
                     <div class="contentItem">
                         <p><span>园区：</span>B区</p>
-                        <p><span>品种：</span>高丛蓝莓</p>
+                        <p><span>品种：</span>{{ item.categoryTitle }}</p>
                     </div>
                     <div class="contentItem">
-                        <p><span>面积：</span>6.8亩</p>
+                        <p><span>面积：</span>{{ item.area }}亩</p>
                         <p>2022.11.01 定值</p>
                     </div>
                 </div>
@@ -24,54 +24,39 @@
                     <p><i class="erp erprili"></i> 种植任务</p>
                 </div>
             </div>
-        </div>
-
-        <div class="pages" v-if="list.length > 0">
-            <span class="total">共 {{ total }} 条</span>
-            <el-pagination
-                v-model:currentPage="currentPage"
-                v-model:page-size="pageSize"
-                background
-                @current-change="getData"
-                layout="prev, pager, next, jumper"
-                :total="total"
-            />
+            <div class="itemSpace" v-for="item in listSpace" :key="item"></div>
         </div>
     </div>
 </template>
 
 <script>
+import timer from "@/utils/timer";
 export default {
     name: "plantDetail",
     data() {
         return {
-            list: [1, 2, 3, 4, 5, 6, 7, 8],
-            currentPage: 1,
-            pageSize: 8,
-            total: 0,
+            list: [],
+            listSpace: 0,
             loading: false,
         };
     },
     mounted() {
-        // this.getData();
+        this.getData();
     },
     methods: {
-        // 获取列表
+        // 获取数据
         getData() {
             this.loading = true;
             this.ajax
-                .post("/api/v1/adam/adminGrowModel/list", {
-                    pageNum: this.currentPage,
-                    pageSize: 8,
-                    param: {
-                        id: 0,
-                        keyWord: "",
-                        state: 0,
-                    },
+                .post("/api/v1/adam/garden/details", {
+                    id: this.$route.query.id,
                 })
                 .then((r) => {
-                    this.list = r.data;
-                    this.total = r.total;
+                    this.list = r.data.growPlantsBoList.map((item) => {
+                        item.count = new Date().getTime() / 1000 - timer.parse(item.plantTime).getTime() / 1000;
+                        item.count = Math.ceil(item.count / 60 / 60 / 24) + 1;
+                        return item;
+                    });
                 });
         },
     },
@@ -88,6 +73,13 @@ export default {
         justify-content: space-between;
         align-content: flex-start;
         flex-wrap: wrap;
+        .itemSpace {
+            width: 23%;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 50px;
+        }
         .item {
             width: 23%;
             border: 1px solid #e4e4e4;
