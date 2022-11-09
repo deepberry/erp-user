@@ -6,7 +6,7 @@
                     <div>
                         <span class="active">{{ gardenList[currentGarden].title }}</span>
                     </div>
-                    <el-button type="primary">新增作物</el-button>
+                    <el-button type="primary" @click="showAddCropsBox = true">新增作物</el-button>
                 </div>
                 <router-view></router-view>
             </div>
@@ -47,7 +47,7 @@
                             <transition name="el-zoom-in-top">
                                 <div v-if="item.showMenu" class="menu" @mouseleave="item.showMenu = false">
                                     <div class="menuPoint"></div>
-                                    <p @click.stop="">历史种植</p>
+                                    <p @click.stop="history(item.id)">历史种植</p>
                                     <p @click.stop="edit(item.id, index)">编辑园区</p>
                                     <p @click.stop="del(item.id, index)">删除园区</p>
                                 </div>
@@ -58,11 +58,18 @@
             </el-drawer>
         </div>
         <PlantAdd :isEdit="isEdit" :id="editId" v-if="showAddBox" @onCloseAdd="onCloseAdd"></PlantAdd>
+        <PlantAddCrops
+            :isEdit="isEdit"
+            :id="editCropsId"
+            v-if="showAddCropsBox"
+            @onCloseAdd="onCloseAddCrops"
+        ></PlantAddCrops>
     </div>
 </template>
 
 <script>
 import PlantAdd from "@/components/plant/PlantAdd";
+import PlantAddCrops from "@/components/plant/PlantAddCrops";
 export default {
     name: "stock",
     data() {
@@ -72,17 +79,29 @@ export default {
             loading: false,
             showGardenList: false,
             showAddBox: false, // 显示新增园区的弹窗
+            showAddCropsBox: false, // 显示新增作物的弹窗
             isEdit: false, // 是否是编辑状态
+            editCropsId: 0,
             editId: 0,
         };
     },
     components: {
         PlantAdd,
+        PlantAddCrops,
     },
     mounted() {
         this.getGardenList();
     },
     methods: {
+        // 历史种植
+        history(id) {
+            this.$router.push({
+                path: "/erp/plant/history",
+                query: {
+                    id,
+                },
+            });
+        },
         // 编辑园区
         edit(id, index) {
             this.showAddBox = true;
@@ -96,19 +115,45 @@ export default {
         },
         // 删除园区
         del(id, index) {
-            this.ajax
-                .post("/api/v1/adam/garden/deleteGarden", {
-                    id,
-                })
-                .then((r) => {
-                    this.$message.success("删除成功");
-                    this.gardenList.splice(index, 1);
-                });
+            let t = this;
+            let name = t.gardenList[index].title;
+            t.$confirm(
+                `
+                <div style="color: #F59103">园区名称：${name}</div>
+                <div>确定要删除此园区？</div>
+            `,
+                "删除园区",
+                {
+                    dangerouslyUseHTMLString: true,
+                    type: "warning",
+                    beforeClose(action, instance, done) {
+                        if (action == "confirm") {
+                            t.ajax
+                                .post("/api/v1/adam/garden/deleteGarden", {
+                                    id,
+                                })
+                                .then((r) => {
+                                    t.$message.success("删除成功");
+                                    t.gardenList.splice(index, 1);
+                                    done();
+                                });
+                        } else {
+                            done();
+                        }
+                    },
+                }
+            ).catch(() => {});
         },
         // 点击园区
         gardenListClick(index) {
             this.currentGarden = index;
             this.showGardenList = false;
+            this.$router.push({
+                path: "/erp/plant/detail",
+                query: {
+                    id: this.gardenList[index].id,
+                },
+            });
         },
         // 获取园区列表
         getGardenList() {
@@ -139,12 +184,19 @@ export default {
         },
         // 关闭创建弹窗
         onCloseAdd(params) {
-            console.log(params);
             if (params == 1) {
                 this.getGardenList();
             }
             setTimeout(() => {
                 this.showAddBox = false;
+            }, 500);
+        },
+        onCloseAddCrops(params) {
+            if (params == 1) {
+                this.getGardenList();
+            }
+            setTimeout(() => {
+                this.showAddCropsBox = false;
             }, 500);
         },
     },

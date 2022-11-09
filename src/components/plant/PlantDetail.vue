@@ -1,22 +1,22 @@
 <template>
     <div class="plantDetail">
-        <div class="list">
-            <div class="item" v-for="(item, index) in list" :key="index">
+        <div class="list" v-loading="loading">
+            <div class="item" v-for="(item, index) in list" :key="index" @click="itemClick(item.id)">
                 <div class="head">
                     <div class="left">
                         <img :src="item.image" alt="" />
-                        <p>{{ item.varietyTitle }}</p>
+                        <p>{{ item.categoryTitle }}</p>
                     </div>
                     <div class="right">第{{ item.count }}天</div>
                 </div>
                 <div class="content">
                     <div class="contentItem">
-                        <p><span>园区：</span>B区</p>
-                        <p><span>品种：</span>{{ item.categoryTitle }}</p>
+                        <p><span>园区：</span>{{ item.address }}</p>
+                        <p><span>品种：</span>{{ item.varietyTitle }}</p>
                     </div>
                     <div class="contentItem">
                         <p><span>面积：</span>{{ item.area }}亩</p>
-                        <p>2022.11.01 定值</p>
+                        <p>{{ item.plantTime }} 定值</p>
                     </div>
                 </div>
                 <div class="btn">
@@ -43,6 +43,12 @@ export default {
     mounted() {
         this.getData();
     },
+    watch: {
+        $route() {
+            console.log(1);
+            this.getData();
+        },
+    },
     methods: {
         // 获取数据
         getData() {
@@ -55,9 +61,21 @@ export default {
                     this.list = r.data.growPlantsBoList.map((item) => {
                         item.count = new Date().getTime() / 1000 - timer.parse(item.plantTime).getTime() / 1000;
                         item.count = Math.ceil(item.count / 60 / 60 / 24) + 1;
+                        item.plantTime = timer.time("y-m-d", timer.parse(item.plantTime));
                         return item;
                     });
+                    this.listSpace = this.list.length % 4 > 0 ? 4 - (this.list.length % 4) : 0;
+                    console.log(this.listSpace);
+                    this.loading = false;
                 });
+        },
+        itemClick(id) {
+            this.$router.push({
+                path: "/erp/plant/crops/detail",
+                query: {
+                    id,
+                },
+            });
         },
     },
 };
@@ -86,6 +104,7 @@ export default {
             border-radius: 10px;
             overflow: hidden;
             margin-top: 50px;
+            cursor: pointer;
             .head {
                 height: 60px;
                 padding: 0 20px;
@@ -149,16 +168,6 @@ export default {
                     border-right: 1px solid #deedfa;
                 }
             }
-        }
-    }
-    .pages {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 30px 0;
-        .total {
-            color: #a0a0a0;
-            margin-right: 10px;
         }
     }
 }

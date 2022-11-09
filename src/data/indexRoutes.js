@@ -17,6 +17,21 @@ export default [
         ],
     },
     {
+        name: "erpPlantHistory",
+        path: "/erp/plant/history",
+        component: () => import("../components/plant/PlantHistory.vue"),
+    },
+    {
+        name: "erpPlantHistoryDetail",
+        path: "/erp/plant/history/detail",
+        component: () => import("../components/plant/PlantHistoryDetail.vue"),
+    },
+    {
+        name: "erpPlantCropsDetail",
+        path: "/erp/plant/crops/detail",
+        component: () => import("../components/plant/PlantCropsDetail.vue"),
+    },
+    {
         name: "erpTask",
         path: "/erp/task",
         component: () => import("../views/erp/task.vue"),
