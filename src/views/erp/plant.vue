@@ -6,7 +6,7 @@
                     <div>
                         <span class="active">{{ gardenList[currentGarden].title }}</span>
                     </div>
-                    <el-button type="primary" @click="showAddCropsBox = true">新增作物</el-button>
+                    <el-button type="primary" @click="addCrops">新增作物</el-button>
                 </div>
                 <router-view></router-view>
             </div>
@@ -93,6 +93,11 @@ export default {
         this.getGardenList();
     },
     methods: {
+        // 添加作物
+        addCrops() {
+            this.showAddCropsBox = true;
+            this.isEdit = false;
+        },
         // 历史种植
         history(id) {
             this.$router.push({
