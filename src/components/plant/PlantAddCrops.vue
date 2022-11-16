@@ -9,18 +9,18 @@
         <div class="plantAdd" v-loading="loading">
             <div class="item">
                 <p class="itemLabel"><span>*</span>种植种类：</p>
-                <el-input v-model="form.growPlantsBo.categoryTitle" placeholder="如：蓝莓" />
+                <el-input v-model="form.categoryTitle" placeholder="如：蓝莓" />
             </div>
             <div class="item">
-                <p class="itemLabel"><span>*</span>种植品种：</p>
+                <p class="itemLabel">种植品种：</p>
                 <el-input v-model="form.varietyTitle" placeholder="品种名称" />
             </div>
             <div class="item">
-                <p class="itemLabel"><span>*</span>种植样图：</p>
+                <p class="itemLabel">种植样图：</p>
                 <div class="upload">
-                    <img v-if="form.growPlantsBo.image" :src="form.growPlantsBo.image" alt="" />
-                    <i class="erp erpguanbi" @click="form.growPlantsBo.image = ''" v-if="form.growPlantsBo.image"></i>
-                    <div class="uploadBox" v-if="!form.growPlantsBo.image">
+                    <img v-if="form.image" :src="form.image" alt="" />
+                    <i class="erp erpguanbi" @click="form.image = ''" v-if="form.image"></i>
+                    <div class="uploadBox" v-if="!form.image">
                         <input v-if="!form.uploading" @change="uploadFile" ref="file" type="file" />
                         <p v-if="!form.uploading"><i class="erp erpshangchuan"></i></p>
                         <p v-if="!form.uploading">点击上传图片</p>
@@ -30,12 +30,12 @@
             </div>
             <div class="item">
                 <p class="itemLabel"><span>*</span>棚区：</p>
-                <el-input v-model="form.area" placeholder="如：棚区、地块、村组" />
+                <el-input v-model="form.address" placeholder="如：棚区、地块、村组" />
             </div>
             <div class="item">
-                <p class="itemLabel"><span>*</span>移植方式：</p>
+                <p class="itemLabel">移植方式：</p>
                 <div class="userList">
-                    <el-select style="width: 475px" v-model="form.growPlantsBo.growthId" placeholder="请选择移植方式">
+                    <el-select style="width: 475px" v-model="form.growthId" placeholder="请选择移植方式">
                         <el-option
                             v-for="item in plantType"
                             :key="item.id"
@@ -49,21 +49,28 @@
                 <p class="itemLabel"><span>*</span>移植时间：</p>
                 <el-date-picker
                     style="width: 565px"
-                    v-model="form.growPlantsBo.plantTime"
+                    v-model="form.plantTime"
                     type="date"
+                    format="YYYY-MM-DD"
+                    value-format="YYYY-MM-DD"
                     placeholder="请选择时间"
                 />
             </div>
             <div class="item">
                 <p class="itemLabel"><span>*</span>种植面积：</p>
-                <el-input v-model="form.growPlantsBo.area" placeholder="请输入种植面积" />
+                <el-input v-model="form.area" placeholder="请输入种植面积" />
             </div>
             <div class="item">
-                <p class="itemLabel"><span>*</span>关联设备：</p>
+                <p class="itemLabel">关联设备：</p>
                 <div class="userList">
-                    <el-select style="width: 475px" v-model="form.device" multiple placeholder="请选择关联设备">
+                    <el-select
+                        style="width: 475px"
+                        v-model="form.smartDeviceBoList"
+                        multiple
+                        placeholder="请选择关联设备"
+                    >
                         <el-option
-                            v-for="item in userList"
+                            v-for="item in form.smartDeviceBoList"
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
@@ -92,13 +99,11 @@ export default {
                 uploading: false,
                 percentage: 0,
                 varietyTitle: '',
-                growPlantsBo: {},
-                growthId: '', // 当前选中的移植方式id
+                growthId: '', // 当前选中的移植方式
                 smartDeviceBoList: []
             },
             plantType: [], // 移植方式列表
             deviceList: [], // 关联设备列表
-            userList: [],
             submitting: false,
         };
     },
@@ -107,18 +112,12 @@ export default {
         let ajax = async function (){
             t.loading = true;
             await t.getData();
-            await t.getUserList();
-            await t.getPlantClassify();
-            await t.getPlantName();
             await t.getPlantType();
             await t.getDevice();
             t.loading = false;
         }
         let ajax2 = async function (){
             t.loading = true;
-            await t.getUserList();
-            await t.getPlantClassify();
-            await t.getPlantName();
             await t.getPlantType();
             await t.getDevice();
             t.loading = false;
@@ -144,36 +143,15 @@ export default {
             if (typeof params == "function") {
                 params = null;
             }
-            console.log(params)
             this.$emit("onCloseAdd", params);
             this.showAddBox = false;
-        },
-        // 获取人员列表
-        getUserList() {
-            return new Promise((a ,b) => {
-                this.ajax.post("/api/v1/adam/garden/getManager").then((r) => {
-                    this.userList = r.data;
-                    a();
-                })
-            })
-        },
-        // 获取种植种类列表
-        getPlantClassify (){
-            return new Promise((a,b) => {
-                a();
-            })
-        },
-        // 获取种植品种列表
-        getPlantName (){
-            return new Promise((a,b) => {
-                a();
-            })
         },
         // 获取移植方式列表
         getPlantType (){
             return new Promise((a,b) => {
                 this.ajax.post('/api/v1/adam/garden/getGrowGrowth').then(r => {
                     this.plantType = r.data;
+                    this.form.growthId = r.data[0].id;
                     a();
                 })
             })
@@ -199,76 +177,49 @@ export default {
                     }
                 )
                 .then((r) => {
-                    this.form.growPlantsBo.image = r.data.imageUrl;
+                    this.form.image = r.data.imageUrl;
                     this.form.uploading = false;
                     this.form.percentage = 0;
                 });
         },
         submit() {
-            console.log(this.form)
-            // if (!this.form.title) {
-            //     this.$message.warning("请输入园区名称");
-            //     return;
-            // }
-            // if (!this.form.img) {
-            //     this.$message.warning("请上传园区图片");
-            //     return;
-            // }
-            // if (this.form.user.length == 0) {
-            //     this.$message.warning("请选择管理人员");
-            //     return;
-            // }
-            // let user = this.form.user.map((item) => {
-            //     this.userList.map((u) => {
-            //         if (item == u.id) {
-            //             item = {
-            //                 aid: u.id,
-            //                 username: u.name,
-            //             };
-            //         }
-            //     });
-            //     return item;
-            // });
-            // this.submitting = true;
-            // this.ajax
-            //     .post("/api/v1/adam/garden/editGarden", {
-            //         detailImage: this.form.img,
-            //         gardenManagerBoList: user,
-            //         growPlantsBoList: [
-            //             {
-            //                 address: "",
-            //                 area: 0,
-            //                 categoryId: 0,
-            //                 categoryTitle: "",
-            //                 endTime: "",
-            //                 gardenId: 0,
-            //                 growthId: 0,
-            //                 id: 0,
-            //                 image: "",
-            //                 isEnd: 0,
-            //                 plantTime: "",
-            //                 smartDevice: 0,
-            //                 smartDeviceBoList: [
-            //                     {
-            //                         id: 0,
-            //                         plantsId: 0,
-            //                         smartDeviceId: 0,
-            //                         title: "",
-            //                     },
-            //                 ],
-            //                 varietyId: 0,
-            //                 varietyTitle: "",
-            //                 weightAll: 0,
-            //             },
-            //         ],
-            //         id: this.id,
-            //         title: this.form.title,
-            //     })
-            //     .then((r) => {
-            //         this.submitting = false;
-            //         this.$message.success("提交成功");
-            //         this.onClose(1);
-            //     });
+            if (!this.form.categoryTitle) {
+                this.$message.warning("请输入种类名称");
+                return;
+            }
+            if (!this.form.plantTime) {
+                this.$message.warning("请输入棚区");
+                return;
+            }
+            if (!this.form.address) {
+                this.$message.warning("请选择移植时间");
+                return;
+            }
+            if (!this.form.area) {
+                this.$message.warning("请输入种植面积");
+                return;
+            }
+            this.submitting = true;
+            let data = {
+                "id": 0,
+                "categoryTitle": this.form.categoryTitle,
+                "varietyTitle": this.form.varietyTitle,
+                "plantTime": this.form.plantTime + ' 08:00:00',
+                "gardenId": this.$route.query.id,
+                "growthId": this.form.growthId,
+                "area": parseInt(this.form.area),
+                "address": this.form.address,
+                "smartDevice": 0,
+                "smartDeviceBoList": [],
+                "image": this.form.image,
+            }
+            console.log(data)
+            this.ajax.post("/api/v1/adam/plants/editPlants", data)
+            .then((r) => {
+                this.submitting = false;
+                this.$message.success("提交成功");
+                this.onClose(1);
+            });
         },
     },
 };

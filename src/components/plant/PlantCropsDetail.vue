@@ -14,11 +14,13 @@
             <div class="main" v-loading="loading">
                 <div class="wrap info">
                     <div class="plant">
-                        <img src="../../assets/img/ds.png" alt="" />
+                        <img :src="detail.image" alt="" />
                         <div>
-                            <p>蓝莓-B区</p>
-                            <p><span>品种：</span>高从蓝莓</p>
-                            <p><span>天数：</span><i style="color: #4069d2">第5天</i></p>
+                            <p>{{ detail.categoryTitle }}-{{ detail.address }}</p>
+                            <p><span>品种：</span>{{ detail.varietyTitle }}</p>
+                            <p>
+                                <span>天数：</span><i style="color: #4069d2">第{{ detail.count }}天</i>
+                            </p>
                         </div>
                     </div>
                     <div class="tips">
@@ -32,8 +34,16 @@
                             &nbsp;
                         </div>
                         <div class="select">
-                            <el-button type="primary" style="width: 120px">种植指导</el-button>
-                            <el-select v-model="selectValue" style="width: 120px" class="m-2" placeholder="作物管理">
+                            <el-button type="primary" style="width: 120px" @click="showGuide = true"
+                                >种植指导</el-button
+                            >
+                            <el-select
+                                v-model="selectValue"
+                                style="width: 120px"
+                                class="m-2"
+                                placeholder="作物管理"
+                                @change="selectChange"
+                            >
                                 <el-option
                                     v-for="(item, index) in selectList"
                                     :key="index"
@@ -62,6 +72,7 @@
                 </div>
             </div>
         </div>
+        <PlantGuide v-if="showGuide" @close="closeGuide"></PlantGuide>
     </div>
 </template>
 
@@ -71,6 +82,7 @@ import PlantCropsDetailTabA from './PlantCropsDetailTabA';
 import PlantCropsDetailTabB from './PlantCropsDetailTabB';
 import PlantCropsDetailTabC from './PlantCropsDetailTabC';
 import PlantCropsDetailTabD from './PlantCropsDetailTabD';
+import PlantGuide from '@/components/plant/PlantGuide';
 export default {
     name: "stockRecord",
     data() {
@@ -78,27 +90,90 @@ export default {
             loading: false,
             activeName: '1',
             selectValue: '',
-            selectList: ['结束种植', '编辑作物', '删除作物']
+            selectList: ['结束种植', '编辑作物', '删除作物'],
+            detail: {},
+            showGuide: false
         }
     },
     mounted() {
-
+        let t = this;
+        let ajax = async function (){
+            t.loading = true;
+            await t.getData();
+            t.loading = false;
+        }
+        ajax();
     },
     components: {
-        PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD
+        PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD, PlantGuide
     },
     methods: {
+        // 操作作物
+        selectChange (){
+            // 结束种植
+            if(this.selectValue == 0){
+                this.ajax.post('/api/v1/adam/plants/end', {
+                    id: this.$route.query.id
+                }).then(r => {
+                    this.$message.success('操作成功');
+                    this.$router.push({
+                        path: '/erp/plant',
+                        query: {
+                            gardenId: this.$route.query.gardenId
+                        }
+                    })
+                })
+            }
+
+            // // 编辑作物
+            // if(this.selectValue == 1){
+
+            // }
+            // 删除作物
+            if(this.selectValue == 2){
+                this.ajax.post('/api/v1/adam/plants/deletePlants', {
+                    id: this.$route.query.id
+                }).then(r => {
+                    this.$message.success('删除成功');
+                    this.$router.push({
+                        path: '/erp/plant',
+                        query: {
+                            gardenId: this.$route.query.gardenId
+                        }
+                    })
+                })
+            }
+        },
         // 返回列表
         back() {
             this.$router.push({
-                path: '/erp/plant/history',
+                path: '/erp/plant',
                 query: {
-                    id: this.$route.query.from
+                    gardenId: this.$route.query.gardenId
                 }
             });
         },
         handleClick (){
 
+        },
+        // 关闭种植指导
+        closeGuide (){
+            setTimeout(() => {
+                this.showGuide = false;
+            }, 500);
+        },
+        // 获取作物详情
+        getData (){
+            return new Promise((a,b) => {
+                this.ajax.post('/api/v1/adam/plants/getPlants', {
+                    id: this.$route.query.id
+                }).then(r => {
+                    r.data.count = new Date().getTime() / 1000 - timer.parse(r.data.plantTime).getTime() / 1000;
+                    r.data.count = Math.ceil(r.data.count / 60 / 60 / 24);
+                    this.detail = r.data;
+                    a();
+                })
+            })
         }
     },
 }

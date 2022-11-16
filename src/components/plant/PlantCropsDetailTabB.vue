@@ -3,40 +3,44 @@
         <div class="status">
             <el-button type="primary">添加农事</el-button>
         </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">农事时间：2022.11.09</div>
-            <div class="itemBox h">备注：备注备注备注备注备注备注备注</div>
-            <div class="itemBox s_3">
-                <i class="erp erpxiangyou1"></i>
-            </div>
-        </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">农事时间：2022.11.09</div>
-            <div class="itemBox">备注：无</div>
-            <div class="itemBox s_3">
-                <i class="erp erpxiangyou1"></i>
-            </div>
-        </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">农事时间：2022.11.09</div>
-            <div class="itemBox">备注：无</div>
-            <div class="itemBox s_3">
-                <i class="erp erpxiangyou1"></i>
-            </div>
-        </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">农事时间：2022.11.09</div>
-            <div class="itemBox">备注：无</div>
-            <div class="itemBox s_3">
-                <i class="erp erpxiangyou1"></i>
+        <el-empty v-if="list.length == 0" description="暂无数据" />
+        <div class="items">
+            <div class="item" v-for="item in list" :key="item.id">
+                <div class="itemBox">{{ item.title }}</div>
+                <div class="itemBox">农事时间：{{ item.workTime }}</div>
+                <div :class="item.workText ? 'itemBox h' : 'itemBox'">备注：{{ item.workText || "无" }}</div>
+                <div class="itemBox s_3">
+                    <i class="erp erpxiangyou1"></i>
+                </div>
             </div>
         </div>
     </div>
 </template>
+<script>
+export default {
+    data() {
+        return {
+            list: [],
+        };
+    },
+    mounted() {
+        this.getData();
+    },
+    methods: {
+        // 获取种植任务列表
+        getData(v) {
+            this.currentStatus = v;
+            this.ajax
+                .post("/api/v1/adam/task/getFarmRecordByPlantsId", {
+                    id: this.$route.query.id,
+                })
+                .then((r) => {
+                    this.list = r.data;
+                });
+        },
+    },
+};
+</script>
 
 <style lang="less" scoped>
 .box {
@@ -47,6 +51,10 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
+    }
+    .items {
+        height: 500px;
+        overflow-y: auto;
     }
     .item {
         width: calc(100% - 80px);

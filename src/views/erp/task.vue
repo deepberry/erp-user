@@ -35,13 +35,14 @@
             <div class="tableWrap">
                 <div class="table">
                     <el-table size="large" :data="list" style="width: 100%" max-height="600px" v-loading="loading">
-                        <el-table-column prop="id" label="任务单号" width="300" show-overflow-tooltip></el-table-column>
-                        <el-table-column
-                            prop="gardenTitle"
-                            width="200"
-                            label="所属棚区"
-                            show-overflow-tooltip
-                        ></el-table-column>
+                        <el-table-column label="任务单号" width="150" show-overflow-tooltip>
+                            <template #default="scope"> RW{{ scope.row.id }} </template>
+                        </el-table-column>
+                        <el-table-column label="所属棚区" show-overflow-tooltip>
+                            <template #default="scope">
+                                {{ scope.row.gardenTitle }}-{{ scope.row.growPlantTitle }}-{{ scope.row.address }}
+                            </template>
+                        </el-table-column>
                         <el-table-column label="执行人" width="200">
                             <template #default="scope">
                                 <p v-for="item in scope.row.executors" :key="item.id">{{ item.name }}</p>
@@ -132,12 +133,30 @@ export default {
     },
     mounted() {
         this.getData();
+        this.getStatus_1();
     },
     methods: {
         // 切换状态
         statusClick(v) {
             this.currentStatus = v;
             this.getData();
+        },
+        // 获取待检查的数据
+        getStatus_1() {
+            this.ajax
+                .post("/api/v1/adam/task/manageTaskList", {
+                    pageNum: this.currentPage,
+                    pageSize: 10,
+                    param: {
+                        gardenId: "",
+                        growPlantId: "",
+                        status: 1,
+                        keyWord: "",
+                    },
+                })
+                .then((r) => {
+                    this.status[2].sup = r.total;
+                });
         },
         // 获取数据
         getData() {
@@ -150,6 +169,7 @@ export default {
                         gardenId: -1,
                         growPlantId: -1,
                         status: this.currentStatus,
+                        keyWord: this.searchKey,
                     },
                 })
                 .then((r) => {

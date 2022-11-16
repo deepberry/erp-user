@@ -117,6 +117,7 @@ export default {
         addGarden() {
             this.showAddBox = true;
             this.isEdit = false;
+            this.editId = "";
         },
         // 删除园区
         del(id, index) {
@@ -174,12 +175,20 @@ export default {
                         i.showMenu = false;
                         return i;
                     });
+
+                    // 默认进入第一个园区
+                    let id = this.$route.query.gardenId || r.data[0].id;
                     this.$router.push({
                         path: "/erp/plant/detail",
                         query: {
-                            id: r.data[0].id,
+                            id,
                         },
                     });
+                    if (this.$route.query.gardenId) {
+                        this.gardenList.map((item, index) => {
+                            if (item.id == this.$route.query.gardenId) this.currentGarden = index;
+                        });
+                    }
                     this.loading = false;
                 });
         },
@@ -198,7 +207,14 @@ export default {
         },
         onCloseAddCrops(params) {
             if (params == 1) {
-                this.getGardenList();
+                // 通过触发路由刷新数据
+                this.$router.push({
+                    path: "/erp/plant/detail",
+                    query: {
+                        id: this.$route.query.id,
+                        re: 1,
+                    },
+                });
             }
             setTimeout(() => {
                 this.showAddCropsBox = false;

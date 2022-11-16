@@ -1,5 +1,6 @@
 <template>
     <div class="plantDetail">
+        <el-empty description="暂无数据" v-if="list.length == 0" style="margin-top: 200px" />
         <div class="list" v-loading="loading">
             <div class="item" v-for="(item, index) in list" :key="index" @click="itemClick(item.id)">
                 <div class="head">
@@ -45,7 +46,6 @@ export default {
     },
     watch: {
         $route() {
-            console.log(1);
             this.getData();
         },
     },
@@ -60,7 +60,7 @@ export default {
                 .then((r) => {
                     this.list = r.data.growPlantsBoList.map((item) => {
                         item.count = new Date().getTime() / 1000 - timer.parse(item.plantTime).getTime() / 1000;
-                        item.count = Math.ceil(item.count / 60 / 60 / 24) + 1;
+                        item.count = Math.ceil(item.count / 60 / 60 / 24);
                         item.plantTime = timer.time("y-m-d", timer.parse(item.plantTime));
                         return item;
                     });
@@ -74,6 +74,7 @@ export default {
                 path: "/erp/plant/crops/detail",
                 query: {
                     id,
+                    gardenId: this.$route.query.id,
                 },
             });
         },

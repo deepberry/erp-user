@@ -32,7 +32,7 @@
                         <el-option
                             v-for="(item, plantIndex) in plantList"
                             :key="plantIndex"
-                            :label="item.categoryTitle"
+                            :label="item.categoryTitle + '-' + item.address"
                             :value="item.id"
                         />
                     </el-select>
@@ -43,14 +43,14 @@
                 </div>
                 <div class="item">
                     <p class="title">操作指导：</p>
-                    <div class="pics">
-                        <div class="img" v-for="(item, index) in videoCover" :key="index">
-                            <img :src="item" alt="" />
-                            <i class="erp erpguanbi"></i>
-                        </div>
-                        <div class="upload">
-                            <p><i class="erp erpshangchuan"></i></p>
-                            <p>点击上传视频</p>
+                    <div class="upload">
+                        <video v-if="video" controls :src="video" alt="" />
+                        <i class="erp erpguanbi" @click="video = ''" v-if="video"></i>
+                        <div class="uploadBox" v-if="!video">
+                            <input v-if="!uploading" @change="uploadFile" ref="file" type="file" />
+                            <p v-if="!uploading"><i class="erp erpshangchuan"></i></p>
+                            <p v-if="!uploading">点击上传图片</p>
+                            <el-progress v-if="uploading" :width="90" type="circle" :percentage="percentage" />
                         </div>
                     </div>
                 </div>
@@ -109,10 +109,9 @@ export default {
             taskContent: "", // 任务内容
             startTime: "",
             endTime: "",
-            video: [],
-            videoCover: [
-                "https://guanglin-b2c.oss-cn-shanghai.aliyuncs.com/avatar/20221027/56c9d7da-a3e8-40ef-a0dd-c3f151750490.png",
-            ],
+            video: "",
+            uploading: false,
+            percentage: 0, // 上传进度
             searchCropLoading: false, // 作物搜索中
             submitting: false,
         };
@@ -177,6 +176,26 @@ export default {
             this.$emit("onCloseCreate", params);
             this.showDetailBox = false;
         },
+        // 上传视频
+        uploadFile() {
+            this.uploading = true;
+            let file = this.$refs.file.files[0];
+            this.ajax
+                .upload(
+                    "/api/v1/adam/upload",
+                    {
+                        file,
+                    },
+                    (num) => {
+                        this.percentage = parseInt(num);
+                    }
+                )
+                .then((r) => {
+                    this.video = r.data.imageUrl;
+                    this.uploading = false;
+                    this.percentage = 0;
+                });
+        },
         // 搜索作物
         searchCrop() {},
         // 提交表单
@@ -240,7 +259,7 @@ export default {
                     gardenTitle: gardenTitle,
                     growPlants: JSON.stringify(growPlants),
                     opinion: "11",
-                    reWire: this.videoCover.join(","),
+                    reWire: this.video,
                     startTime: this.startTime,
                     taskContent: this.taskContent,
                 })
@@ -274,49 +293,42 @@ export default {
         p.title {
             width: 90px;
         }
-        .pics {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            flex-wrap: wrap;
+        .upload {
+            width: 180px;
+            height: 100px;
             position: relative;
             left: -10px;
-            .img {
-                width: 140px;
+            background: #ffffff;
+            video {
+                width: 180px;
                 height: 100px;
-                border-radius: 5px;
-                position: relative;
-                overflow: hidden;
-                img {
-                    width: 140px;
-                    height: 100px;
-                }
-                i {
-                    display: inline-block;
-                    font-size: 14px;
-                    color: #ffffff;
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    cursor: pointer;
-                    background: rgba(0, 0, 0, 0.5);
-                    padding: 5px;
-                }
+                border-radius: 10px;
             }
-            .upload {
-                width: 140px;
+            .erpguanbi {
+                position: absolute;
+                top: 0;
+                right: 0;
+                z-index: 999;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 5px;
+                font-size: 12px;
+                border-top-right-radius: 5px;
+                color: #ffffff;
+                cursor: pointer;
+            }
+            .uploadBox {
+                width: 180px;
                 height: 100px;
                 border-radius: 5px;
                 background: rgba(244, 248, 251, 1);
                 display: flex;
-                border: 1px solid #e6e6e6;
                 justify-content: center;
                 align-content: center;
                 flex-wrap: wrap;
                 font-size: 12px;
                 color: rgba(107, 145, 242, 1);
-                margin-left: 10px;
                 cursor: pointer;
+                position: relative;
                 p {
                     width: 100%;
                     text-align: center;
@@ -324,6 +336,21 @@ export default {
                     i {
                         font-size: 22px;
                     }
+                }
+                input {
+                    width: 180px;
+                    height: 100px;
+                    background: rgba(0, 0, 0, 0.5);
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    cursor: pointer;
+                    opacity: 0;
+                }
+                .el-progress--circle {
+                    position: absolute;
+                    top: 5px;
+                    z-index: 10;
                 }
             }
         }

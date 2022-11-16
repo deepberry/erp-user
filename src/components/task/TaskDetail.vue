@@ -5,28 +5,53 @@
             :before-close="onClose"
             append-to-body
             v-model="showDetailBox"
-            title="工单详情"
+            title="任务详情"
             width="700px"
         >
             <div v-loading="detailLoading" class="taskDetailInner purchaseDetailBoxInner">
-                <div class="id wrap">任务单号：{{ detail.id }}</div>
+                <!-- 此处状态图标临时引用，后期修改为动态图片 -->
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 0"
+                    src="../../assets/img/task-detail-status/0.png"
+                    alt=""
+                />
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 1"
+                    src="../../assets/img/task-detail-status/1.png"
+                    alt=""
+                />
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 2"
+                    src="../../assets/img/task-detail-status/2.png"
+                    alt=""
+                />
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 3"
+                    src="../../assets/img/task-detail-status/3.png"
+                    alt=""
+                />
+                <div class="id wrap">任务单号：RW{{ detail.id }}</div>
                 <div class="create wrap">
                     <div>任务创建</div>
                     <div>
-                        <p>创建人：Mins</p>
-                        <p>创建时间：2022.10.19 14:33:01</p>
+                        <p>创建人：{{ detail.createUserName }}</p>
+                        <p>创建时间：{{ detail.createTime }}</p>
                     </div>
                     <div>任务内容</div>
                     <div class="taskContent">
                         <div>
                             <p>园区：{{ detail.gardenTitle }}</p>
-                            <p>作物：蓝莓</p>
+                            <p>作物：{{ detail.growPlantTitle }}-{{ detail.gardenTitle }}</p>
                         </div>
                         <div>
                             <p>内容：{{ detail.taskContent }}</p>
                             <div>
                                 <p>操作视频：</p>
-                                <img :src="detail.reWire" alt="" />
+                                <video controls @click="view(detail.reWire)" :src="detail.reWire" alt="" />
                             </div>
                         </div>
                     </div>
@@ -40,7 +65,7 @@
                     <div>开始时间：{{ detail.startTime }}</div>
                     <div>截止时间：{{ detail.endTime }}</div>
                 </div>
-                <div class="todo wrap">
+                <div class="todo wrap" v-if="detail.status != 1">
                     <div>任务执行</div>
                     <div>执行提交时间：2022.10.19 14:35:01</div>
                     <div>执行提交人：张三</div>
@@ -114,6 +139,10 @@ export default {
         this.getData();
     },
     methods: {
+        // 图片预览
+        view(src) {
+            window.open(src);
+        },
         getData() {
             this.detailLoading = true;
             this.ajax
@@ -122,8 +151,9 @@ export default {
                 })
                 .then((r) => {
                     this.detailLoading = false;
-                    r.data.startTime = timer.time("y-m-d h:is", r.data.startTime);
-                    r.data.endTime = timer.time("y-m-d h:is", r.data.endTime);
+                    r.data.startTime = timer.time("y-m-d h:i:s", r.data.startTime);
+                    r.data.endTime = timer.time("y-m-d h:i:s", r.data.endTime);
+                    r.data.createTime = timer.time("y-m-d h:i:s", r.data.createTime);
                     r.data.executors = JSON.parse(r.data.executors);
                     this.detail = r.data;
                 });
@@ -161,6 +191,11 @@ export default {
     top: -10px;
     padding: 20px 0;
     border-top: 1px solid rgba(0, 0, 0, 0.09);
+    .statusImg {
+        position: absolute;
+        top: 0px;
+        right: 50px;
+    }
     .wrap {
         padding: 20px 0;
         border-bottom: 1px solid rgba(0, 0, 0, 0.09);
@@ -193,7 +228,7 @@ export default {
                     p {
                         width: auto;
                     }
-                    img {
+                    video {
                         width: 200px;
                         height: 130px;
                         margin-left: 10px;

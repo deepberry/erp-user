@@ -13,29 +13,29 @@
             </div>
             <div class="main" v-loading="loading">
                 <div class="list" v-loading="loading">
-                    <div class="item" v-for="(item, index) in list" :key="index" @click="itemClick(index)">
+                    <div class="item" v-for="(item, index) in list" :key="index" @click="itemClick(item.id)">
                         <div class="head">
                             <div class="left">
-                                <img src="../../assets/img/ds.png" alt="" />
-                                <p>蓝莓-高从蓝莓-B区</p>
+                                <img :src="item.image" alt="" />
+                                <p>{{ item.categoryTitle }}-{{ item.varietyTitle }}-{{ item.address }}</p>
                             </div>
                         </div>
                         <div class="content">
                             <div class="contentItem">
-                                <p><span>面积：</span>100亩</p>
-                                <p><span>产量：</span>1000公斤</p>
+                                <p><span>面积：</span>{{ item.area }}亩</p>
+                                <p><span>产量：</span>{{ item.weightAll }}公斤</p>
                             </div>
                         </div>
                         <div class="btn">
                             <div class="start">
-                                <p>2022.11.08</p>
+                                <p>{{ item.plantTime }}</p>
                                 <p>开始种植</p>
                             </div>
                             <div class="line">
                                 <img src="../../assets/img/img-jiantou.png" alt="" />
                             </div>
                             <div class="end">
-                                <p>2022.11.08</p>
+                                <p>{{ item.endTime }}</p>
                                 <p>结束种植</p>
                             </div>
                         </div>
@@ -54,26 +54,45 @@ export default {
     data() {
         return {
             note: '',
-            list: [1,2,3,4,5,6],
+            list: [],
             listSpace: 2,
             loading: false,
         }
     },
     mounted() {
-
+        this.getData();
     },
     methods: {
         // 返回列表
         back() {
-            this.$router.push("/erp/plant");
+            this.$router.push({
+                path: '/erp/plant',
+                query: {
+                    id: this.$route.query.id
+                }
+            });
         },
         itemClick (id){
             this.$router.push({
                 path: '/erp/plant/history/detail',
                 query: {
                     id,
-                    from: this.$route.query.id
+                    gardenId: this.$route.query.id
                 }
+            })
+        },
+        // 获取历史记录
+        getData (){
+            this.loading = true;
+            this.ajax.post('/api/v1/adam/plants/getHistoryPlants', {
+                id: this.$route.query.id
+            }).then(r => {
+                this.list = r.data.map(item => {
+                    item.plantTime = timer.time('y-m-d', item.plantTime);
+                    item.endTime = timer.time('y-m-d', item.endTime);
+                    return item;
+                })
+                this.loading = false;
             })
         }
     },

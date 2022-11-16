@@ -1,42 +1,78 @@
 <template>
     <div class="box">
         <div class="status">
-            <span class="active">全部</span>
-            <span>待执行</span>
-            <span>待检查</span>
-            <span>合格</span>
-            <span>不合格</span>
+            <span
+                @click="getData(item.v)"
+                :class="item.v == currentStatus ? 'active' : ''"
+                v-for="item in status"
+                :key="item.v"
+                >{{ item.k }}</span
+            >
         </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">截止时间：2022.11.09</div>
-            <div class="itemBox h">建议：修建的更细致些</div>
-            <div class="itemBox">执行人：张三</div>
-            <div class="itemBox s_0">待执行</div>
-        </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">截止时间：2022.11.09</div>
-            <div class="itemBox">建议：无</div>
-            <div class="itemBox">执行人：张三</div>
-            <div class="itemBox s_1">待检查</div>
-        </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">截止时间：2022.11.09</div>
-            <div class="itemBox">建议：无</div>
-            <div class="itemBox">执行人：张三</div>
-            <div class="itemBox s_2">合格</div>
-        </div>
-        <div class="item">
-            <div class="itemBox">施肥，每亩1000公斤</div>
-            <div class="itemBox">截止时间：2022.11.09</div>
-            <div class="itemBox">建议：无</div>
-            <div class="itemBox">执行人：张三</div>
-            <div class="itemBox s_3">不合格</div>
+        <el-empty v-if="list.length == 0" description="暂无数据" />
+        <div class="item" v-for="item in list" :key="item.id">
+            <div class="itemBox">{{ item.taskContent }}</div>
+            <div class="itemBox">截止时间：{{ item.endTime }}</div>
+            <div :class="item.opinion ? 'itemBox h' : 'itemBox'">建议：{{ item.opinion || "无" }}</div>
+            <div class="itemBox">执行人：{{ item.executors }}</div>
+            <div :class="`itemBox s_${item.status}`">{{ item.status }}</div>
         </div>
     </div>
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            list: [],
+            currentStatus: -1,
+            status: [
+                {
+                    k: "全部",
+                    v: -1,
+                },
+                {
+                    k: "待执行",
+                    v: 0,
+                },
+                {
+                    k: "待检查",
+                    v: 1,
+                },
+                {
+                    k: "合格",
+                    v: 2,
+                },
+                {
+                    k: "不合格",
+                    v: 3,
+                },
+            ],
+        };
+    },
+    mounted() {
+        this.getData(-1);
+    },
+    methods: {
+        // 获取种植任务列表
+        getData(v) {
+            this.currentStatus = v;
+            this.ajax
+                .post("/api/v1/adam/task/taskList", {
+                    pageNum: 1,
+                    pageSize: 100,
+                    param: {
+                        gardenId: 0,
+                        growPlantId: this.$route.query.id,
+                        keyWord: "",
+                        status: this.currentStatus,
+                    },
+                })
+                .then((r) => {});
+        },
+    },
+};
+</script>
 
 <style lang="less" scoped>
 .box {

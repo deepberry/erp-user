@@ -12,27 +12,27 @@
                 <span style="position: relative; top: 2px; font-size: 15px">历史种植详情</span>
             </div>
             <div class="main" v-loading="loading">
-                <div class="wrap">云南张三蓝莓种植基地</div>
+                <div class="wrap">{{ detail.categoryTitle }}</div>
                 <div class="wrap info">
                     <div class="plant">
-                        <img src="../../assets/img/ds.png" alt="" />
+                        <img :src="detail.image" alt="" />
                         <div>
-                            <p>蓝莓-高从蓝莓-B区</p>
-                            <p><span>面积：</span>8亩</p>
-                            <p><span>产量：</span>111111公斤</p>
+                            <p>{{ detail.categoryTitle }}-{{ detail.varietyTitle }}-{{ detail.address }}</p>
+                            <p><span>面积：</span>{{ detail.area }}亩</p>
+                            <p><span>产量：</span>{{ detail.weightAll }}公斤</p>
                         </div>
                     </div>
                     <div class="space"></div>
                     <div class="time">
                         <div class="start">
-                            <p>2022.11.08</p>
+                            <p>{{ detail.plantTime }}</p>
                             <p>开始时间</p>
                         </div>
                         <div class="line">
                             <img src="../../assets/img/img-jiantou.png" alt="" />
                         </div>
                         <div class="start">
-                            <p>2022.11.08</p>
+                            <p>{{ detail.endTime }}</p>
                             <p>结束时间</p>
                         </div>
                     </div>
@@ -40,84 +40,50 @@
                 <div class="t">历史种植数据：</div>
                 <div class="list">
                     <div class="table">
-                        <div class="tableTitle">（采购统计）</div>
+                        <div class="tableTitle">（采收统计）</div>
                         <div class="tableItem tableHead">
-                            <p>采购时间</p>
+                            <p>采收时间</p>
                             <p>重量</p>
                         </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem tableAll">
-                            <p>合计</p>
-                            <p>2000公斤</p>
+                        <div class="tableItems">
+                            <div class="tableItem" v-for="(item, index) in reap" :key="index">
+                                <p>{{ item.workTime }}</p>
+                                <p>{{ item.weightAll || 0 }}</p>
+                            </div>
+                            <div class="tableItem tableAll">
+                                <p>合计</p>
+                                <p>{{ reapCount }}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="table">
-                        <div class="tableTitle">（采购统计）</div>
+                        <div class="tableTitle">（农资使用）</div>
                         <div class="tableItem tableHead">
-                            <p>采购时间</p>
-                            <p>重量</p>
+                            <p>类型</p>
+                            <p>用量</p>
                         </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem tableAll">
-                            <p>合计</p>
-                            <p>2000公斤</p>
+                        <div class="tableItems">
+                            <div class="tableItem" v-for="(item, index) in farmUseBos" :key="index">
+                                <p>{{ item.agricultural }}</p>
+                                <p>{{ item.agriculturalCount || 0 }}{{ item.agriculturalUnit }}</p>
+                            </div>
                         </div>
                     </div>
                     <div class="table">
-                        <div class="tableTitle">（采购统计）</div>
+                        <div class="tableTitle">（工时统计）</div>
                         <div class="tableItem tableHead">
-                            <p>采购时间</p>
-                            <p>重量</p>
+                            <p>农事类型</p>
+                            <p>工时（小时）</p>
                         </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem">
-                            <p>2022.11.08</p>
-                            <p>2000公斤</p>
-                        </div>
-                        <div class="tableItem tableAll">
-                            <p>合计</p>
-                            <p>2000公斤</p>
+                        <div class="tableItems">
+                            <div class="tableItem" v-for="(item, index) in farmWorkBos" :key="index">
+                                <p>{{ item.agricultural }}</p>
+                                <p>{{ item.agriculturalCount || 0 }}</p>
+                            </div>
+                            <div class="tableItem tableAll">
+                                <p>合计</p>
+                                <p>{{ farmWorkBosCount }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -133,10 +99,38 @@ export default {
     data() {
         return {
             loading: false,
+            detail: {},
+            reap: [],
+            farmUseBos: [],
+            farmWorkBos: []
+        }
+    },
+    computed: {
+        farmWorkBosCount (){
+            let r = 0;
+            this.farmWorkBos.map(item => {
+                r += item.agriculturalCount || 0;
+            })
+            return r;
+        },
+        reapCount (){
+            let r = 0;
+            this.reap.map(item => {
+                r += item.weightAll || 0;
+            })
+            return r;
         }
     },
     mounted() {
-
+        let t = this;
+        let ajax = async function (){
+            t.loading = true;
+            await t.getData();
+            await t.getReap();
+            await t.getStat();
+            t.loading = false;
+        }
+        ajax();
     },
     methods: {
         // 返回列表
@@ -144,10 +138,48 @@ export default {
             this.$router.push({
                 path: '/erp/plant/history',
                 query: {
-                    id: this.$route.query.from
+                    id: this.$route.query.gardenId
                 }
             });
         },
+        // 获取历史详情
+        getData (){
+            return new Promise((a,b) => {
+                this.ajax.post('/api/v1/adam/plants/getPlants', {
+                    id: this.$route.query.gardenId
+                }).then(r => {
+                    this.detail = r.data;
+                    this.loading = false;
+                    a();
+                })
+            })
+        },
+        // 获取采收统计
+        getReap (){
+            return new Promise((a,b) => {
+                this.ajax.post('/api/v1/adam/farm/getFarmRecoveryByPlantsId', {
+                    "plantsId": this.$route.query.id
+                }).then(r => {
+                    this.reap = r.data;
+                    a();
+                })
+            })
+        },
+        // 获取统计数据
+        getStat (){
+            return new Promise((a,b) => {
+                this.ajax.post('/api/v1/adam/farm/searchfarmUseRecoveryByPlantsId', {
+                    "endTime": "",
+                    "id": this.$route.query.id,
+                    "keyWord": "",
+                    "startTime": ""
+                }).then(r => {
+                    this.farmUseBos = r.data.farmUseBos;
+                    this.farmWorkBos = r.data.farmWorkBos;
+                    a();
+                })
+            })
+        }
     },
 }
 </script>
@@ -223,6 +255,13 @@ export default {
                 text-align: center;
                 padding: 12px 0;
             }
+            .tableItems {
+                overflow-y: scroll;
+                height: 420px;
+            }
+            .tableItems::-webkit-scrollbar {
+                width: 0px;
+            }
             .tableItem {
                 display: flex;
                 justify-content: flex-start;
@@ -232,7 +271,7 @@ export default {
                 p {
                     width: 180px;
                     text-align: center;
-                    padding: 12px 0;
+                    padding: 10px 0;
                     border-bottom: 1px solid #d2e8fd;
                     color: #777777;
                 }
