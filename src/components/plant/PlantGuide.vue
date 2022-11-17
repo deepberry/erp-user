@@ -6,9 +6,12 @@
                     <div class="box">
                         <div class="boxTitle">生长阶段：</div>
                         <el-select v-model="step" style="width: 370px" placeholder="请选择">
-                            <el-option label="00" value="0"></el-option>
-                            <el-option label="11" value="1"></el-option>
-                            <el-option label="22" value="2"></el-option>
+                            <el-option
+                                v-for="item in stepList"
+                                :key="item.id"
+                                :label="item.phaseName"
+                                :value="item.id"
+                            ></el-option>
                         </el-select>
                     </div>
                     <div class="box">
@@ -48,11 +51,85 @@
                 <div>
                     <div class="box">
                         <div class="boxTitle">数据对比：</div>
-                        <el-select v-model="step" placeholder="请选择" size="large">
-                            <el-option label="00" value="0"></el-option>
-                            <el-option label="11" value="1"></el-option>
-                            <el-option label="22" value="2"></el-option>
-                        </el-select>
+                        <div class="table">
+                            <div class="tableItem tableHead">
+                                <p>参数名</p>
+                                <p>参考值</p>
+                                <p>当前值</p>
+                            </div>
+                            <div class="tableContent">
+                                <div class="tableItem">
+                                    <p>参数名</p>
+                                    <p>参考值</p>
+                                    <p>当前值</p>
+                                </div>
+                                <div class="tableItem">
+                                    <p>参数名</p>
+                                    <p>参考值</p>
+                                    <p>当前值</p>
+                                </div>
+                                <div class="tableItem">
+                                    <p>参数名</p>
+                                    <p>参考值</p>
+                                    <p>当前值</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrap wrap2">
+                <p class="tips">种植建议：光合积分、积温和株高指标值偏低</p>
+            </div>
+            <div class="wrap wrap2">
+                <div class="box">
+                    <div class="wrap2Title">增加有效光照，降低空气温度</div>
+                    <div class="video">
+                        <div class="videoItem">
+                            <video controls src="../../assets/video/movie.mp4"></video>
+                            <p>LED增加有效光照</p>
+                            <div class="videoTips">
+                                <span>#有效光合</span>
+                                <span>#增加光照</span>
+                                <span>#LED</span>
+                                <span>#补光</span>
+                            </div>
+                        </div>
+                        <div class="videoItem">
+                            <video controls src="../../assets/video/movie.mp4"></video>
+                            <p>LED增加有效光照</p>
+                            <div class="videoTips">
+                                <span>#有效光合</span>
+                                <span>#增加光照</span>
+                                <span>#LED</span>
+                                <span>#补光</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="wrap2Title">病虫害防治指导：</div>
+                    <div class="video">
+                        <div class="videoItem">
+                            <video controls src="../../assets/video/movie.mp4"></video>
+                            <p>LED增加有效光照</p>
+                            <div class="videoTips">
+                                <span>#有效光合</span>
+                                <span>#增加光照</span>
+                                <span>#LED</span>
+                                <span>#补光</span>
+                            </div>
+                        </div>
+                        <div class="videoItem">
+                            <video controls src="../../assets/video/movie.mp4"></video>
+                            <p>LED增加有效光照</p>
+                            <div class="videoTips">
+                                <span>#有效光合</span>
+                                <span>#增加光照</span>
+                                <span>#LED</span>
+                                <span>#补光</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -66,16 +143,20 @@ export default {
     data() {
         return {
             showGuide: true,
-            step: "0",
+            step: "",
+            stepList: [],
             swiperIndex: 0,
             swiperWidth: 370 * 3,
         };
     },
-    mounted() {},
+    mounted() {
+        this.getGrowthStage();
+    },
     methods: {
         handleClose(done) {
             done();
         },
+        // 轮播
         swiperRun(v) {
             if (v == 0) {
                 if (this.swiperIndex == 0) {
@@ -94,6 +175,16 @@ export default {
                 }
             }
         },
+        // 获取生长阶段
+        getGrowthStage() {
+            this.ajax
+                .post("/api/v1/adam/adminGrowModel/getGrowthStage", {
+                    id: this.$route.query.id,
+                })
+                .then((r) => {
+                    this.stepList = r.data;
+                });
+        },
     },
 };
 </script>
@@ -111,6 +202,7 @@ export default {
             display: flex;
             justify-content: flex-start;
             align-content: flex-start;
+            flex-wrap: wrap;
             padding: 10px 0;
             .boxTitle {
                 line-height: 30px;
@@ -179,6 +271,72 @@ export default {
                 img {
                     width: 370px;
                     height: 240px;
+                }
+            }
+            .table {
+                width: 400px;
+                .tableItem {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    text-align: center;
+                    border-left: 1px solid rgb(231, 231, 231);
+                    border-bottom: 1px solid rgb(231, 231, 231);
+                    p {
+                        width: 100%;
+                        padding: 5px 0;
+                        border-right: 1px solid rgb(231, 231, 231);
+                        font-size: 12px;
+                    }
+                }
+                .tableItem.tableHead {
+                    border-top: 1px solid rgb(231, 231, 231);
+                    background: #fafafa;
+                }
+            }
+        }
+    }
+    .wrap2 {
+        width: calc(100% - 80px);
+        margin-left: 80px;
+        margin-top: 20px;
+        .tips {
+            width: 100%;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.09);
+            color: #f59103;
+        }
+        .wrap2Title {
+            color: #6f9aff;
+            margin-top: -10px;
+        }
+        .video {
+            width: 370px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 10px;
+            .videoItem {
+                width: 180px;
+                video {
+                    width: 180px;
+                    border-radius: 5px;
+                }
+                p {
+                    padding: 10px 0;
+                }
+                div {
+                    width: 140px;
+                    padding: 5px 20px;
+                    background: #caf982;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-content: flex-start;
+                    flex-wrap: wrap;
+                    span {
+                        margin: 2px 5px;
+                        font-size: 12px;
+                    }
                 }
             }
         }

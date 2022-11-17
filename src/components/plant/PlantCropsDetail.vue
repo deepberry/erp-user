@@ -73,6 +73,12 @@
             </div>
         </div>
         <PlantGuide v-if="showGuide" @close="closeGuide"></PlantGuide>
+        <PlantAddCrops
+            :isEdit="true"
+            :id="editCropsId"
+            v-if="showAddCropsBox"
+            @onCloseAdd="onCloseAddCrops"
+        ></PlantAddCrops>
     </div>
 </template>
 
@@ -83,6 +89,7 @@ import PlantCropsDetailTabB from './PlantCropsDetailTabB';
 import PlantCropsDetailTabC from './PlantCropsDetailTabC';
 import PlantCropsDetailTabD from './PlantCropsDetailTabD';
 import PlantGuide from '@/components/plant/PlantGuide';
+import PlantAddCrops from "@/components/plant/PlantAddCrops";
 export default {
     name: "stockRecord",
     data() {
@@ -92,7 +99,9 @@ export default {
             selectValue: '',
             selectList: ['结束种植', '编辑作物', '删除作物'],
             detail: {},
-            showGuide: false
+            showGuide: false,
+            editCropsId: '',
+            showAddCropsBox: false
         }
     },
     mounted() {
@@ -105,9 +114,19 @@ export default {
         ajax();
     },
     components: {
-        PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD, PlantGuide
+        PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD, PlantGuide, PlantAddCrops
     },
     methods: {
+        onCloseAddCrops(params) {
+            if (params == 1) {
+                // 通过触发路由刷新数据
+                this.getData();
+            }
+            this.selectValue = '';
+            setTimeout(() => {
+                this.showAddCropsBox = false;
+            }, 500);
+        },
         // 操作作物
         selectChange (){
             // 结束种植
@@ -125,10 +144,11 @@ export default {
                 })
             }
 
-            // // 编辑作物
-            // if(this.selectValue == 1){
-
-            // }
+            // 编辑作物
+            if(this.selectValue == 1){
+                this.showAddCropsBox = true;
+                this.editCropsId = this.$route.query.id;
+            }
             // 删除作物
             if(this.selectValue == 2){
                 this.ajax.post('/api/v1/adam/plants/deletePlants', {

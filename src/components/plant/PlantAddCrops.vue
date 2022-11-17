@@ -72,7 +72,7 @@
                         <el-option
                             v-for="item in form.smartDeviceBoList"
                             :key="item.id"
-                            :label="item.name"
+                            :label="item.title"
                             :value="item.id"
                         ></el-option>
                     </el-select>
@@ -128,11 +128,9 @@ export default {
         // 获取数据
         getData (){
             return new Promise((a ,b) => {
-                this.ajax.post("/api/v1/adam/garden/details", {
+                this.ajax.post("/api/v1/adam/plants/getPlants", {
                     id: this.id
                 }).then((r) => {
-                    r.data.img = r.data.detailImage;
-                    r.data.user = r.data.gardenManagerBoList.map(item => String(item.aid));
                     this.form = r.data;
                     a();
                 })
@@ -159,7 +157,16 @@ export default {
         // 获取关联设备列表
         getDevice (){
             return new Promise((a,b) => {
-                a();
+                this.ajax.post('/api/v1/adam/garden/getSmartDevice', {
+                    "dashboardId": 0,
+                    "id": 0,
+                    "plantsId": 0,
+                    "smartDeviceId": 0,
+                    "title": ""
+                }).then(r => {
+                    this.deviceList = r.data;
+                    a();
+                })
             })
         },
         // 上传图片
@@ -200,12 +207,15 @@ export default {
                 return;
             }
             this.submitting = true;
+            let id = this.isEdit ? this.id : 0;
+            let plantTime = this.form.plantTime.length > 12 ? this.form.plantTime : this.form.plantTime + ' 08:00:00';
+            let gardenId = this.isEdit ? this.$route.query.gardenId : this.$route.query.id;
             let data = {
-                "id": 0,
+                "id": id,
                 "categoryTitle": this.form.categoryTitle,
                 "varietyTitle": this.form.varietyTitle,
-                "plantTime": this.form.plantTime + ' 08:00:00',
-                "gardenId": this.$route.query.id,
+                "plantTime": plantTime,
+                "gardenId": gardenId,
                 "growthId": this.form.growthId,
                 "area": parseInt(this.form.area),
                 "address": this.form.address,
@@ -213,7 +223,6 @@ export default {
                 "smartDeviceBoList": [],
                 "image": this.form.image,
             }
-            console.log(data)
             this.ajax.post("/api/v1/adam/plants/editPlants", data)
             .then((r) => {
                 this.submitting = false;
