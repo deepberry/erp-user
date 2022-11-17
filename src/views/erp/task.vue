@@ -219,6 +219,7 @@ export default {
             if (params == 1) {
                 this.getData();
             }
+            console.log(params);
             let timer = setTimeout(() => {
                 this.showCreateBox = false;
                 clearTimeout(timer);

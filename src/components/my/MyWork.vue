@@ -13,13 +13,23 @@
         </div>
         <div class="table">
             <el-table size="large" :data="list" style="width: 100%" v-loading="loading">
-                <el-table-column prop="time" label="时间" />
-                <el-table-column prop="title" label="农资名称" />
-                <el-table-column prop="type" label="农事类型" />
-                <el-table-column prop="num" label="数量" />
-                <el-table-column prop="area" label="实施棚区" />
-                <el-table-column prop="user" label="实施人" />
-                <el-table-column prop="timenum" label="工时数" />
+                <el-table-column prop="workTime" label="时间" />
+                <el-table-column label="农资名称">
+                    <template #default="scope">
+                        <p v-for="item in scope.row.farmUseBos" :key="item.id">{{ item.agricultural }}</p>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="title" label="农事类型" />
+                <el-table-column label="数量">
+                    <template #default="scope">
+                        <p v-for="item in scope.row.farmUseBos" :key="item.id">
+                            {{ item.agriculturalCount }}{{ item.agriculturalUnit }}
+                        </p>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="gardenName" label="实施棚区" />
+                <el-table-column prop="userName" label="实施人" />
+                <el-table-column prop="workHour" label="工时数" />
             </el-table>
         </div>
         <div class="pages" v-if="list.length > 0">
@@ -36,6 +46,7 @@
 </template>
 
 <script>
+import timer from "@/utils/timer";
 export default {
     name: "StatistiProduct",
     data() {
@@ -64,7 +75,10 @@ export default {
                 .then((r) => {
                     this.loading = false;
                     if (r.code == 200) {
-                        this.list = r.data;
+                        this.list = r.data.map((item) => {
+                            item.workTime = timer.time("y-m-d h:i:s", item.workTime);
+                            return item;
+                        });
                     }
                 });
         },

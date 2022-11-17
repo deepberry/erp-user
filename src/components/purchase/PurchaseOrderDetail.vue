@@ -22,17 +22,25 @@
                     <el-table-column prop="agriculturalBo.agriculturalCategory" label="类型" show-overflow-tooltip />
                     <el-table-column prop="id" label="规格" show-overflow-tooltip>
                         <template #default="scope">
-                            ({{
+                            {{
                                 scope.row.agriculturalBo.agriculturalCount +
                                 scope.row.agriculturalBo.unitweight +
                                 "/" +
                                 scope.row.agriculturalBo.unitmeasurement
-                            }})
+                            }}
                         </template>
                     </el-table-column>
                     <el-table-column prop="agriculturalBo.manufacturers" label="厂家" show-overflow-tooltip />
-                    <el-table-column prop="agriculturalBo.agriculturalCount" label="申领数量" show-overflow-tooltip />
-                    <el-table-column prop="agriculturalBo.agriculturalPrice" label="参考单价" show-overflow-tooltip />
+                    <el-table-column label="采购数量" show-overflow-tooltip>
+                        <template #default="scope">
+                            {{ scope.row.unit }}{{ scope.row.agriculturalBo.unitmeasurement }}（共{{
+                                scope.row.agriculturalCount
+                            }}{{ scope.row.agriculturalBo.unitweight }}）
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="agriculturalBo.agriculturalPrice" label="参考单价" show-overflow-tooltip>
+                        <template #default="scope"> ￥{{ scope.row.agriculturalBo.agriculturalPrice }}.00元 </template>
+                    </el-table-column>
                 </el-table>
                 <div class="bottom">
                     <div>合计：</div>
@@ -43,7 +51,7 @@
                         </p>
                         <p>
                             <span>总价</span>
-                            <span>￥100.00元</span>
+                            <span>￥{{ detail.orderCos }}.00元</span>
                         </p>
                     </div>
                 </div>

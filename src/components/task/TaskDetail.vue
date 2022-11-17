@@ -65,24 +65,36 @@
                     <div>开始时间：{{ detail.startTime }}</div>
                     <div>截止时间：{{ detail.endTime }}</div>
                 </div>
-                <div class="todo wrap" v-if="detail.status != 1">
+                <div class="todo wrap" v-if="detail.status != 0">
                     <div>任务执行</div>
-                    <div>执行提交时间：2022.10.19 14:35:01</div>
-                    <div>执行提交人：张三</div>
+                    <div>执行提交时间：{{ detail.farmRecordBo.workTime }}</div>
+                    <div>执行提交人：{{ detail.farmRecordBo.userName }}</div>
                     <div class="todoContent">
                         <div>
-                            <p class="a">施肥</p>
-                            <p>2022.10.19</p>
+                            <p class="a">{{ detail.farmRecordBo.title }}</p>
+                            <p>{{ detail.farmRecordBo.workTime }}</p>
                         </div>
-                        <div style="display: block">
+                        <!-- <div style="display: block">
                             <p>这次是施肥</p>
                             <p>这次是施肥</p>
                             <p>这次是施肥</p>
-                        </div>
+                        </div> -->
                         <div>
-                            <p class="b">复合肥-5号 500公斤</p>
+                            <p class="b">
+                                {{ detail.farmRecordBo.farmUseBos.agricultural }}
+                                {{ detail.farmRecordBo.farmUseBos.agriculturalCount
+                                }}{{ detail.farmRecordBo.farmUseBos.agriculturalUnit }}
+                            </p>
                             <p>张三</p>
                         </div>
+                    </div>
+                </div>
+                <div class="todo wrap" v-if="detail.status > 1">
+                    <div>任务检查</div>
+                    <div>检查结果：{{ detail.status == 2 ? "合格" : "不合格" }}</div>
+                    <div>检查意见：</div>
+                    <div class="todoContent">
+                        <div style="display: block">{{ detail.opinion }}</div>
                     </div>
                 </div>
                 <el-button
@@ -128,7 +140,11 @@ export default {
         return {
             detailLoading: false,
             showDetailBox: true, // 是否显示详情弹窗
-            detail: "",
+            detail: {
+                farmRecordBo: {
+                    farmUseBos: [],
+                },
+            },
             showTextArea: false,
             textarea: "",
             isPass: "2",
@@ -155,6 +171,8 @@ export default {
                     r.data.endTime = timer.time("y-m-d h:i:s", r.data.endTime);
                     r.data.createTime = timer.time("y-m-d h:i:s", r.data.createTime);
                     r.data.executors = JSON.parse(r.data.executors);
+                    r.data.farmRecordBo = r.data.farmRecordBo || { farmUseBos: {} };
+                    r.data.farmRecordBo.farmUseBos = r.data.farmRecordBo.farmUseBos || {};
                     this.detail = r.data;
                 });
         },

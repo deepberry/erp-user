@@ -72,6 +72,7 @@
                         v-model:currentPage="currentPage"
                         v-model:page-size="pageSize"
                         background
+                        @current-change="getData"
                         layout="prev, pager, next, jumper"
                         :total="total"
                     />

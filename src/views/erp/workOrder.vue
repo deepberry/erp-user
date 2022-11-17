@@ -57,11 +57,17 @@
                                 <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="user" label="申领人"></el-table-column>
+                        <el-table-column prop="userName" label="申领人"></el-table-column>
                         <el-table-column label="操作" width="260">
                             <template #default="scope">
                                 <el-button link type="primary" @click="showDetail(scope.row.id)">查看详情</el-button>
-                                <el-button link type="primary" @click="out(scope.row.id)">一键出库</el-button>
+                                <el-button
+                                    link
+                                    type="primary"
+                                    v-if="scope.row.orderStatus == 1"
+                                    @click="out(scope.row.id)"
+                                    >一键出库</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>
@@ -70,6 +76,7 @@
                         <el-pagination
                             v-model:currentPage="currentPage"
                             background
+                            @current-change="getData"
                             layout="prev, pager, next, jumper"
                             :total="total"
                         />
@@ -101,7 +108,7 @@ export default {
                     sup: 0,
                 },
                 {
-                    title: "已通过",
+                    title: "待出库",
                     value: "1",
                     sup: 0,
                 },
@@ -133,7 +140,7 @@ export default {
     mounted() {
         const ajax = async () => {
             await this.getData();
-            await this.getStatus_1();
+            await this.getStatus_0();
         };
         ajax();
     },
@@ -158,15 +165,19 @@ export default {
                             let color = "";
                             switch (item.orderStatus) {
                                 case 0:
-                                    status = "已提交";
-                                    color = "#1890FF";
+                                    status = "待审核";
+                                    color = "#EC2626";
                                     break;
                                 case 1:
-                                    status = "已完成";
+                                    status = "待出库";
                                     color = "#0DD71C";
                                     break;
                                 case 2:
-                                    status = "已关闭";
+                                    status = "不通过";
+                                    color = "#1890FF";
+                                    break;
+                                case 3:
+                                    status = "已出库";
                                     color = "#A8A8A8";
                                     break;
                             }
@@ -180,7 +191,7 @@ export default {
             });
         },
         // 获取待审核的数量
-        getStatus_1() {
+        getStatus_0() {
             return new Promise((a, b) => {
                 this.ajax
                     .post("/api/v1/adam/workOrder/workOrder-list", {
@@ -188,7 +199,7 @@ export default {
                         pageSize: 10,
                         param: {
                             keyWord: this.searchKey,
-                            orderStatus: 1,
+                            orderStatus: 0,
                         },
                     })
                     .then((r) => {
@@ -208,7 +219,10 @@ export default {
             this.showDetailBox = true;
         },
         // 关闭详情
-        onCloseDetail() {
+        onCloseDetail(v) {
+            if (v == 1) {
+                this.getData();
+            }
             let timer = setTimeout(() => {
                 this.showDetailBox = false;
                 clearTimeout(timer);

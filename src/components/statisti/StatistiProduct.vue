@@ -42,14 +42,20 @@ export default {
     methods: {
         getData() {
             this.loading = true;
-            this.ajax.post("/api/v1/adam/task/dataStatistics").then((r) => {
-                this.loading = false;
-                console.log(r);
-                if (r.code == 200) {
-                    // this.list = r.data;
-                    // this.total = r.total;
-                }
-            });
+            this.ajax
+                .post("/api/v1/adam/task/outputDetailSta", {
+                    endTime: "",
+                    keyWord: this.searchKey,
+                    startTime: "",
+                })
+                .then((r) => {
+                    this.loading = false;
+                    console.log(r);
+                    if (r.code == 200) {
+                        this.list = r.data.list || [];
+                        // this.total = r.total;
+                    }
+                });
         },
     },
 };

@@ -92,7 +92,6 @@ export default {
     .table {
         margin-top: 20px;
         .und {
-            text-decoration: underline;
             color: rgba(83, 141, 255, 1);
             font-size: 12px;
         }

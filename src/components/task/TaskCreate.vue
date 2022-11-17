@@ -49,7 +49,7 @@
                         <div class="uploadBox" v-if="!video">
                             <input v-if="!uploading" @change="uploadFile" ref="file" type="file" />
                             <p v-if="!uploading"><i class="erp erpshangchuan"></i></p>
-                            <p v-if="!uploading">点击上传图片</p>
+                            <p v-if="!uploading">点击上传视频</p>
                             <el-progress v-if="uploading" :width="90" type="circle" :percentage="percentage" />
                         </div>
                     </div>
@@ -73,11 +73,23 @@
                 </div>
                 <div class="item">
                     <p class="title">开始时间：</p>
-                    <el-date-picker style="width: 650px" v-model="startTime" type="date" placeholder="请选择开始时间" />
+                    <el-date-picker
+                        value-format="YYYY-MM-DD"
+                        style="width: 650px"
+                        v-model="startTime"
+                        type="date"
+                        placeholder="请选择开始时间"
+                    />
                 </div>
                 <div class="item">
                     <p class="title">截止时间：</p>
-                    <el-date-picker style="width: 650px" v-model="endTime" type="date" placeholder="请选择截止时间" />
+                    <el-date-picker
+                        style="width: 650px"
+                        value-format="YYYY-MM-DD"
+                        v-model="endTime"
+                        type="date"
+                        placeholder="请选择截止时间"
+                    />
                 </div>
             </div>
             <div class="btns">
@@ -233,19 +245,14 @@ export default {
             }
 
             let executors = this.selectedUser.map((item) => {
-                let json = {};
+                let json = {
+                    id: "",
+                    name: "",
+                };
                 this.userlist.map((i) => {
                     if (item == i.id) {
-                        json = i;
-                    }
-                });
-                return json;
-            });
-            let growPlants = this.selectedPlant.map((item) => {
-                let json = {};
-                this.plantList.map((i) => {
-                    if (item == i.id) {
-                        json = i;
+                        json.id = i.id;
+                        json.name = i.name;
                     }
                 });
                 return json;
@@ -257,8 +264,8 @@ export default {
                     executors: JSON.stringify(executors),
                     gardenId: this.selectedGarden,
                     gardenTitle: gardenTitle,
-                    growPlants: JSON.stringify(growPlants),
-                    opinion: "11",
+                    growPlants: this.selectedPlant,
+                    opinion: "",
                     reWire: this.video,
                     startTime: this.startTime,
                     taskContent: this.taskContent,
@@ -266,7 +273,7 @@ export default {
                 .then((r) => {
                     this.submitting = false;
                     if (r.code == 200 && r.data == true) {
-                        this.$emit("onCloseDetail", 1);
+                        this.onClose(1);
                         this.showDetailBox = false;
                     } else {
                         this.$message.error(r.message);

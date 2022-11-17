@@ -26,7 +26,7 @@
                         </p>
                     </div>
                     <div class="info">
-                        <p>
+                        <p style="color: #409eff">
                             库存：{{ item.agriculturalUnit }}{{ item.agriculturalBo.unitmeasurement }} (共{{
                                 item.agriculturalCount
                             }}{{ item.agriculturalBo.unitweight }})
@@ -55,12 +55,12 @@
                         <el-date-picker v-model="outInTime" type="datetime" placeholder="请选择时间" />
                     </p>
                     <p v-show="defaultType == backUser">
-                        <span class="must">*</span> 退回人：
+                        <span class="must">*</span> 领用人：
                         <el-select
                             v-model="userName"
                             class="m-2"
                             style="width: 220px; margin-left: 14px"
-                            placeholder="请选择退回人"
+                            placeholder="请选择领用人"
                         >
                             <el-option v-for="item in userlist" :key="item.id" :label="item.name" :value="item.id" />
                         </el-select>
@@ -90,11 +90,18 @@
                 </div>
             </div>
         </div>
-        <StockReg v-if="showReg" default="1" @onSubmit="onRegSubmit" @closeReg="closeReg"></StockReg>
+        <StockReg
+            title="请选择要操作的农资"
+            v-if="showReg"
+            default="1"
+            @onSubmit="onRegSubmit"
+            @closeReg="closeReg"
+        ></StockReg>
     </div>
 </template>
 
 <script lang="js">
+import { ElMessage, ElMessageBox } from "element-plus";
 import StockReg from '@/components/stock/StockReg.vue';
 export default {
     name: "stockOut",
@@ -213,65 +220,79 @@ export default {
                 }
                 return {
                     agriculturalCount: item.num,
-                    id: item.id
+                    id: item.id,
+                    title: item.agriculturalBo.title
                 }
             })
-            if(haveEmptyNum > -1){
-                this.$message.warning(`请输入 [ ${emptyNumName} ] 的出库数量`);
-                return;
-            }
-            if(!this.defaultType){
-                this.$message.warning('请选择出库类型');
-                return;
-            }
-            if(!this.outInTime){
-                this.$message.warning('请选择出库时间');
-                return;
-            }
-            if(this.defaultType == this.backUser && !this.userName){
-                this.$message.warning('请输入退回人');
-                return;
-            }
-            if(this.imgs.length <= 0){
-                this.$message.warning('请上传凭证');
-                return;
-            }
-            let workTypeName = '';
-            this.typeList.map(item => {
-                if(item.id == this.defaultType){
-                    workTypeName = item.title;
+            ElMessageBox.confirm(
+                `农资名称：${agriculturalOutInBos.map(i => i.title).join('、')} <br> 确定要出库吗？`,
+                "农资出库",
+                {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning",
+                    dangerouslyUseHTMLString: true,
                 }
-            })
-            let username = '';
-            if(this.userName){
-                this.userlist.map(item => {
-                    if(item.id == this.userName){
-                        username = item.name;
+            )
+            .then(() => {
+                if(haveEmptyNum > -1){
+                    this.$message.warning(`请输入 [ ${emptyNumName} ] 的出库数量`);
+                    return;
+                }
+                if(!this.defaultType){
+                    this.$message.warning('请选择出库类型');
+                    return;
+                }
+                if(!this.outInTime){
+                    this.$message.warning('请选择出库时间');
+                    return;
+                }
+                if(this.defaultType == this.backUser && !this.userName){
+                    this.$message.warning('请输入退回人');
+                    return;
+                }
+                if(this.imgs.length <= 0){
+                    this.$message.warning('请上传凭证');
+                    return;
+                }
+                let workTypeName = '';
+                this.typeList.map(item => {
+                    if(item.id == this.defaultType){
+                        workTypeName = item.title;
                     }
                 })
-            }
-            this.submitting = true;
-            this.ajax.post('/api/v1/adam/farmLand/saveAgriculturalStorage', {
-                agriculturalOutInBos,
-                image: this.imgs.join(','),
-                outInTime: this.outInTime,
-                remark: this.note,
-                type: 1,
-                workAid: this.userName,
-                username,
-                workType: this.defaultType,
-                workTypeName
-            }).then(r => {
-                if(r.code == 200){
-                    this.$message.success('出库成功！');
-                    let t = setTimeout(() => {
-                        this.$router.push("/erp/stock");
-                        clearTimeout(t);
-                    }, 800)
-                }else{
-                    this.$message.error('操作失败，请联系管理员！');
+                let username = '';
+                if(this.userName){
+                    this.userlist.map(item => {
+                        if(item.id == this.userName){
+                            username = item.name;
+                        }
+                    })
                 }
+                this.submitting = true;
+                this.ajax.post('/api/v1/adam/farmLand/saveAgriculturalStorage', {
+                    agriculturalOutInBos,
+                    image: this.imgs.join(','),
+                    outInTime: this.outInTime,
+                    remark: this.note,
+                    type: 1,
+                    workAid: this.userName,
+                    username,
+                    workType: this.defaultType,
+                    workTypeName
+                }).then(r => {
+                    if(r.code == 200){
+                        this.$message.success('出库成功！');
+                        let t = setTimeout(() => {
+                            this.$router.push("/erp/stock");
+                            clearTimeout(t);
+                        }, 800)
+                    }else{
+                        this.$message.error('操作失败，请联系管理员！');
+                    }
+                })
             })
+            .catch(() => {});
         }
     },
 }

@@ -6,11 +6,11 @@
             append-to-body
             v-model="showDetailBox"
             title="工单详情"
-            width="900px"
+            width="1000px"
         >
             <div v-loading="detailLoading" class="workOrderDetailInner purchaseDetailBoxInner">
                 <div class="item">
-                    <p>订单号：{{ detail.orderNo }}</p>
+                    <p>工单号：{{ detail.orderNo }}</p>
                     <p :style="{ color: detail.color }">{{ detail.status }}</p>
                 </div>
                 <div class="item">
@@ -40,25 +40,25 @@
                         prop="agriculturalBo.manufacturers"
                         show-overflow-tooltip
                     ></el-table-column>
-                    <el-table-column label="申领数量" width="100" show-overflow-tooltip>
+                    <el-table-column label="申领数量" show-overflow-tooltip>
                         <template #default="scope">
-                            {{ scope.row.agriculturalCount }} {{ scope.row.agriculturalBo.unitweight }}
+                            {{ scope.row.agriculturalCos }} {{ scope.row.agriculturalBo.unitweight }}
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        label="当前库存"
-                        width="100"
-                        prop="agriculturalCos"
-                        show-overflow-tooltip
-                    ></el-table-column>
+                    <el-table-column label="当前库存" show-overflow-tooltip>
+                        <template #default="scope">
+                            {{ scope.row.unit }} {{ scope.row.agriculturalBo.unitweight }}
+                        </template>
+                    </el-table-column>
                 </el-table>
                 <div class="bottom">
                     <div>合计：</div>
                     <div>
                         <p v-for="(item, index) in detail.totalCount" :key="index">
-                            <span>{{ item.variety }}</span>
+                            <span>{{ item.title }}</span>
                             <span>{{ item.agriculturalCos }}{{ item.unitweight }}</span>
                         </p>
+                        <p style="height: 0px"></p>
                     </div>
                 </div>
                 <div class="form">
@@ -69,9 +69,9 @@
                         <span>{{ item.checkTime }}</span>
                     </p>
                 </div>
-                <div class="formButton">
-                    <el-button type="primary" plain>不通过</el-button>
-                    <el-button type="primary">通过</el-button>
+                <div class="formButton" v-if="detail.orderStatus == 10">
+                    <el-button type="primary" @click="check(2)" plain>不通过</el-button>
+                    <el-button type="primary" @click="check(1)">通过</el-button>
                 </div>
             </div>
         </el-dialog>
@@ -93,6 +93,18 @@ export default {
         this.getData();
     },
     methods: {
+        // 审核工单
+        check(v) {
+            this.ajax
+                .post("/api/v1/adam/workOrder/checkOrder", {
+                    checkStatus: v,
+                    id: this.detail.id,
+                    orderNo: this.detail.orderNo,
+                })
+                .then((r) => {
+                    this.onClose(1);
+                });
+        },
         // 获取详情
         getData() {
             this.detailLoading = true;
@@ -103,15 +115,19 @@ export default {
                 .then((r) => {
                     switch (r.data.orderStatus) {
                         case 0:
-                            r.data.status = "已提交";
-                            r.data.color = "#1890FF";
+                            r.data.status = "待审核";
+                            r.data.color = "#EC2626";
                             break;
                         case 1:
-                            r.data.status = "已完成";
+                            r.data.status = "待出库";
                             r.data.color = "#0DD71C";
                             break;
                         case 2:
-                            r.data.status = "已关闭";
+                            r.data.status = "不通过";
+                            r.data.color = "#1890FF";
+                            break;
+                        case 3:
+                            r.data.status = "已出库";
                             r.data.color = "#A8A8A8";
                             break;
                     }
@@ -141,8 +157,11 @@ export default {
                     this.detailLoading = false;
                 });
         },
-        onClose() {
-            this.$emit("onCloseDetail", 0);
+        onClose(v) {
+            if (typeof v == "function") {
+                v = null;
+            }
+            this.$emit("onCloseDetail", v);
             this.showDetailBox = false;
         },
     },

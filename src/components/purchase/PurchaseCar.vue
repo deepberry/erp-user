@@ -9,7 +9,14 @@
             width="900px"
         >
             <div v-loading="carLoading" class="purchaseDetailBoxInner">
-                <el-table size="large" ref="table" :data="list" style="width: 100%">
+                <el-table
+                    size="large"
+                    ref="table"
+                    @select="select"
+                    @select-all="select"
+                    :data="list"
+                    style="width: 100%"
+                >
                     <el-table-column type="selection" width="40" />
                     <el-table-column prop="agriculturalBo.title" label="农资名称" show-overflow-tooltip />
                     <el-table-column
@@ -50,11 +57,11 @@
                     <div>
                         <p v-for="item in totalList" :key="item.title">
                             <span>{{ item.title }}</span>
-                            <span>{{ item.num }}公斤</span>
+                            <span>{{ item.num }}{{ item.unit }}</span>
                         </p>
                         <p>
                             <span>总价</span>
-                            <span>￥{{ allPrice }}元</span>
+                            <span>￥{{ allPrice }}.00元</span>
                         </p>
                     </div>
                 </div>
@@ -75,6 +82,7 @@ export default {
     data() {
         return {
             list: [],
+            selected: [],
             showCarBox: true, // 是否显示详情弹窗
             detail: {}, // 详情数据,
             carLoading: false, // 详情数据加载状态
@@ -85,7 +93,7 @@ export default {
     computed: {
         allPrice() {
             let num = 0;
-            this.list.map((item) => {
+            this.selected.map((item) => {
                 num += item.agriculturalBo.agriculturalPrice * item.unit;
             });
             return num;
@@ -93,14 +101,26 @@ export default {
     },
     watch: {
         allPrice() {
-            console.log(this.list);
-            this.totalList = tools.total(this.list, "agriculturalBo.title");
+            this.totalList = tools.total(this.selected, "agriculturalBo.title");
+            this.totalList = this.totalList.map((item) => {
+                this.list.map((i) => {
+                    if (i.agriculturalBo.title == item.title) {
+                        item.unit = i.agriculturalBo.unitweight;
+                    }
+                });
+                return item;
+            });
         },
     },
     mounted() {
         this.getCar();
     },
     methods: {
+        // 选择行
+        select(row) {
+            console.log(row);
+            this.selected = row;
+        },
         // 获取购物车列表
         getCar() {
             this.carLoading = true;
@@ -114,8 +134,11 @@ export default {
                     },
                 })
                 .then((r) => {
-                    console.log(r);
-                    this.list = r.data;
+                    let list = [];
+                    r.data.map((item) => {
+                        if (item.unit > 0) list.push(item);
+                    });
+                    this.list = list;
                     this.carLoading = false;
                 });
         },

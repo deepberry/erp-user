@@ -83,7 +83,7 @@
             :before-close="onClose"
             append-to-body
             v-model="showImport"
-            title="选择平台农资信息"
+            :title="title || '选择平台农资信息'"
             width="800px"
         >
             <div class="_import">
@@ -126,7 +126,7 @@
 <script lang="js">
 export default {
     name: 'stockReg',
-    props: ['default', 'needSubmit'],
+    props: ['default', 'needSubmit', 'title'],
     data (){
         return {
             loading: false,
@@ -277,6 +277,10 @@ export default {
                 let id = this.$refs.table.getSelectionRows().map(item => {
                     return item.id;
                 })
+                if(id.length == 0){
+                    this.$message.warning('请选择农资');
+                    return;
+                }
                 this.submitting = true;
                 this.ajax.post('/api/v1/adam/farmLand/savePlatform', {
                     id
@@ -286,6 +290,8 @@ export default {
                         this.$message.success('保存成功');
                         this.$emit('onSave');
                         this.onClose();
+                    }else{
+                        this.$message.warning(r.message);
                     }
                 })
             }

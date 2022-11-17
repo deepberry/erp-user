@@ -6,9 +6,13 @@
         </div>
         <div class="table" v-loading="loading">
             <el-table size="large" :data="list" style="width: 100%">
-                <el-table-column prop="type" label="农资" width="280" />
-                <el-table-column prop="type" label="入库量" width="280" />
-                <el-table-column prop="num" label="出库量" />
+                <el-table-column prop="title" label="农资" width="280" />
+                <el-table-column prop="type" label="入库量" width="280">
+                    <template #default="scope"> {{ scope.row.inCount || 0 }}{{ scope.row.unitWeight }} </template>
+                </el-table-column>
+                <el-table-column prop="type" label="出库量">
+                    <template #default="scope"> {{ scope.row.outCount || 0 }}{{ scope.row.unitWeight }} </template>
+                </el-table-column>
             </el-table>
         </div>
         <div class="pages" v-if="list.length > 0">
@@ -44,16 +48,15 @@ export default {
         getData() {
             this.loading = true;
             this.ajax
-                .post("/api/v1/adam/task/outputDetailSta", {
-                    outboundQuantity: 0,
-                    scheduledReceipt: 0,
-                    totalHours: 0,
-                    totalOutput: 0,
+                .post("/api/v1/adam/task/repertoryDetailSta", {
+                    endTime: "",
+                    keyWord: this.searchKey,
+                    startTime: "",
                 })
                 .then((r) => {
                     this.loading = false;
                     if (r.code == 200) {
-                        // this.list = r.data;
+                        this.list = r.data;
                         // this.total = r.total;
                     }
                 });

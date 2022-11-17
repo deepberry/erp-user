@@ -43,7 +43,7 @@
                             <el-table-column prop="createTime" label="申请日期" />
                             <el-table-column label="状态">
                                 <template #default="scope">
-                                    <span>{{ scope.row.orderStatusString }}</span>
+                                    <span :style="{ color: scope.row.color }">{{ scope.row.orderStatusString }}</span>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -106,11 +106,26 @@ export default {
                 this.loading = false;
                 if(r.code == 200){
                     this.list = r.data.map(item => {
-                        this.status.map(i => {
-                            if(item.orderStatus == i.v) item.orderStatusString = i.k;
-                        })
+                        switch (item.orderStatus) {
+                            case 0:
+                                item.orderStatusString = '待审核';
+                                item.color = '#1890FF';
+                                break;
+                            case 1:
+                                item.orderStatusString = '待出库';
+                                item.color = '#0DD71C';
+                                break;
+                            case 2:
+                                item.orderStatusString = '不通过';
+                                item.color = '#FF4949';
+                                break;
+                            case 3:
+                                item.orderStatusString = '已出库';
+                                item.color = '#A8A8A8';
+                                break;
+                        }
                         return item;
-                    });
+                    })
                     this.total = r.total;
                 }else{
                     this.$message.error(r.message);

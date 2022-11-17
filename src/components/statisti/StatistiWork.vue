@@ -6,8 +6,8 @@
         </div>
         <div class="table" v-loading="loading">
             <el-table size="large" :data="list" style="width: 100%">
-                <el-table-column prop="type" label="姓名" width="280" />
-                <el-table-column prop="num" label="工时" />
+                <el-table-column prop="userName" label="姓名" width="280" />
+                <el-table-column prop="workHours" label="工时" />
             </el-table>
         </div>
         <div class="pages" v-if="list.length > 0">
@@ -43,16 +43,15 @@ export default {
         getData() {
             this.loading = true;
             this.ajax
-                .post("/api/v1/adam/task/outputDetailSta", {
-                    outboundQuantity: 0,
-                    scheduledReceipt: 0,
-                    totalHours: 0,
-                    totalOutput: 0,
+                .post("/api/v1/adam/task/workHoursSta", {
+                    endTime: "",
+                    keyWord: this.searchKey,
+                    startTime: "",
                 })
                 .then((r) => {
                     this.loading = false;
                     if (r.code == 200) {
-                        // this.list = r.data;
+                        this.list = r.data.workDetailHoursList;
                         // this.total = r.total;
                     }
                 });

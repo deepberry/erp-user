@@ -28,10 +28,9 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="manufacturers" label="厂家" show-overflow-tooltip></el-table-column>
-                    <el-table-column label="数量"></el-table-column>
                     <el-table-column label="参考单价">
                         <template #default="scope">
-                            <span style="color: rgba(224, 29, 29, 1)">￥{{ scope.row.agriculturalPrice }}元</span>
+                            <span style="color: rgba(224, 29, 29, 1)">￥{{ scope.row.agriculturalPrice }}.00元</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="180">
