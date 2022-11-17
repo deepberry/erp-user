@@ -1,7 +1,7 @@
 <template>
     <div class="stock inner">
         <div class="box" v-loading="loading">
-            <div class="head">
+            <div class="head" v-if="gardenList.length > 0">
                 <div class="headBox">
                     <div>
                         <span class="active">{{ gardenList[currentGarden].title }}</span>
@@ -9,6 +9,14 @@
                     <el-button type="primary" @click="addCrops">新增作物</el-button>
                 </div>
                 <router-view></router-view>
+            </div>
+            <div class="nodata" v-if="gardenList.length == 0">
+                <el-empty description="暂无园区" style="padding-top: 200px">
+                    <el-button type="primary" @click="addGarden">
+                        <i class="erp erpicon_tianjia" style="font-size: 14px; margin-right: 5px"></i>
+                        添加园区</el-button
+                    >
+                </el-empty>
             </div>
             <div class="btn" @click="showGardenList = true">
                 <i class="erp erpanniu_jiantouxiangzuo_o"></i>
@@ -176,18 +184,20 @@ export default {
                         return i;
                     });
 
-                    // 默认进入第一个园区
-                    let id = this.$route.query.gardenId || r.data[0].id;
-                    this.$router.push({
-                        path: "/erp/plant/detail",
-                        query: {
-                            id,
-                        },
-                    });
-                    if (this.$route.query.gardenId) {
-                        this.gardenList.map((item, index) => {
-                            if (item.id == this.$route.query.gardenId) this.currentGarden = index;
+                    if (this.gardenList.length > 0) {
+                        // 默认进入第一个园区
+                        let id = this.$route.query.gardenId || r.data[0].id;
+                        this.$router.push({
+                            path: "/erp/plant/detail",
+                            query: {
+                                id,
+                            },
                         });
+                        if (this.$route.query.gardenId) {
+                            this.gardenList.map((item, index) => {
+                                if (item.id == this.$route.query.gardenId) this.currentGarden = index;
+                            });
+                        }
                     }
                     this.loading = false;
                 });
@@ -240,7 +250,7 @@ export default {
     height: 45px;
     padding: 0 20px;
     position: absolute;
-    top: 30px;
+    top: 17px;
     right: 0;
     display: flex;
     cursor: pointer;

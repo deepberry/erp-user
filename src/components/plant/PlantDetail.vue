@@ -12,7 +12,7 @@
                 </div>
                 <div class="content">
                     <div class="contentItem">
-                        <p><span>园区：</span>{{ item.address }}</p>
+                        <p><span>棚区：</span>{{ item.address }}</p>
                         <p><span>品种：</span>{{ item.varietyTitle }}</p>
                     </div>
                     <div class="contentItem">
