@@ -33,6 +33,7 @@
                             :key="item.id"
                             :label="item.name"
                             :value="item.id"
+                            :disabled="item.defaultCheck"
                         ></el-option>
                     </el-select>
                 </div>
@@ -63,6 +64,7 @@ export default {
             },
             userList: [],
             submitting: false,
+            currentUser: {}
         };
     },
     mounted() {
@@ -88,7 +90,8 @@ export default {
                     id: this.id
                 }).then((r) => {
                     r.data.img = r.data.detailImage;
-                    r.data.user = r.data.gardenManagerBoList.map(item => String(item.aid));
+                    r.data.user = r.data.gardenManagerBoList.map(item => Number(item.aid));
+                    console.log(r.data.user)
                     this.form = r.data;
                     a();
                 })
@@ -106,8 +109,16 @@ export default {
         // 获取人员列表
         getUserList() {
             return new Promise((a ,b) => {
-                this.ajax.post("/api/v1/adam/garden/getManager").then((r) => {
-                    this.userList = r.data;
+                this.ajax.post("/api/v1/adam/task/getOrganizationUsers").then((r) => {
+                    this.currentUser = JSON.parse(localStorage.getItem('erp_user'));
+                    let name = '';
+                    this.userList = r.data.map(item => {
+                        if(item.id == this.currentUser.id){
+                            item.defaultCheck = true;
+                        }
+                        return item;
+                    })
+                    if(!this.form.user.includes(this.currentUser.id)) this.form.user.push(this.currentUser.id);
                     a();
                 })
             })
@@ -194,7 +205,11 @@ export default {
                 .then((r) => {
                     this.submitting = false;
                     this.$message.success("提交成功");
-                    this.onClose(1);
+                    this.onClose(!this.isEdit ? 'add' : {
+                        title: this.form.title,
+                        detailImage: this.form.img,
+                        id: this.id
+                    });
                 });
         },
     },

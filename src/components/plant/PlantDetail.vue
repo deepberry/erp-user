@@ -2,15 +2,15 @@
     <div class="plantDetail">
         <el-empty description="暂无数据" v-if="list.length == 0" style="margin-top: 200px" />
         <div class="list" v-loading="loading">
-            <div class="item" v-for="(item, index) in list" :key="index" @click="itemClick(item.id)">
-                <div class="head">
+            <div class="item" v-for="(item, index) in list" :key="index">
+                <div class="head" @click="itemClick(item.id)">
                     <div class="left">
                         <img :src="item.image" alt="" />
                         <p>{{ item.categoryTitle }}</p>
                     </div>
                     <div class="right">第{{ item.count }}天</div>
                 </div>
-                <div class="content">
+                <div class="content" @click="itemClick(item.id)">
                     <div class="contentItem">
                         <p><span>棚区：</span>{{ item.address }}</p>
                         <p><span>品种：</span>{{ item.varietyTitle }}</p>
@@ -21,8 +21,10 @@
                     </div>
                 </div>
                 <div class="btn">
-                    <p><i class="erp erpjiekouyunwei"></i> 智能设备</p>
-                    <p><i class="erp erprili"></i> 种植任务</p>
+                    <p v-if="item.smartDevice > 0"><i class="erp erpjiekouyunwei"></i> 智能设备</p>
+                    <p @click="itemClick(item.id)">
+                        <i class="erp erprili"></i> <span v-if="item.task > 0"></span> 种植任务
+                    </p>
                 </div>
             </div>
             <div class="itemSpace" v-for="item in listSpace" :key="item"></div>
@@ -62,11 +64,30 @@ export default {
                         item.count = new Date().getTime() / 1000 - timer.parse(item.plantTime).getTime() / 1000;
                         item.count = Math.ceil(item.count / 60 / 60 / 24);
                         item.plantTime = timer.time("y-m-d", timer.parse(item.plantTime));
+                        item.task = false;
                         return item;
                     });
                     this.listSpace = this.list.length % 4 > 0 ? 4 - (this.list.length % 4) : 0;
                     console.log(this.listSpace);
                     this.loading = false;
+                    this.getTaskCount();
+                });
+        },
+        // 获取用户任务列表
+        getTaskCount() {
+            this.ajax
+                .post("/api/v1/adam/task/getTaskCountByUser", {
+                    gardenId: this.$route.query.id,
+                })
+                .then((r) => {
+                    this.list = this.list.map((item) => {
+                        r.data.map((i) => {
+                            if (item.id == i.id) {
+                                item.task = i.count;
+                            }
+                        });
+                        return item;
+                    });
                 });
         },
         itemClick(id) {
@@ -105,7 +126,6 @@ export default {
             border-radius: 10px;
             overflow: hidden;
             margin-top: 50px;
-            cursor: pointer;
             .head {
                 height: 60px;
                 padding: 0 20px;
@@ -114,6 +134,7 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                cursor: pointer;
                 .left {
                     display: flex;
                     justify-content: flex-start;
@@ -134,6 +155,7 @@ export default {
             .content {
                 padding: 0 20px;
                 padding-bottom: 0;
+                cursor: pointer;
                 .contentItem {
                     margin-top: 30px;
                     display: flex;
@@ -161,12 +183,24 @@ export default {
                     width: 100%;
                     cursor: pointer;
                     text-align: center;
+                    position: relative;
+                    border-right: 1px solid #deedfa;
                     i {
                         margin-right: 3px;
                     }
+                    span {
+                        display: inline-block;
+                        width: 5px;
+                        height: 5px;
+                        border-radius: 50%;
+                        background: red;
+                        position: absolute;
+                        top: 0;
+                        right: 10px;
+                    }
                 }
-                p:first-child {
-                    border-right: 1px solid #deedfa;
+                p:last-child {
+                    border-right: none;
                 }
             }
         }

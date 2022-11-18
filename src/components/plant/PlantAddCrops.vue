@@ -58,7 +58,9 @@
             </div>
             <div class="item">
                 <p class="itemLabel"><span>*</span>种植面积：</p>
-                <el-input v-model="form.area" placeholder="请输入种植面积" />
+                <el-input v-model="form.area" placeholder="请输入种植面积">
+                    <template #append>亩</template>
+                </el-input>
             </div>
             <div class="item">
                 <p class="itemLabel">关联设备：</p>

@@ -1,89 +1,90 @@
 <template>
     <el-dialog v-model="showGuide" append-to-body title="种植指导" width="1000px" :before-close="handleClose">
         <div class="main">
-            <div class="wrap">
-                <div>
-                    <div class="box">
-                        <div class="boxTitle">生长阶段：</div>
-                        <el-select v-model="step" style="width: 370px" placeholder="请选择">
-                            <el-option
-                                v-for="item in stepList"
-                                :key="item.id"
-                                :label="item.phaseName"
-                                :value="item.id"
-                            ></el-option>
-                        </el-select>
-                    </div>
-                    <div class="box">
-                        <div class="boxTitle">参考模型：</div>
-                        <div class="swiper2">
-                            <div
-                                class="swiper-wrapper"
-                                :style="{ left: swiperIndex * 370 * -1 + 'px', width: swiperWidth + 'px' }"
-                            >
-                                <div class="swiper-slide">
-                                    <img src="../../assets/img/ds.png" alt="" />
-                                </div>
-                                <div class="swiper-slide">
-                                    <img src="../../assets/img/ds.png" alt="" />
-                                </div>
-                                <div class="swiper-slide">
-                                    <img src="../../assets/img/ds.png" alt="" />
-                                </div>
+            <div class="left">
+                <div class="box">
+                    <div class="boxTitle">生长阶段：</div>
+                    <!-- <el-select v-model="step" style="width: 370px" placeholder="请选择">
+                        <el-option
+                            v-for="item in stepList"
+                            :key="item.id"
+                            :label="item.phaseName"
+                            :value="item.id"
+                        ></el-option>
+                    </el-select> -->
+                    <div class="boxTitle">萌芽阶段</div>
+                </div>
+                <div class="box">
+                    <div class="boxTitle">参考模型：</div>
+                    <div class="swiper2">
+                        <div
+                            class="swiper-wrapper"
+                            :style="{ left: swiperIndex * 370 * -1 + 'px', width: swiperWidth + 'px' }"
+                        >
+                            <div class="swiper-slide">
+                                <img src="../../assets/img/ds.png" alt="" />
                             </div>
-                            <div class="swiper-pagination">
-                                <span
-                                    @click="swiperIndex = item - 1"
-                                    v-for="item in 3"
-                                    :key="item"
-                                    :class="swiperIndex == item - 1 ? 'active' : ''"
-                                ></span>
+                            <div class="swiper-slide">
+                                <img src="../../assets/img/ds.png" alt="" />
                             </div>
-                            <div class="swiper-button-prev" @click="swiperRun(0)">
-                                <i class="erp erpxiangyou1"></i>
+                            <div class="swiper-slide">
+                                <img src="../../assets/img/ds.png" alt="" />
                             </div>
-                            <div class="swiper-button-next" @click="swiperRun(1)">
-                                <i class="erp erpxiangyou1"></i>
-                            </div>
+                        </div>
+                        <div class="swiper-pagination">
+                            <span
+                                @click="swiperIndex = item - 1"
+                                v-for="item in 3"
+                                :key="item"
+                                :class="swiperIndex == item - 1 ? 'active' : ''"
+                            ></span>
+                        </div>
+                        <div class="swiper-button-prev" @click="swiperRun(0)">
+                            <i class="erp erpxiangyou1"></i>
+                        </div>
+                        <div class="swiper-button-next" @click="swiperRun(1)">
+                            <i class="erp erpxiangyou1"></i>
                         </div>
                     </div>
                 </div>
-                <div>
-                    <div class="box">
-                        <div class="boxTitle">数据对比：</div>
-                        <div class="table">
-                            <div class="tableItem tableHead">
+                <div class="box">
+                    <div class="boxTitle">
+                        数据对比：<span style="color: #f59103; margin-left: 10px; text-decoration: underline"
+                            >种植建议：光合积分、积温和株高指标值偏低</span
+                        >
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="table">
+                        <div class="tableItem tableHead">
+                            <p>参数名</p>
+                            <p>参考值</p>
+                            <p>当前值</p>
+                        </div>
+                        <div class="tableContent">
+                            <div class="tableItem">
                                 <p>参数名</p>
                                 <p>参考值</p>
                                 <p>当前值</p>
                             </div>
-                            <div class="tableContent">
-                                <div class="tableItem">
-                                    <p>参数名</p>
-                                    <p>参考值</p>
-                                    <p>当前值</p>
-                                </div>
-                                <div class="tableItem">
-                                    <p>参数名</p>
-                                    <p>参考值</p>
-                                    <p>当前值</p>
-                                </div>
-                                <div class="tableItem">
-                                    <p>参数名</p>
-                                    <p>参考值</p>
-                                    <p>当前值</p>
-                                </div>
+                            <div class="tableItem">
+                                <p>参数名</p>
+                                <p>参考值</p>
+                                <p>当前值</p>
+                            </div>
+                            <div class="tableItem">
+                                <p>参数名</p>
+                                <p>参考值</p>
+                                <p>当前值</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="wrap wrap2">
-                <p class="tips">种植建议：光合积分、积温和株高指标值偏低</p>
-            </div>
-            <div class="wrap wrap2">
+            <div class="right">
                 <div class="box">
-                    <div class="wrap2Title">增加有效光照，降低空气温度</div>
+                    <div class="wrap2Title">农事操作指导</div>
+                    <div class="wrap2Title" style="margin-top: 30px; color: #6f9aff">增加有效光照，降低空气湿度</div>
                     <div class="video">
                         <div class="videoItem">
                             <video controls src="../../assets/video/movie.mp4"></video>
@@ -107,7 +108,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="box">
+                <div class="box" style="margin-top: 40px">
                     <div class="wrap2Title">病虫害防治指导：</div>
                     <div class="video">
                         <div class="videoItem">
@@ -193,10 +194,11 @@ export default {
 .main {
     position: relative;
     top: -20px;
-    .wrap {
-        display: flex;
-        justify-content: flex-start;
-        align-items: flex-start;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    .left {
+        width: 49%;
         .box {
             width: 480px;
             display: flex;
@@ -274,7 +276,7 @@ export default {
                 }
             }
             .table {
-                width: 400px;
+                width: 450px;
                 .tableItem {
                     display: flex;
                     justify-content: space-between;
@@ -296,10 +298,8 @@ export default {
             }
         }
     }
-    .wrap2 {
-        width: calc(100% - 80px);
-        margin-left: 80px;
-        margin-top: 20px;
+    .right {
+        width: 49%;
         .tips {
             width: 100%;
             padding-top: 20px;
@@ -307,8 +307,7 @@ export default {
             color: #f59103;
         }
         .wrap2Title {
-            color: #6f9aff;
-            margin-top: -10px;
+            color: #3d3d3d;
         }
         .video {
             width: 370px;

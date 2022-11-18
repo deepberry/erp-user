@@ -43,7 +43,7 @@
                                 {{ scope.row.gardenTitle }}-{{ scope.row.growPlantTitle }}-{{ scope.row.address }}
                             </template>
                         </el-table-column>
-                        <el-table-column label="执行人" width="200">
+                        <el-table-column label="执行人">
                             <template #default="scope">
                                 <p v-for="item in scope.row.executors" :key="item.id">{{ item.name }}</p>
                             </template>

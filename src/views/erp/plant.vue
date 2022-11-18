@@ -147,9 +147,19 @@ export default {
                                     id,
                                 })
                                 .then((r) => {
-                                    t.$message.success("删除成功");
-                                    t.gardenList.splice(index, 1);
-                                    done();
+                                    if (r.code == 200) {
+                                        t.$message.success("删除成功");
+                                        t.gardenList.splice(index, 1);
+                                        done();
+                                        t.$router.push({
+                                            path: "/erp/plant/detail",
+                                            query: {
+                                                id: t.gardenList[0].id,
+                                            },
+                                        });
+                                    } else {
+                                        t.$message.error(r.message);
+                                    }
                                 });
                         } else {
                             done();
@@ -208,8 +218,17 @@ export default {
         },
         // 关闭创建弹窗
         onCloseAdd(params) {
-            if (params == 1) {
+            if (typeof params == "string" && params == "add") {
                 this.getGardenList();
+            }
+            if (typeof params == "object" && params) {
+                this.gardenList = this.gardenList.map((item) => {
+                    if (item.id == params.id) {
+                        item.title = params.title;
+                        item.detailImage = params.detailImage;
+                    }
+                    return item;
+                });
             }
             setTimeout(() => {
                 this.showAddBox = false;

@@ -131,7 +131,7 @@ export default {
             }
         }
         .left {
-            width: 500px;
+            width: 50%;
             .tags {
                 display: flex;
                 justify-content: flex-start;
@@ -141,7 +141,7 @@ export default {
             }
         }
         .right {
-            width: calc(100% - 600px);
+            width: 50%;
             margin-left: 100px;
             .imgs {
                 display: flex;
