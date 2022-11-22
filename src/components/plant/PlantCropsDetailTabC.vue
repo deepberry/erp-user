@@ -27,7 +27,12 @@
                 <div class="tableItems">
                     <div class="tableItem" v-for="(item, index) in farmUseBos" :key="index">
                         <p>{{ item.agricultural }}</p>
-                        <p>{{ item.agriculturalCount || 0 }}{{ item.agriculturalUnit }}</p>
+                        <p
+                            style="color: #6397fd; cursor: pointer; text-decoration: underline"
+                            @click="showDialogBox('农资使用统计', item.id)"
+                        >
+                            {{ item.agriculturalCount || 0 }}{{ item.agriculturalUnit }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -40,7 +45,12 @@
                 <div class="tableItems">
                     <div class="tableItem" v-for="(item, index) in farmWorkBos" :key="index">
                         <p>{{ item.agricultural }}</p>
-                        <p>{{ item.agriculturalCount || 0 }}</p>
+                        <p
+                            style="color: #6397fd; cursor: pointer; text-decoration: underline"
+                            @click="showDialogBox('工时使用统计', item.id)"
+                        >
+                            {{ item.agriculturalCount || 0 }}
+                        </p>
                     </div>
                     <div class="tableItem tableAll">
                         <p>合计</p>
@@ -49,10 +59,12 @@
                 </div>
             </div>
         </div>
+        <PlantCropsDetailCDialog :title="dialogTitle" v-if="showDialog" @close="closeDialog"></PlantCropsDetailCDialog>
     </div>
 </template>
 
 <script lang="js">
+import PlantCropsDetailCDialog from '@/components/plant/PlantCropsDetailCDialog';
 export default {
     data() {
         return {
@@ -60,8 +72,14 @@ export default {
             detail: {},
             reap: [],
             farmUseBos: [],
-            farmWorkBos: []
+            farmWorkBos: [],
+            showDialog: false,
+            dialogTitle: '',
+            dialogId: ''
         }
+    },
+    components: {
+        PlantCropsDetailCDialog
     },
     computed: {
         farmWorkBosCount (){
@@ -90,6 +108,16 @@ export default {
         ajax();
     },
     methods: {
+        showDialogBox (title, id){
+            this.dialogTitle = title;
+            this.dialogId = id;
+            this.showDialog = true;
+        },
+        closeDialog (){
+            setTimeout(() => {
+                this.showDialog = false;
+            }, 500);
+        },
         // 获取采收统计
         getReap (){
             return new Promise((a,b) => {

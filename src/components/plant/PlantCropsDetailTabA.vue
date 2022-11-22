@@ -10,17 +10,19 @@
             >
         </div>
         <el-empty v-if="list.length == 0" description="暂无数据" />
-        <div class="item" v-for="item in list" :key="item.id">
+        <div class="item" v-for="item in list" :key="item.id" @click="showDialogBox(id)">
             <div class="itemBox">{{ item.taskContent }}</div>
             <div class="itemBox">截止时间：{{ item.endTime }}</div>
             <div :class="item.opinion ? 'itemBox h' : 'itemBox'">建议：{{ item.opinion || "无" }}</div>
             <div class="itemBox">执行人：{{ item.executors }}</div>
             <div :class="`itemBox s_${item.status}`">{{ item.status }}</div>
         </div>
+        <TaskDetail v-if="showDetailBox" :id="currentId" @onCloseDetail="onCloseDetail"></TaskDetail>
     </div>
 </template>
 
 <script>
+import TaskDetail from "@/components/task/TaskDetail.vue";
 export default {
     data() {
         return {
@@ -48,12 +50,31 @@ export default {
                     v: 3,
                 },
             ],
+            showDetailBox: false,
+            currentId: "",
         };
     },
     mounted() {
         this.getData(-1);
     },
+    components: {
+        TaskDetail,
+    },
     methods: {
+        showDialogBox(id) {
+            this.dialogId = id;
+            this.showDialog = true;
+        },
+        // 关闭详情
+        onCloseDetail(params) {
+            if (params == 1) {
+                this.getData();
+            }
+            let timer = setTimeout(() => {
+                this.showDetailBox = false;
+                clearTimeout(timer);
+            }, 500);
+        },
         // 获取种植任务列表
         getData(v) {
             this.currentStatus = v;
