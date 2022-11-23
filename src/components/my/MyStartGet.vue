@@ -250,7 +250,6 @@ export default {
             }
             i.erpicon_tianjia {
                 padding: 10px;
-                background: ;
             }
         }
     }
