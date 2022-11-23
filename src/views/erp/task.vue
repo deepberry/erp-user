@@ -38,7 +38,7 @@
                         <el-table-column label="任务单号" width="150" show-overflow-tooltip>
                             <template #default="scope"> RW{{ scope.row.id }} </template>
                         </el-table-column>
-                        <el-table-column label="所属棚区" show-overflow-tooltip>
+                        <el-table-column label="所属棚区" width="300" show-overflow-tooltip>
                             <template #default="scope">
                                 {{ scope.row.gardenTitle }}-{{ scope.row.growPlantTitle }}-{{ scope.row.address }}
                             </template>

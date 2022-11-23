@@ -45,7 +45,7 @@
                     <div class="taskContent">
                         <div>
                             <p>园区：{{ detail.gardenTitle }}</p>
-                            <p>作物：{{ detail.growPlantTitle }}-{{ detail.gardenTitle }}</p>
+                            <p>作物：{{ detail.growPlantTitle }}-{{ detail.address }}</p>
                         </div>
                         <div>
                             <p>内容：{{ detail.taskContent }}</p>

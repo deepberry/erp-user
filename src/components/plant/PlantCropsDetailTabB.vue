@@ -1,11 +1,11 @@
 <template>
     <div class="box">
         <div class="status">
-            <el-button type="primary">添加农事</el-button>
+            <el-button type="primary" @click="showAdd = true">添加农事</el-button>
         </div>
         <el-empty v-if="list.length == 0" description="暂无数据" />
         <div class="items">
-            <div class="item" v-for="item in list" :key="item.id">
+            <div class="item" v-for="item in list" :key="item.id" @click="itemClick(item.id)">
                 <div class="itemBox">{{ item.title }}</div>
                 <div class="itemBox">农事时间：{{ item.workTime }}</div>
                 <div :class="item.workText ? 'itemBox h' : 'itemBox'">备注：{{ item.workText || "无" }}</div>
@@ -14,19 +14,42 @@
                 </div>
             </div>
         </div>
+        <PlantCropsDetailCDialogDetail
+            v-if="showDetail"
+            :title="detailTitle"
+            :id="detailId"
+            @close="closeDetail"
+        ></PlantCropsDetailCDialogDetail>
+        <PlantCropsDetailBDialog v-if="showAdd" @close="closeAdd"></PlantCropsDetailBDialog>
     </div>
 </template>
 <script>
+import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
+import PlantCropsDetailBDialog from "@/components/plant/PlantCropsDetailBDialog";
 export default {
+    props: ["showADialog"],
     data() {
         return {
             list: [],
+            showDetail: false,
+            detailTitle: "",
+            detailId: "",
+            showAdd: false,
         };
     },
     mounted() {
         this.getData();
     },
+    components: {
+        PlantCropsDetailCDialogDetail,
+        PlantCropsDetailBDialog,
+    },
     methods: {
+        itemClick(id) {
+            this.detailTitle = "sad";
+            this.detailId = "";
+            this.showDetail = true;
+        },
         // 获取种植任务列表
         getData(v) {
             this.currentStatus = v;
@@ -37,6 +60,16 @@ export default {
                 .then((r) => {
                     this.list = r.data;
                 });
+        },
+        closeDetail() {
+            setTimeout(() => {
+                this.showDetail = false;
+            }, 300);
+        },
+        closeAdd() {
+            setTimeout(() => {
+                this.showAdd = false;
+            }, 300);
         },
     },
 };

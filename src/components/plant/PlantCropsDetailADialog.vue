@@ -126,6 +126,9 @@
                     <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
                     <el-button type="primary" @click="submitCheck" :loading="submitting">确定</el-button>
                 </div>
+                <div class="btns">
+                    <el-button type="primary" @click="gotob">去执行</el-button>
+                </div>
             </div>
         </el-dialog>
     </div>
@@ -155,6 +158,10 @@ export default {
         this.getData();
     },
     methods: {
+        gotob() {
+            this.onClose();
+            this.$emit("gotob");
+        },
         // 图片预览
         view(src) {
             window.open(src);

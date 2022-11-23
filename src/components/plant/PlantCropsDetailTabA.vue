@@ -1,5 +1,5 @@
 <template>
-    <div class="box">
+    <div class="box" v-loading="loading">
         <div class="status">
             <span
                 @click="getData(item.v)"
@@ -10,23 +10,30 @@
             >
         </div>
         <el-empty v-if="list.length == 0" description="暂无数据" />
-        <div class="item" v-for="item in list" :key="item.id" @click="showDialogBox(id)">
+        <div class="item" v-for="item in list" :key="item.id" @click="showDialogBox(item.id)">
             <div class="itemBox">{{ item.taskContent }}</div>
             <div class="itemBox">截止时间：{{ item.endTime }}</div>
             <div :class="item.opinion ? 'itemBox h' : 'itemBox'">建议：{{ item.opinion || "无" }}</div>
             <div class="itemBox">执行人：{{ item.executors }}</div>
-            <div :class="`itemBox s_${item.status}`">{{ item.status }}</div>
+            <div :class="`itemBox s_${item.status}`">{{ item.statusStr }}</div>
         </div>
-        <TaskDetail v-if="showDetailBox" :id="currentId" @onCloseDetail="onCloseDetail"></TaskDetail>
+        <PlantCropsDetailADialog
+            @gotob="gotob"
+            v-if="showDetailBox"
+            :id="currentId"
+            @onCloseDetail="onCloseDetail"
+        ></PlantCropsDetailADialog>
     </div>
 </template>
 
 <script>
-import TaskDetail from "@/components/task/TaskDetail.vue";
+import timer from "@/utils/timer";
+import PlantCropsDetailADialog from "@/components/plant/PlantCropsDetailADialog";
 export default {
     data() {
         return {
             list: [],
+            loading: false,
             currentStatus: -1,
             status: [
                 {
@@ -58,12 +65,15 @@ export default {
         this.getData(-1);
     },
     components: {
-        TaskDetail,
+        PlantCropsDetailADialog,
     },
     methods: {
+        gotob() {
+            this.$emit("gotob");
+        },
         showDialogBox(id) {
-            this.dialogId = id;
-            this.showDialog = true;
+            this.currentId = id;
+            this.showDetailBox = true;
         },
         // 关闭详情
         onCloseDetail(params) {
@@ -77,19 +87,43 @@ export default {
         },
         // 获取种植任务列表
         getData(v) {
+            this.loading = true;
             this.currentStatus = v;
             this.ajax
                 .post("/api/v1/adam/task/taskList", {
                     pageNum: 1,
                     pageSize: 100,
                     param: {
-                        gardenId: 0,
+                        gardenId: this.$route.query.gardenId,
                         growPlantId: this.$route.query.id,
                         keyWord: "",
                         status: this.currentStatus,
                     },
                 })
-                .then((r) => {});
+                .then((r) => {
+                    this.list = r.data.map((item) => {
+                        item.executors = JSON.parse(item.executors)
+                            .map((item) => item.name)
+                            .join(",");
+                        item.endTime = timer.time("y-m-d", item.endTime);
+                        switch (item.status) {
+                            case 0:
+                                item.statusStr = "待执行";
+                                break;
+                            case 1:
+                                item.statusStr = "待检查";
+                                break;
+                            case 2:
+                                item.statusStr = "合格";
+                                break;
+                            case 3:
+                                item.statusStr = "不合格";
+                                break;
+                        }
+                        return item;
+                    });
+                    this.loading = false;
+                });
         },
     },
 };
@@ -122,6 +156,7 @@ export default {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        cursor: pointer;
         .itemBox:nth-child(1) {
             width: 20%;
             padding: 5px;

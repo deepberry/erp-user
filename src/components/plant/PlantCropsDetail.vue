@@ -57,7 +57,7 @@
                 <div class="tabs">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
                         <el-tab-pane label="种植任务" name="1">
-                            <PlantCropsDetailTabA></PlantCropsDetailTabA>
+                            <PlantCropsDetailTabA @gotob="gotob"></PlantCropsDetailTabA>
                         </el-tab-pane>
                         <el-tab-pane label="农事记录" name="2">
                             <PlantCropsDetailTabB></PlantCropsDetailTabB>
@@ -117,6 +117,11 @@ export default {
         PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD, PlantGuide, PlantAddCrops
     },
     methods: {
+        // 去执行
+        gotob (){
+            this.activeName = '2';
+            this.showADialog = true;
+        },
         onCloseAddCrops(params) {
             if (params == 1) {
                 // 通过触发路由刷新数据
