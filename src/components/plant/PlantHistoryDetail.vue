@@ -46,11 +46,12 @@
                             <p>重量</p>
                         </div>
                         <div class="tableItems">
+                            <el-empty description="暂无数据" v-if="reap.length == 0" />
                             <div class="tableItem" v-for="(item, index) in reap" :key="index">
                                 <p>{{ item.workTime }}</p>
                                 <p>{{ item.weightAll || 0 }}</p>
                             </div>
-                            <div class="tableItem tableAll">
+                            <div class="tableItem tableAll" v-if="reap.length > 0">
                                 <p>合计</p>
                                 <p>{{ reapCount }}</p>
                             </div>
@@ -63,9 +64,15 @@
                             <p>用量</p>
                         </div>
                         <div class="tableItems">
+                            <el-empty description="暂无数据" v-if="farmUseBos.length == 0" />
                             <div class="tableItem" v-for="(item, index) in farmUseBos" :key="index">
                                 <p>{{ item.agricultural }}</p>
-                                <p>{{ item.agriculturalCount || 0 }}{{ item.agriculturalUnit }}</p>
+                                <p
+                                    style="color: #6397fd; cursor: pointer; text-decoration: underline"
+                                    @click="showDialogBox('农资使用统计', item.id)"
+                                >
+                                    {{ item.agriculturalCount || 0 }}{{ item.agriculturalUnit }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -76,11 +83,17 @@
                             <p>工时（小时）</p>
                         </div>
                         <div class="tableItems">
+                            <el-empty description="暂无数据" v-if="farmWorkBos.length == 0" />
                             <div class="tableItem" v-for="(item, index) in farmWorkBos" :key="index">
                                 <p>{{ item.agricultural }}</p>
-                                <p>{{ item.agriculturalCount || 0 }}</p>
+                                <p
+                                    style="color: #6397fd; cursor: pointer; text-decoration: underline"
+                                    @click="showDialogBox('工时使用统计', item.id)"
+                                >
+                                    {{ item.agriculturalCount || 0 }}
+                                </p>
                             </div>
-                            <div class="tableItem tableAll">
+                            <div class="tableItem tableAll" v-if="farmWorkBos.length > 0">
                                 <p>合计</p>
                                 <p>{{ farmWorkBosCount }}</p>
                             </div>
@@ -89,10 +102,12 @@
                 </div>
             </div>
         </div>
+        <PlantCropsDetailCDialog :title="dialogTitle" v-if="showDialog" @close="closeDialog"></PlantCropsDetailCDialog>
     </div>
 </template>
 
 <script lang="js">
+import PlantCropsDetailCDialog from '@/components/plant/PlantCropsDetailCDialog';
 import timer from "@/utils/timer.js";
 export default {
     name: "stockRecord",
@@ -102,8 +117,14 @@ export default {
             detail: {},
             reap: [],
             farmUseBos: [],
-            farmWorkBos: []
+            farmWorkBos: [],
+            showDialog: false,
+            dialogTitle: '',
+            dialogId: ''
         }
+    },
+    components: {
+        PlantCropsDetailCDialog
     },
     computed: {
         farmWorkBosCount (){
@@ -133,6 +154,16 @@ export default {
         ajax();
     },
     methods: {
+        showDialogBox (title, id){
+            this.dialogTitle = title;
+            this.dialogId = id;
+            this.showDialog = true;
+        },
+        closeDialog (){
+            setTimeout(() => {
+                this.showDialog = false;
+            }, 500);
+        },
         // 返回列表
         back() {
             this.$router.push({
