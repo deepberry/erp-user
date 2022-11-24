@@ -40,17 +40,23 @@ export default {
     mounted() {
         this.getData();
     },
+    watch: {
+        $route(v) {
+            if (v.query.tab == 2) {
+                this.getData();
+            }
+        },
+    },
     components: {
         PlantCropsDetailCDialogDetail,
         PlantCropsDetailBDialog,
     },
     methods: {
         itemClick(id) {
-            this.detailTitle = "sad";
-            this.detailId = "";
+            this.detailTitle = "农事记录详情";
+            this.detailId = id;
             this.showDetail = true;
         },
-        // 获取种植任务列表
         getData(v) {
             this.currentStatus = v;
             this.ajax
@@ -66,7 +72,10 @@ export default {
                 this.showDetail = false;
             }, 300);
         },
-        closeAdd() {
+        closeAdd(v = null) {
+            if (v == 1) {
+                this.getData();
+            }
             setTimeout(() => {
                 this.showAdd = false;
             }, 300);

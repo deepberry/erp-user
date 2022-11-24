@@ -98,6 +98,13 @@ export default {
             imgs: [1, 2, 3, 4, 5],
         };
     },
+    watch: {
+        $route(v) {
+            if (v.query.tab == 4) {
+                console.log(4);
+            }
+        },
+    },
     computed: {
         selected() {
             return this.selectValue.map((item) => {

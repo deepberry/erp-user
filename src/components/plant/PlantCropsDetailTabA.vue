@@ -67,6 +67,13 @@ export default {
     components: {
         PlantCropsDetailADialog,
     },
+    watch: {
+        $route(v) {
+            if (v.query.tab == 1) {
+                this.getData(-1);
+            }
+        },
+    },
     methods: {
         gotob() {
             this.$emit("gotob");

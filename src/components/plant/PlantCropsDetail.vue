@@ -55,7 +55,7 @@
                     </div>
                 </div>
                 <div class="tabs">
-                    <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
+                    <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleClick">
                         <el-tab-pane label="种植任务" name="1">
                             <PlantCropsDetailTabA @gotob="gotob"></PlantCropsDetailTabA>
                         </el-tab-pane>
@@ -178,8 +178,14 @@ export default {
                 }
             });
         },
-        handleClick (){
-
+        handleClick (v){
+            let query = JSON.parse(JSON.stringify(this.$route.query));
+            query.tab = v;
+            console.log(query)
+            this.$router.push({
+                path: this.$route.path,
+                query
+            })
         },
         // 关闭种植指导
         closeGuide (){

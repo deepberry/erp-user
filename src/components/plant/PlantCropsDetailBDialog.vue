@@ -4,35 +4,34 @@
             <div class="item">
                 <div class="title">种植植物：</div>
                 <div class="content">
-                    <el-input v-model="input" placeholder="请输入种植植物" />
+                    <el-input v-model="categoryTitle" placeholder="请输入种植植物" />
                 </div>
             </div>
             <div class="item">
                 <div class="title"><span>*</span>农事类型：</div>
                 <div class="content">
-                    <el-select style="width: 100%" v-model="value" placeholder="请选择农事类型">
-                        <el-option label="sdssd" value="asdas"></el-option>
+                    <el-select style="width: 100%" v-model="farmId" placeholder="请选择农事类型">
+                        <el-option
+                            v-for="item in farmType"
+                            :key="item.id"
+                            :label="item.title"
+                            :value="item.id"
+                        ></el-option>
                     </el-select>
                 </div>
             </div>
             <div class="item">
                 <div class="title">使用农资：</div>
                 <div class="content nz">
-                    <div class="nzItem">
+                    <div class="nzItem" v-for="(item, index) in farmUseBos" :key="item.id">
                         <div class="nzBox">
-                            <span class="tag">化肥</span>
-                            <span>复合肥5号</span>
-                            <span>8000公斤</span>
+                            <span>
+                                <span class="tag">{{ item.agriculturalType }}</span>
+                            </span>
+                            <span>{{ item.agricultural }}</span>
+                            <span>{{ item.agriculturalCount }}{{ item.agriculturalUnit }}</span>
                         </div>
-                        <i class="erp erpshanchu"></i>
-                    </div>
-                    <div class="nzItem">
-                        <div class="nzBox">
-                            <span class="tag">化肥</span>
-                            <span>复合肥5号</span>
-                            <span>8000公斤</span>
-                        </div>
-                        <i class="erp erpshanchu"></i>
+                        <i class="erp erpshanchu" @click="removeNz(index)"></i>
                     </div>
                     <div class="nzAdd" @click="showChose = true"><i class="erp erpicon_tianjia"></i> 添加农资</div>
                 </div>
@@ -40,7 +39,7 @@
             <div class="item">
                 <div class="title">工时：</div>
                 <div class="content">
-                    <el-input v-model="input" placeholder="请输入工时">
+                    <el-input v-model="workHour" placeholder="请输入工时">
                         <template #append>小时</template>
                     </el-input>
                 </div>
@@ -65,7 +64,7 @@
             <div class="item">
                 <div class="title">备注：</div>
                 <div class="content">
-                    <el-input v-model="input" :rows="5" type="textarea" placeholder="请输入备注内容" />
+                    <el-input v-model="workText" :rows="5" type="textarea" placeholder="请输入备注内容" />
                 </div>
             </div>
             <div class="item">
@@ -79,8 +78,13 @@
             <div class="item" v-if="showMore">
                 <div class="title">作业方式：</div>
                 <div class="content">
-                    <el-select style="width: 100%" v-model="value" placeholder="请选择作业方式">
-                        <el-option label="sdssd" value="asdas"></el-option>
+                    <el-select style="width: 100%" v-model="workType" placeholder="请选择作业方式">
+                        <el-option
+                            v-for="item in operatingType"
+                            :key="item.id"
+                            :label="item.title"
+                            :value="item.id"
+                        ></el-option>
                     </el-select>
                 </div>
             </div>
@@ -89,7 +93,7 @@
                 <div class="content">
                     <el-date-picker
                         style="width: 100%"
-                        v-model="value1"
+                        v-model="workTime"
                         type="date"
                         placeholder="请选择日期"
                         format="YYYY-MM-DD"
@@ -100,37 +104,134 @@
             <div class="item" v-if="showMore">
                 <div class="title">操作人：</div>
                 <div class="content">
-                    <p class="text">Davy</p>
+                    <p class="text">{{ workAname }}</p>
                 </div>
             </div>
             <div class="btn">
-                <el-button type="primary" plain>取消</el-button>
-                <el-button type="primary">保存</el-button>
+                <el-button type="primary" plain @click="onClose">取消</el-button>
+                <el-button type="primary" @click="submit">保存</el-button>
             </div>
         </div>
-        <PlantCropsDetailBDialogChose v-if="showChose" @close="closeChose"></PlantCropsDetailBDialogChose>
+        <PlantCropsDetailBDialogChose
+            @save="save"
+            @chose="chose"
+            v-if="showChose"
+            @close="closeChose"
+        ></PlantCropsDetailBDialogChose>
     </el-dialog>
 </template>
 
 <script>
+import timer from "@/utils/timer";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
     props: ["id"],
+    emits: ["success", "close"],
     data() {
         return {
             showDetailBox: true,
-            imgs: [],
             uploading: false,
             percentage: 0,
             showMore: false,
             showChose: false,
+            farmType: [],
+            farmId: "",
+            categoryTitle: "",
+            farmUseBos: [],
+            workHour: "",
+            imgs: [],
+            workText: "",
+            operatingType: [],
+            workType: "",
+            workTime: "",
+            workAid: "",
+            workAname: "",
         };
     },
-    mounted() {},
+    mounted() {
+        this.getFarmType();
+        this.getOperatingType();
+        let user = JSON.parse(localStorage.getItem("erp_user"));
+        this.workAid = user.id;
+        this.workAname = user.name;
+        this.workTime = timer.time("y-m-d");
+    },
     components: {
         PlantCropsDetailBDialogChose,
     },
     methods: {
+        // 移除农资项
+        removeNz(index) {
+            this.farmUseBos.splice(index, 1);
+        },
+        chose(v) {
+            console.log(v);
+            let data = [...this.farmUseBos, ...v].map((item) => {
+                item.agriculturalCount = Number(item.agriculturalCount);
+                return item;
+            });
+            var trans = function (v) {
+                var arr = [];
+                var list = [];
+                for (var i = 0; i < v.length; i++) {
+                    if (list.indexOf(v[i].agricultural) > -1) {
+                        arr[list.indexOf(v[i].agricultural)].agriculturalCount += v[i].agriculturalCount;
+                    } else {
+                        list.push(v[i].agricultural);
+                        arr.push(v[i]);
+                    }
+                }
+                return arr;
+            };
+            this.farmUseBos = trans(data);
+        },
+        // 保存农资
+        save(params) {
+            this.farmUseBos.push(params);
+        },
+        submit() {
+            let data = {
+                categoryTitle: this.categoryTitle,
+                farmId: this.farmId,
+                farmUseBos: this.farmUseBos,
+                workHour: this.workHour,
+                image: this.imgs.join(","),
+                workText: this.workText,
+                workType: this.workType,
+                workTime: this.workTime,
+                workAid: this.workAid,
+                plantsId: this.$route.query.id,
+            };
+            if (!data.farmId) {
+                this.$message.warning("请选择农事类型");
+                return;
+            }
+            this.ajax.post("/api/v1/adam/farm/editeFarm", data).then((r) => {
+                if (r.code == 200) {
+                    this.$message.success("添加成功");
+                    this.onClose(1);
+                } else {
+                    this.$message.error("添加失败，请稍后再试");
+                }
+            });
+        },
+        // 获取农事类型
+        getFarmType() {
+            this.ajax.post("/api/v1/adam/farm/getFarmType").then((r) => {
+                this.farmType = r.data;
+            });
+        },
+        // 获取作业方式
+        getOperatingType() {
+            this.ajax.post("/api/v1/adam/farm/getOperatingType").then((r) => {
+                this.operatingType = r.data;
+                r.data.map((item) => {
+                    if (item.title == "人工") {
+                        this.workType = item.id;
+                    }
+                });
+            });
+        },
         // 移除图片
         removeImg(index) {
             console.log(index);
@@ -160,7 +261,7 @@ export default {
             if (typeof params == "function") {
                 params = null;
             }
-            this.$emit("onCloseDetail", params);
+            this.$emit("close", params);
             this.showDetailBox = false;
         },
         closeChose() {
@@ -187,7 +288,7 @@ export default {
         .title {
             width: 100px;
             text-align: right;
-            line-height: 35px;
+            line-height: 30px;
             span {
                 color: red;
             }
@@ -216,17 +317,17 @@ export default {
                     justify-content: flex-start;
                     align-items: center;
                     font-size: 13px;
-                    span:nth-child(1) {
+                    > span {
+                        width: 160px;
+                        text-align: left;
+                    }
+                    span.tag {
                         background: #c3f8c7;
                         color: #2ac726;
                         display: inline-block;
                         padding: 2px 10px;
                         font-size: 12px;
                         border-radius: 3px;
-                    }
-                    span:nth-child(2) {
-                        margin-left: 50px;
-                        width: 200px;
                     }
                 }
                 i {
@@ -319,7 +420,7 @@ export default {
                 }
             }
             p.text {
-                line-height: 35px;
+                line-height: 30px;
             }
         }
     }

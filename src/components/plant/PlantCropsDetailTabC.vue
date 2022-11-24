@@ -8,11 +8,12 @@
                     <p>重量</p>
                 </div>
                 <div class="tableItems">
+                    <el-empty description="暂无数据" v-if="reap.length == 0" />
                     <div class="tableItem" v-for="(item, index) in reap" :key="index">
                         <p>{{ item.workTime }}</p>
                         <p>{{ item.weightAll || 0 }}</p>
                     </div>
-                    <div class="tableItem tableAll">
+                    <div class="tableItem tableAll" v-if="reap.length > 0">
                         <p>合计</p>
                         <p>{{ reapCount }}</p>
                     </div>
@@ -25,6 +26,7 @@
                     <p>用量</p>
                 </div>
                 <div class="tableItems">
+                    <el-empty description="暂无数据" v-if="farmUseBos.length == 0" />
                     <div class="tableItem" v-for="(item, index) in farmUseBos" :key="index">
                         <p>{{ item.agricultural }}</p>
                         <p
@@ -43,6 +45,7 @@
                     <p>工时（小时）</p>
                 </div>
                 <div class="tableItems">
+                    <el-empty description="暂无数据" v-if="farmWorkBos.length == 0" />
                     <div class="tableItem" v-for="(item, index) in farmWorkBos" :key="index">
                         <p>{{ item.agricultural }}</p>
                         <p
@@ -52,7 +55,7 @@
                             {{ item.agriculturalCount || 0 }}
                         </p>
                     </div>
-                    <div class="tableItem tableAll">
+                    <div class="tableItem tableAll" v-if="farmWorkBos.length > 0">
                         <p>合计</p>
                         <p>{{ farmWorkBosCount }}</p>
                     </div>
@@ -95,6 +98,20 @@ export default {
                 r += item.weightAll || 0;
             })
             return r;
+        }
+    },
+    watch: {
+        $route (v){
+            if(v.query.tab == 3){
+                let t = this;
+                let ajax = async function (){
+                    t.loading = true;
+                    await t.getReap();
+                    await t.getStat();
+                    t.loading = false;
+                }
+                ajax();
+            }
         }
     },
     mounted() {
