@@ -318,6 +318,9 @@ export default {
                 font-size: 20px;
                 color: #aaaaaa;
             }
+            > i.erpduoxuankuangxuanzhong {
+                color: #3e7cf6;
+            }
             .itemBox {
                 width: 600px;
                 padding: 10px 20px;

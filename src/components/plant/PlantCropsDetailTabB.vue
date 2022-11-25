@@ -19,8 +19,9 @@
             :title="detailTitle"
             :id="detailId"
             @close="closeDetail"
+            @load="getData"
         ></PlantCropsDetailCDialogDetail>
-        <PlantCropsDetailBDialog v-if="showAdd" @close="closeAdd"></PlantCropsDetailBDialog>
+        <PlantCropsDetailBDialog @load="getData" v-if="showAdd" @close="closeAdd"></PlantCropsDetailBDialog>
     </div>
 </template>
 <script>

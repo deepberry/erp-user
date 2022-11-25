@@ -1,14 +1,14 @@
 <template>
     <el-dialog v-model="dialogVisible" :title="title" width="1200px" :before-close="handleClose" append-to-body>
         <div class="btn">
-            <el-button type="primary" size="small" @click="isEdit = !isEdit">{{ isEdit ? "保存" : "编辑" }}</el-button>
-            <el-button type="primary" plain size="small">删除</el-button>
+            <el-button type="primary" @click="editButton">{{ isEdit ? "保存" : "编辑" }}</el-button>
+            <el-button type="primary" plain @click="del">{{ isEdit ? "取消" : "删除" }}</el-button>
         </div>
         <div class="form">
             <div class="item">
                 <p class="title">种植植物：</p>
                 <div class="content">
-                    <el-input :disabled="!isEdit" v-model="form.varietyName" placeholder="请输入种植植物" />
+                    <p class="text">{{ form.varietyName }}</p>
                 </div>
             </div>
             <div class="item">
@@ -31,14 +31,23 @@
             </div>
             <div class="item">
                 <p class="title">使用农资：</p>
-                <div class="content nz">
-                    <p v-for="item in form.farmUseBos" :key="item.id">
-                        <span>{{ item.agricultural }}</span>
-                        <span class="tag">
-                            <span>{{ item.agriculturalType }}</span>
-                        </span>
-                        <span>{{ item.agriculturalCount }}{{ item.agriculturalUnit }}</span>
-                    </p>
+                <div class="content" v-if="form.farmUseBos.length == 0 && !isEdit">
+                    <p class="text">暂无数据</p>
+                </div>
+                <div class="content nz" v-if="form.farmUseBos.length > 0 || isEdit">
+                    <div class="nzItem" v-for="(item, index) in form.farmUseBos" :key="item.id">
+                        <div class="nzBox" :style="{ width: isEdit ? '400px' : '438px' }">
+                            <span>
+                                <span class="tag">{{ item.agriculturalType }}</span>
+                            </span>
+                            <span>{{ item.agricultural }}</span>
+                            <span>{{ item.agriculturalCount }}{{ item.agriculturalUnit }}</span>
+                        </div>
+                        <i class="erp erpshanchu" v-if="isEdit" @click="removeNz(index)"></i>
+                    </div>
+                    <div class="nzAdd" @click="showChose = true" v-if="isEdit">
+                        <i class="erp erpicon_tianjia"></i> 添加农资
+                    </div>
                 </div>
             </div>
             <div class="item">
@@ -85,8 +94,23 @@
             </div>
             <div class="item">
                 <p class="title">农事照片：</p>
-                <div class="content">
-                    <img class="pics" v-for="(item, index) in form.image" :key="index" :src="item" alt="" />
+                <div class="content" v-if="!isEdit">
+                    <img class="picsimg" v-for="(item, index) in form.image" :key="index" :src="item" alt="" />
+                    <p class="text" v-if="form.image.length == 0">暂无数据</p>
+                </div>
+                <div class="content" v-if="isEdit">
+                    <div class="pics">
+                        <div class="img" v-for="(item, imgIndex) in form.image" :key="imgIndex">
+                            <img :src="item" alt="" />
+                            <i class="erp erpguanbi" @click="removeImg(imgIndex)"></i>
+                        </div>
+                        <div class="upload" v-if="form.image.length < 2">
+                            <input v-if="!uploading" @change="uploadFile" ref="file" type="file" />
+                            <p v-if="!uploading"><i class="erp erpshangchuan"></i></p>
+                            <p v-if="!uploading">点击上传照片</p>
+                            <el-progress v-if="uploading" :width="90" type="circle" :percentage="percentage" />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="item itemBig">
@@ -141,28 +165,45 @@
                 </div>
             </div>
             <div class="item">
-                <p class="title">作物现场照片：</p>
+                <p class="title">现场照片：</p>
                 <div class="content">
-                    <img src="../../assets/img/ds.png" alt="" />
+                    <p class="text">暂无数据</p>
                 </div>
             </div>
         </div>
+        <PlantCropsDetailBDialogChose
+            @save="save"
+            @chose="chose"
+            v-if="showChose"
+            @close="closeChose"
+        ></PlantCropsDetailBDialogChose>
     </el-dialog>
 </template>
 
 <script>
+import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
     props: ["title", "id"],
+    emits: ["load", "success", "close"],
     data() {
         return {
             dialogVisible: true,
             searchKey: "",
             list: [],
-            form: {},
+            form: {
+                image: [],
+                farmUseBos: [],
+            },
             farmType: [],
             operatingType: [],
             isEdit: false,
+            uploading: false,
+            percentage: 0,
+            showChose: false,
         };
+    },
+    components: {
+        PlantCropsDetailBDialogChose,
     },
     mounted() {
         let t = this;
@@ -174,20 +215,108 @@ export default {
         ajax();
     },
     methods: {
+        // 保存农资
+        editButton() {
+            if (this.isEdit) {
+                let data = JSON.parse(JSON.stringify(this.form));
+                data.image = data.image.join(",");
+                this.ajax.post("/api/v1/adam/farm/editeFarm", data).then((r) => {
+                    if (r.code == 200) {
+                        this.$message.success("保存成功");
+                        this.isEdit = false;
+                        this.$emit("load");
+                    } else {
+                        this.$message.error("编辑失败，请稍后再试");
+                    }
+                });
+            } else {
+                this.isEdit = true;
+            }
+        },
+        closeChose() {
+            setTimeout(() => {
+                this.showChose = false;
+            }, 300);
+        },
+        // 移除农资项
+        removeNz(index) {
+            this.form.farmUseBos.splice(index, 1);
+        },
+        chose(v) {
+            console.log(v);
+            let data = [...this.form.farmUseBos, ...v].map((item) => {
+                item.agriculturalCount = Number(item.agriculturalCount);
+                return item;
+            });
+            var trans = function (v) {
+                var arr = [];
+                var list = [];
+                for (var i = 0; i < v.length; i++) {
+                    if (list.indexOf(v[i].agricultural) > -1) {
+                        arr[list.indexOf(v[i].agricultural)].agriculturalCount += v[i].agriculturalCount;
+                    } else {
+                        list.push(v[i].agricultural);
+                        arr.push(v[i]);
+                    }
+                }
+                return arr;
+            };
+            this.form.farmUseBos = trans(data);
+        },
+        // 保存农资
+        save(params) {
+            this.form.farmUseBos.push(params);
+        },
+        // 移除图片
+        removeImg(index) {
+            console.log(index);
+            this.form.image.splice(index, 1);
+        },
+        // 上传图片
+        uploadFile() {
+            this.uploading = true;
+            let file = this.$refs.file.files[0];
+            this.ajax
+                .upload(
+                    "/api/v1/adam/upload",
+                    {
+                        file,
+                    },
+                    (num) => {
+                        this.percentage = parseInt(num);
+                    }
+                )
+                .then((r) => {
+                    this.form.image.push(r.data.imageUrl);
+                    this.uploading = false;
+                    this.percentage = 0;
+                });
+        },
+        del() {
+            if (this.isEdit) {
+                this.isEdit = false;
+                this.getData();
+            } else {
+                this.ajax.post("/api/v1/adam/farm/delFarmRecordById", { id: this.id }).then((r) => {
+                    if (r.code == 200) {
+                        this.$message.success("删除成功");
+                        this.handleClose();
+                        this.$emit("load");
+                    } else {
+                        this.$message.error(r.message);
+                    }
+                });
+            }
+        },
         handleClose() {
             this.dialogVisible = false;
             this.$emit("close");
-        },
-        detail() {
-            if (this.title == "农资使用统计") {
-                this.$message.warning("dsdsdsds");
-            }
         },
         // 获取详情
         getData() {
             return new Promise((a, b) => {
                 this.ajax.post("/api/v1/adam/farm/getFarmRecordById", { id: this.id }).then((r) => {
-                    r.data.image = r.data.image.split(",");
+                    r.data.image = r.data.image.length > 0 ? r.data.image.split(",") : [];
                     this.form = r.data;
                     a();
                 });
@@ -244,6 +373,55 @@ export default {
         justify-content: flex-start;
         align-items: flex-start;
         margin-top: 20px;
+        .nzItem {
+            width: 460px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            .nzBox {
+                border: 1px solid rgb(236, 236, 236);
+                padding: 7px 10px;
+                margin-bottom: 5px;
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                font-size: 13px;
+                > span {
+                    width: 160px;
+                    text-align: left;
+                }
+                span.tag {
+                    background: #c3f8c7;
+                    color: #2ac726;
+                    display: inline-block;
+                    padding: 2px 10px;
+                    font-size: 12px;
+                    border-radius: 3px;
+                }
+            }
+            i {
+                width: 40px;
+                font-size: 20px;
+                color: #538dff;
+                cursor: pointer;
+                line-height: 35px;
+                text-align: center;
+            }
+        }
+        .nzAdd {
+            height: 35px;
+            color: #538dff;
+            line-height: 35px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            background: #f4f8ff;
+            position: relative;
+            top: -5px;
+            i {
+                font-size: 13px;
+            }
+        }
         .title {
             width: 100px;
             text-align: right;
@@ -251,11 +429,80 @@ export default {
         }
         .content {
             width: 460px;
-            img.pics {
-                width: 150px;
-                height: 90px;
+            img.picsimg {
+                width: 180px;
+                height: 100px;
                 border-radius: 5px;
                 margin-right: 10px;
+            }
+            .text {
+                line-height: 30px;
+            }
+            .pics {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                flex-wrap: wrap;
+                .img {
+                    width: 180px;
+                    height: 100px;
+                    border-radius: 5px;
+                    margin: 0 10px;
+                    position: relative;
+                    overflow: hidden;
+                    img {
+                        width: 180px;
+                        height: 100px;
+                    }
+                    i {
+                        display: inline-block;
+                        font-size: 14px;
+                        color: #ffffff;
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        cursor: pointer;
+                        background: rgba(0, 0, 0, 0.5);
+                        padding: 5px;
+                    }
+                }
+                .upload {
+                    width: 180px;
+                    height: 100px;
+                    border-radius: 5px;
+                    background: rgba(244, 248, 251, 1);
+                    display: flex;
+                    justify-content: center;
+                    align-content: center;
+                    flex-wrap: wrap;
+                    font-size: 12px;
+                    color: rgba(107, 145, 242, 1);
+                    cursor: pointer;
+                    position: relative;
+                    p {
+                        width: 100%;
+                        text-align: center;
+                        padding: 5px 0;
+                        i {
+                            font-size: 22px;
+                        }
+                    }
+                    input {
+                        width: 180px;
+                        height: 100px;
+                        background: rgba(0, 0, 0, 0.5);
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        cursor: pointer;
+                        opacity: 0;
+                    }
+                    .el-progress--circle {
+                        position: absolute;
+                        top: 5px;
+                        z-index: 10;
+                    }
+                }
             }
         }
         .hj {

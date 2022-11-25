@@ -126,7 +126,7 @@ import timer from "@/utils/timer";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
     props: ["id"],
-    emits: ["success", "close"],
+    emits: ["success", "close", "load"],
     data() {
         return {
             showDetailBox: true,

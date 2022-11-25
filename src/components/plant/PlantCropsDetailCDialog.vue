@@ -96,6 +96,19 @@ export default {
                 this.showDetail = false;
             }, 300);
         },
+        getData() {
+            this.ajax
+                .post("/api/v1/adam/farm/getFarmRecordByAgriculturalId", {
+                    agriculturalId: this.id,
+                    endTime: "",
+                    keyWord: "",
+                    plantsId: 0,
+                    startTime: "",
+                })
+                .then((r) => {
+                    this.list = r.data;
+                });
+        },
     },
 };
 </script>
