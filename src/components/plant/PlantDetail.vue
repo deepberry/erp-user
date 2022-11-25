@@ -23,7 +23,10 @@
                 <div class="btn">
                     <p v-if="item.smartDevice > 0"><i class="erp erpjiekouyunwei"></i> 智能设备</p>
                     <p @click="itemClick(item.id)">
-                        <i class="erp erprili"></i> <span v-if="item.task > 0"></span> 种植任务
+                        <i class="erp erprili">
+                            <span v-if="item.task > 0"></span>
+                        </i>
+                        种植任务
                     </p>
                 </div>
             </div>
@@ -73,7 +76,7 @@ export default {
                     this.getTaskCount();
                 });
         },
-        // 获取用户任务列表
+        // 获取任务列表
         getTaskCount() {
             this.ajax
                 .post("/api/v1/adam/task/getTaskCountByUser", {
@@ -82,7 +85,7 @@ export default {
                 .then((r) => {
                     this.list = this.list.map((item) => {
                         r.data.map((i) => {
-                            if (item.id == i.id) {
+                            if (item.id == i.growPlantId) {
                                 item.task = i.count;
                             }
                         });
@@ -187,16 +190,17 @@ export default {
                     border-right: 1px solid #deedfa;
                     i {
                         margin-right: 3px;
-                    }
-                    span {
-                        display: inline-block;
-                        width: 5px;
-                        height: 5px;
-                        border-radius: 50%;
-                        background: red;
-                        position: absolute;
-                        top: 0;
-                        right: 10px;
+                        position: relative;
+                        span {
+                            display: inline-block;
+                            width: 5px;
+                            height: 5px;
+                            border-radius: 50%;
+                            background: red;
+                            position: absolute;
+                            top: 0;
+                            right: -70px;
+                        }
                     }
                 }
                 p:last-child {
