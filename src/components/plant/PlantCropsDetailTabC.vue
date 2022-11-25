@@ -62,7 +62,12 @@
                 </div>
             </div>
         </div>
-        <PlantCropsDetailCDialog :title="dialogTitle" v-if="showDialog" @close="closeDialog"></PlantCropsDetailCDialog>
+        <PlantCropsDetailCDialog
+            :id="dialogId"
+            :title="dialogTitle"
+            v-if="showDialog"
+            @close="closeDialog"
+        ></PlantCropsDetailCDialog>
     </div>
 </template>
 
@@ -131,9 +136,7 @@ export default {
             this.showDialog = true;
         },
         closeDialog (){
-            setTimeout(() => {
-                this.showDialog = false;
-            }, 500);
+            this.showDialog = false;
         },
         // 获取采收统计
         getReap (){

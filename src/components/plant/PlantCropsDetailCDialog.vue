@@ -2,56 +2,35 @@
     <el-dialog v-model="dialogVisible" :title="title" width="30%" :before-close="handleClose" append-to-body>
         <div class="search">
             <el-input v-model="searchKey" placeholder="关键字搜索：农事类型、农资、备注" />
-            <el-button type="primary" style="margin-left: 15px" plain>查询</el-button>
+            <el-button type="primary" style="margin-left: 15px" plain @click="getData">查询</el-button>
         </div>
         <div class="list">
-            <div class="item" :style="{ cursor: title == '农资使用统计' ? 'pointer' : '' }" @click="detail">
+            <el-empty description="暂无数据" v-if="list.length == 0" />
+            <div
+                class="item"
+                v-for="item in list"
+                :key="item.id"
+                :style="{ cursor: title == '农资使用统计' ? 'pointer' : '' }"
+                @click="detail(item.id)"
+            >
                 <div class="itemInner">
-                    <p class="itemTitle">施肥</p>
-                    <p>2022.09.15</p>
+                    <p class="itemTitle">{{ item.title }}</p>
+                    <p>{{ item.workTime }}</p>
                 </div>
                 <div class="itemInner">
-                    <p>备注：这次是施肥</p>
+                    <p>备注：{{ item.workText }}</p>
                     <p></p>
                 </div>
                 <div class="itemInner btm">
                     <div>
-                        <p>
-                            <span>复合肥5号</span>
-                            <span>8000公斤</span>
-                        </p>
-                        <p>
-                            <span>复合肥5号</span>
-                            <span>8000公斤</span>
+                        <p v-for="itemSon in item.farmUseBos" :key="itemSon.id">
+                            <span>{{ itemSon.agricultural }}</span>
+                            <span>{{ itemSon.agriculturalCount }}{{ itemSon.agriculturalUnit }}</span>
                         </p>
                     </div>
-                    <p>张三</p>
+                    <p>{{ item.userName }}</p>
                 </div>
-                <div class="foot" v-if="title == '工时使用统计'">5工时</div>
-            </div>
-            <div class="item">
-                <div class="itemInner">
-                    <p class="itemTitle">施肥</p>
-                    <p>2022.09.15</p>
-                </div>
-                <div class="itemInner">
-                    <p>备注：这次是施肥</p>
-                    <p></p>
-                </div>
-                <div class="itemInner btm">
-                    <div>
-                        <p>
-                            <span>复合肥5号</span>
-                            <span>8000公斤</span>
-                        </p>
-                        <p>
-                            <span>复合肥5号</span>
-                            <span>8000公斤</span>
-                        </p>
-                    </div>
-                    <p>张三</p>
-                </div>
-                <div class="foot" v-if="title == '工时使用统计'">5工时</div>
+                <div class="foot" v-if="title == '工时使用统计'">{{ item.workHour }}工时</div>
             </div>
         </div>
         <PlantCropsDetailCDialogDetail
@@ -64,6 +43,7 @@
 </template>
 
 <script>
+import timer from "@/utils/timer";
 import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
 export default {
     props: ["title", "id"],
@@ -77,6 +57,9 @@ export default {
             detailId: "",
         };
     },
+    mounted() {
+        this.getData();
+    },
     components: {
         PlantCropsDetailCDialogDetail,
     },
@@ -85,10 +68,12 @@ export default {
             this.dialogVisible = false;
             this.$emit("close");
         },
-        detail() {
+        detail(id) {
             if (this.title == "农资使用统计") {
                 this.detailTitle = "施肥详情";
                 this.showDetail = true;
+                this.detailId = id;
+                console.log(id);
             }
         },
         closeDetail() {
@@ -97,17 +82,34 @@ export default {
             }, 300);
         },
         getData() {
-            this.ajax
-                .post("/api/v1/adam/farm/getFarmRecordByAgriculturalId", {
+            let data = {};
+            let url = "";
+            if (this.title == "农资使用统计") {
+                data = {
                     agriculturalId: this.id,
                     endTime: "",
-                    keyWord: "",
-                    plantsId: 0,
+                    keyWord: this.searchKey,
+                    plantsId: this.$route.query.id,
                     startTime: "",
-                })
-                .then((r) => {
-                    this.list = r.data;
+                };
+                url = "/api/v1/adam/farm/getFarmRecordByAgriculturalId";
+            } else {
+                data = {
+                    endTime: "",
+                    farmId: this.id,
+                    keyWord: this.searchKey,
+                    plantsId: this.$route.query.id,
+                    startTime: "",
+                };
+                url = "/api/v1/adam/farm/getFarmWorkRecordByFarmId";
+            }
+
+            this.ajax.post(url, data).then((r) => {
+                this.list = r.data.map((item) => {
+                    item.workTime = timer.time("y-m-d", item.workTime);
+                    return item;
                 });
+            });
         },
     },
 };
