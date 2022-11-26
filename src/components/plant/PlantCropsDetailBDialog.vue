@@ -125,8 +125,8 @@
 import timer from "@/utils/timer";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
-    props: ["id"],
-    emits: ["success", "close", "load"],
+    props: ["taskId", "plantName"],
+    emits: ["success", "close", "load", "finish"],
     data() {
         return {
             showDetailBox: true,
@@ -155,6 +155,7 @@ export default {
         this.workAid = user.id;
         this.workAname = user.name;
         this.workTime = timer.time("y-m-d");
+        this.categoryTitle = this.plantName;
     },
     components: {
         PlantCropsDetailBDialogChose,
@@ -199,6 +200,7 @@ export default {
                 workText: this.workText,
                 workType: this.workType,
                 workTime: this.workTime,
+                taskId: this.taskId || "",
                 workAid: this.workAid,
                 plantsId: this.$route.query.id,
             };
@@ -210,10 +212,23 @@ export default {
                 if (r.code == 200) {
                     this.$message.success("添加成功");
                     this.onClose(1);
+                    if (this.taskId) {
+                        this.finishTask();
+                    }
                 } else {
                     this.$message.error("添加失败，请稍后再试");
                 }
             });
+        },
+        // 完成农事任务
+        finishTask() {
+            this.ajax
+                .post("/api/v1/adam/task/finishTask", {
+                    taskId: this.taskId,
+                })
+                .then((r) => {
+                    this.$emit("finish");
+                });
         },
         // 获取农事类型
         getFarmType() {

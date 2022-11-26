@@ -74,16 +74,14 @@
                             <p class="a">{{ detail.farmRecordBo.title }}</p>
                             <p>{{ detail.farmRecordBo.workTime }}</p>
                         </div>
-                        <!-- <div style="display: block">
-                            <p>这次是施肥</p>
-                            <p>这次是施肥</p>
-                            <p>这次是施肥</p>
-                        </div> -->
+                        <div style="display: block">
+                            <p>{{ detail.farmRecordBo.workText }}</p>
+                        </div>
                         <div>
-                            <p class="b">
-                                {{ detail.farmRecordBo.farmUseBos.agricultural }}
-                                {{ detail.farmRecordBo.farmUseBos.agriculturalCount
-                                }}{{ detail.farmRecordBo.farmUseBos.agriculturalUnit }}
+                            <p class="b" v-for="item in detail.farmRecordBo.farmUseBos" :key="item.id">
+                                {{ item.agricultural }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                {{ item.agriculturalCount }}
+                                {{ item.agriculturalUnit }}
                             </p>
                             <p>张三</p>
                         </div>
@@ -189,7 +187,7 @@ export default {
                 .post("/api/v1/adam/task/taskCheck", {
                     checkStatus: this.isPass,
                     taskId: this.id,
-                    taskOpinion: "",
+                    taskOpinion: this.textarea,
                 })
                 .then((r) => {
                     this.submitting = false;

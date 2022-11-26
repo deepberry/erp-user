@@ -193,7 +193,10 @@ export default {
                 }
             }).then(r => {
                 this.loading = false;
-                this.tableData = r.data;
+                this.tableData = r.data.map(item => {
+                    item.agriculturalBo = item.agriculturalBo || {};
+                    return item;
+                })
             })
         },
         // 获取农资类型列表

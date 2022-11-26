@@ -14,9 +14,10 @@
                     <el-button type="primary" plain @click="getData">查询</el-button>
                 </div>
                 <div class="list">
-                    <div class="item" @click="submit(item)" v-for="(item, index) in list" :key="index">
+                    <div class="item" @click="chose(item, index)" v-for="(item, index) in list" :key="index">
                         <div>
                             <p>{{ item.agriculturalBo.title }}</p>
+                            <i :class="item.check ? 'erp erpduoxuankuangxuanzhong' : 'erp erpduoxuan-01'"></i>
                         </div>
                         <div>
                             <p>
@@ -34,6 +35,9 @@
                     </div>
                     <el-empty description="暂无数据" v-if="list.length == 0" />
                 </div>
+                <el-button @click="submit" type="primary" style="width: calc(100% - 40px); margin: 20px"
+                    >确定选择</el-button
+                >
             </div>
         </el-dialog>
     </div>
@@ -48,6 +52,7 @@ export default {
             searchKey: '',
             list: [],
             showBox: true,
+            chosed: []
         }
     },
     mounted (){
@@ -65,7 +70,10 @@ export default {
                     "keyWord": this.searchKey
                 }
             }).then(r => {
-                this.list = r.data;
+                this.list = r.data.map(item => {
+                    item.check = false;
+                    return item;
+                })
                 this.loading = false;
             })
         },
@@ -73,8 +81,12 @@ export default {
             this.$emit('onClose', 0);
             this.showBox = false;
         },
-        submit (item){
-            this.$emit('submit', item);
+        chose (item, index){
+            this.list[index].check = !this.list[index].check;
+            this.chosed.push(item);
+        },
+        submit (){
+            this.$emit('submit', this.chosed);
             this.onClose();
         }
     }
@@ -93,6 +105,8 @@ export default {
         border-top: 1px solid rgba(0, 0, 0, 0.09);
     }
     .list {
+        overflow-y: auto;
+        max-height: 500px;
         .item {
             padding: 10px 20px;
             background: #ffffff;
@@ -100,6 +114,9 @@ export default {
             border-radius: 8px;
             margin-top: 15px;
             cursor: pointer;
+            i.erpduoxuankuangxuanzhong {
+                color: #409eff;
+            }
             div {
                 display: flex;
                 justify-content: space-between;

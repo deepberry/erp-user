@@ -147,7 +147,7 @@ export default {
             this.showCarBox = false;
         },
         showServer() {
-            this.$alert("客服电话：18012345678", "联系客服");
+            this.$alert("客服电话：13606870818", "联系客服");
         },
         // 更新购物车数量
         resetCarCount(v) {

@@ -85,7 +85,7 @@
         </div>
         <StockDetail v-if="showDetailBox" :id="currentDetailId" @closeDetailBox="closeDetailBox"></StockDetail>
         <StockReg v-if="showReg" needSubmit @onSave="onRegSave" @closeReg="closeReg"></StockReg>
-        <StockPutBatch v-if="showBatch" @closeBathBox="closeBathBox"> </StockPutBatch>
+        <StockPutBatch v-if="showBatch" @load="getData" @closeBathBox="closeBathBox"> </StockPutBatch>
     </div>
 </template>
 
@@ -139,7 +139,10 @@ export default {
                         "keyWord": this.searchKey
                     }
                 }).then(r => {
-                    this.list = r.data;
+                    this.list = r.data.map(item => {
+                        item.agriculturalBo = item.agriculturalBo || {};
+                        return item;
+                    })
                     this.currentPage = r.pageNum;
                     this.pageSize = r.pageSize;
                     this.total = r.total;

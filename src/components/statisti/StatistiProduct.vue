@@ -6,8 +6,8 @@
         </div>
         <div class="table" v-loading="loading">
             <el-table size="large" :data="list" style="width: 100%">
-                <el-table-column prop="type" label="种类" width="280" />
-                <el-table-column prop="num" label="重量" />
+                <el-table-column prop="cateGoryTitle" label="种类" width="280" />
+                <el-table-column prop="weight" label="重量" />
             </el-table>
         </div>
         <div class="pages" v-if="list.length > 0">
@@ -53,7 +53,7 @@ export default {
                     console.log(r);
                     if (r.code == 200) {
                         this.list = r.data.list || [];
-                        // this.total = r.total;
+                        this.total = r.data.list.length;
                     }
                 });
         },

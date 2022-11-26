@@ -69,7 +69,7 @@
                         <span>{{ item.checkTime }}</span>
                     </p>
                 </div>
-                <div class="formButton" v-if="detail.orderStatus == 10">
+                <div class="formButton" v-if="showBtn">
                     <el-button type="primary" @click="check(2)" plain>不通过</el-button>
                     <el-button type="primary" @click="check(1)">通过</el-button>
                 </div>
@@ -87,6 +87,7 @@ export default {
             detailLoading: false,
             showDetailBox: true, // 是否显示详情弹窗
             detail: {},
+            showBtn: false,
         };
     },
     mounted() {
@@ -113,6 +114,14 @@ export default {
                     id: this.id,
                 })
                 .then((r) => {
+                    // 是否显示审核按钮
+                    let user = JSON.parse(localStorage.getItem("erp_user")).id;
+                    r.data.orderManagerBoList.map((item) => {
+                        if (item.aid == user && item.isCheck == 0) {
+                            this.showBtn = true;
+                        }
+                    });
+
                     switch (r.data.orderStatus) {
                         case 0:
                             r.data.status = "待审核";

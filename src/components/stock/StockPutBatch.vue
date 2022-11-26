@@ -307,11 +307,9 @@ export default {
                         })
                         .then((r) => {
                             if (r.code == 200) {
+                                this.onClose();
                                 this.$message.success("入库成功！");
-                                let t = setTimeout(() => {
-                                    this.$router.push("/erp/stock");
-                                    clearTimeout(t);
-                                }, 800);
+                                this.$emit("load");
                             } else {
                                 this.$message.error("操作失败，请联系管理员！");
                             }

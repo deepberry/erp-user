@@ -93,11 +93,12 @@ export default {
             note: '',
             showChose: false,
             input: '',
-            submitting: false
+            submitting: false,
         }
     },
     mounted() {
         this.getUserlist();
+        this.getStep();
     },
     components: {
         MyStartChose
@@ -107,6 +108,15 @@ export default {
         getUserlist (){
             this.ajax.post('/api/v1/adam/task/getOrganizationUsers').then(r => {
                 this.userlist = r.data;
+            })
+        },
+        // 获取上次的审核流程
+        getStep (){
+            this.ajax.post('/api/v1/adam/workOrder/getManager-list').then(r => {
+                this.userChosed = r.data.map(item => {
+                    item.name = item.username;
+                    return item;
+                })
             })
         },
         // 返回列表
@@ -122,7 +132,7 @@ export default {
         },
         // 选择农资
         chose (v){
-            this.list.push(v);
+            this.list = [...this.list, ...v];
         },
         // 选择用户
         select (v){

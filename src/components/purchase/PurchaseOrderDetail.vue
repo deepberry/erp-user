@@ -11,7 +11,7 @@
             <div v-loading="detailLoading" class="purchaseDetailBoxInner">
                 <div class="item">
                     <p>订单号：{{ detail.orderUuid }}</p>
-                    <p>订单状态</p>
+                    <p :style="{ color: detail.color }">{{ detail.status }}</p>
                 </div>
                 <div class="item">
                     <p>提交人：{{ detail.userName }}</p>
@@ -79,7 +79,24 @@ export default {
                 id: this.id,
             })
             .then((r) => {
-                console.log(r);
+                let status = "";
+                let color = "";
+                switch (r.data.orderStatus) {
+                    case 0:
+                        status = "已提交";
+                        color = "#1890FF";
+                        break;
+                    case 1:
+                        status = "已完成";
+                        color = "#0DD71C";
+                        break;
+                    case 2:
+                        status = "已关闭";
+                        color = "#A8A8A8";
+                        break;
+                }
+                r.data.status = status;
+                r.data.color = color;
                 r.data.orderTime = timer.time("y-m-d h:i:s", r.data.orderTime);
                 this.detail = r.data;
                 this.detailLoading = false;

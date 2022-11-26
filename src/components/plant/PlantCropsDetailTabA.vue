@@ -59,6 +59,7 @@ export default {
             ],
             showDetailBox: false,
             currentId: "",
+            showAdd: false,
         };
     },
     mounted() {
@@ -85,7 +86,7 @@ export default {
         // 关闭详情
         onCloseDetail(params) {
             if (params == 1) {
-                this.getData();
+                this.getData(this.currentStatus);
             }
             let timer = setTimeout(() => {
                 this.showDetailBox = false;

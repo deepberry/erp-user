@@ -4,14 +4,6 @@
             <div class="left">
                 <div class="box">
                     <div class="boxTitle">生长阶段：</div>
-                    <!-- <el-select v-model="step" style="width: 370px" placeholder="请选择">
-                        <el-option
-                            v-for="item in stepList"
-                            :key="item.id"
-                            :label="item.phaseName"
-                            :value="item.id"
-                        ></el-option>
-                    </el-select> -->
                     <div class="boxTitle">萌芽阶段</div>
                 </div>
                 <div class="box">
@@ -152,6 +144,8 @@ export default {
     },
     mounted() {
         this.getGrowthStage();
+        this.getGuide();
+        this.getGuide2();
     },
     methods: {
         handleClose(done) {
@@ -184,6 +178,28 @@ export default {
                 })
                 .then((r) => {
                     this.stepList = r.data;
+                });
+        },
+        // 农事操作指导
+        getGuide() {
+            this.ajax
+                .post("/api/v1/adam/farm/getPlantOperationGuidanceList", {
+                    id: this.$route.query.id,
+                    text: "",
+                })
+                .then((r) => {
+                    console.log(r);
+                });
+        },
+        // 病虫害防治指导
+        getGuide2() {
+            this.ajax
+                .post("/api/v1/adam/farm/getPlantPreventionGuidanceList", {
+                    id: this.$route.query.id,
+                    text: "",
+                })
+                .then((r) => {
+                    console.log(r);
                 });
         },
     },

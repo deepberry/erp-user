@@ -126,15 +126,24 @@
                     <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
                     <el-button type="primary" @click="submitCheck" :loading="submitting">确定</el-button>
                 </div>
-                <div class="btns">
+                <div class="btns" v-if="detail.status == 0">
                     <el-button type="primary" @click="gotob">去执行</el-button>
                 </div>
             </div>
         </el-dialog>
+        <PlantCropsDetailBDialog
+            :taskId="detail.id"
+            :plantName="detail.growPlantTitle"
+            @finish="onClose(1)"
+            @load="getData"
+            v-if="showAdd"
+            @close="closeAdd"
+        ></PlantCropsDetailBDialog>
     </div>
 </template>
 
 <script>
+import PlantCropsDetailBDialog from "@/components/plant/PlantCropsDetailBDialog";
 import timer from "@/utils/timer";
 export default {
     name: "taskDetail",
@@ -152,15 +161,26 @@ export default {
             textarea: "",
             isPass: "2",
             submitting: false,
+            showAdd: false,
         };
     },
     mounted() {
         this.getData();
     },
+    components: {
+        PlantCropsDetailBDialog,
+    },
     methods: {
+        closeAdd(v = null) {
+            if (v == 1) {
+                this.getData();
+            }
+            setTimeout(() => {
+                this.showAdd = false;
+            }, 300);
+        },
         gotob() {
-            this.onClose();
-            this.$emit("gotob");
+            this.showAdd = true;
         },
         // 图片预览
         view(src) {

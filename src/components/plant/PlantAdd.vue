@@ -91,7 +91,6 @@ export default {
                 }).then((r) => {
                     r.data.img = r.data.detailImage;
                     r.data.user = r.data.gardenManagerBoList.map(item => Number(item.aid));
-                    console.log(r.data.user)
                     this.form = r.data;
                     a();
                 })
@@ -110,15 +109,15 @@ export default {
         getUserList() {
             return new Promise((a ,b) => {
                 this.ajax.post("/api/v1/adam/task/getOrganizationUsers").then((r) => {
-                    this.currentUser = JSON.parse(localStorage.getItem('erp_user'));
-                    let name = '';
+                    let defaultId = '';
                     this.userList = r.data.map(item => {
-                        if(item.id == this.currentUser.id){
+                        if(item.isMain == 1){
                             item.defaultCheck = true;
+                            defaultId = item.id;
                         }
                         return item;
                     })
-                    if(!this.form.user.includes(this.currentUser.id)) this.form.user.push(this.currentUser.id);
+                    if(!this.form.user.includes(defaultId)) this.form.user.push(defaultId);
                     a();
                 })
             })
