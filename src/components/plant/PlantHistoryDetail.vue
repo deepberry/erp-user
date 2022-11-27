@@ -180,7 +180,7 @@ export default {
         getData (){
             return new Promise((a,b) => {
                 this.ajax.post('/api/v1/adam/plants/getPlants', {
-                    id: this.$route.query.gardenId
+                    id: this.$route.query.id
                 }).then(r => {
                     this.detail = r.data;
                     this.loading = false;
