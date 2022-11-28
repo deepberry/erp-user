@@ -126,7 +126,7 @@
                     <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
                     <el-button type="primary" @click="submitCheck" :loading="submitting">确定</el-button>
                 </div>
-                <div class="btns" v-if="detail.status == 0">
+                <div class="btns" v-if="detail.status == 0 && $store.state.power.performTaskBtn">
                     <el-button type="primary" @click="gotob">去执行</el-button>
                 </div>
             </div>

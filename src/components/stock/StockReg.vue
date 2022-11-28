@@ -9,8 +9,8 @@
             width="400px"
         >
             <div class="stockRegBoxInner">
-                <p @click="input">手动输入农资信息</p>
-                <p @click="_import">选择平台农资信息</p>
+                <p @click="input" v-if="$store.state.power.addMaterialsInfo">手动输入农资信息</p>
+                <p @click="_import" v-if="$store.state.power.selectMaterialsInfo">选择平台农资信息</p>
             </div>
         </el-dialog>
 

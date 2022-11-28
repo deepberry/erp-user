@@ -69,7 +69,7 @@
                         <span>{{ item.checkTime }}</span>
                     </p>
                 </div>
-                <div class="formButton" v-if="showBtn">
+                <div class="formButton" v-if="showBtn && $store.state.power.reviewOrderBtn">
                     <el-button type="primary" @click="check(2)" plain>不通过</el-button>
                     <el-button type="primary" @click="check(1)">通过</el-button>
                 </div>

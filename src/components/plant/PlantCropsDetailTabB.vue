@@ -1,11 +1,18 @@
 <template>
     <div class="box">
         <div class="status">
-            <el-button type="primary" @click="showAdd = true">添加农事</el-button>
+            <el-button type="primary" @click="showAdd = true" v-if="$store.state.power.addFarmRecordBtn"
+                >添加农事</el-button
+            >
         </div>
         <el-empty v-if="list.length == 0" description="暂无数据" />
         <div class="items">
-            <div class="item" v-for="item in list" :key="item.id" @click="itemClick(item.id)">
+            <div
+                class="item"
+                v-for="item in list"
+                :key="item.id"
+                @click="$store.state.power.farmRecordDetail ? itemClick(item.id) : () => {}"
+            >
                 <div class="itemBox">{{ item.title }}</div>
                 <div class="itemBox">农事时间：{{ item.workTime }}</div>
                 <div :class="item.workText ? 'itemBox h' : 'itemBox'">备注：{{ item.workText || "无" }}</div>

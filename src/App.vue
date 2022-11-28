@@ -10,6 +10,12 @@
 <script lang="js">
 export default {
     name: "App",
+    mounted (){
+        // 获取可见菜单列表
+        this.ajax.post('/api/v1/adam/adminMenu/getUserMenusList').then(r => {
+            this.$store.commit('setPower', r.data);
+        })
+    }
 }
 </script>
 

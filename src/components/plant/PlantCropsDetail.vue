@@ -34,7 +34,11 @@
                             &nbsp;
                         </div>
                         <div class="select">
-                            <el-button type="primary" style="width: 120px" @click="showGuide = true"
+                            <el-button
+                                type="primary"
+                                style="width: 120px"
+                                v-if="$store.state.power.workingHoursBtn"
+                                @click="showGuide = true"
                                 >种植指导</el-button
                             >
                             <el-select
@@ -48,7 +52,7 @@
                                     v-for="(item, index) in selectList"
                                     :key="index"
                                     :label="item"
-                                    :value="index"
+                                    :value="item"
                                 />
                             </el-select>
                         </div>
@@ -56,13 +60,13 @@
                 </div>
                 <div class="tabs">
                     <el-tabs v-model="activeName" class="demo-tabs" @tab-change="handleClick">
-                        <el-tab-pane label="种植任务" name="1">
+                        <el-tab-pane label="种植任务" name="1" v-if="$store.state.power.farmTaskList">
                             <PlantCropsDetailTabA @gotob="gotob"></PlantCropsDetailTabA>
                         </el-tab-pane>
-                        <el-tab-pane label="农事记录" name="2">
+                        <el-tab-pane label="农事记录" name="2" v-if="$store.state.power.farmRecordList">
                             <PlantCropsDetailTabB></PlantCropsDetailTabB>
                         </el-tab-pane>
-                        <el-tab-pane label="农事统计" name="3">
+                        <el-tab-pane label="农事统计" name="3" v-if="$store.state.power.farmStatistics">
                             <PlantCropsDetailTabC></PlantCropsDetailTabC>
                         </el-tab-pane>
                         <el-tab-pane label="种植分析" name="4">
@@ -97,7 +101,7 @@ export default {
             loading: false,
             activeName: '1',
             selectValue: '',
-            selectList: ['结束种植', '编辑作物', '删除作物'],
+            selectList: [],
             detail: {},
             showGuide: false,
             editCropsId: '',
@@ -112,6 +116,15 @@ export default {
             t.loading = false;
         }
         ajax();
+        if(this.$store.state.power.stopPlantBtn){
+            this.selectList.push('结束种植')
+        }
+        if(this.$store.state.power.editPlantBtn){
+            this.selectList.push('编辑作物')
+        }
+        if(this.$store.state.power.delPlantBtn){
+            this.selectList.push('删除作物')
+        }
     },
     components: {
         PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD, PlantGuide, PlantAddCrops
@@ -135,7 +148,7 @@ export default {
         // 操作作物
         selectChange (){
             // 结束种植
-            if(this.selectValue == 0){
+            if(this.selectValue == '结束种植'){
                 this.ajax.post('/api/v1/adam/plants/end', {
                     id: this.$route.query.id
                 }).then(r => {
@@ -150,12 +163,12 @@ export default {
             }
 
             // 编辑作物
-            if(this.selectValue == 1){
+            if(this.selectValue == '编辑作物'){
                 this.showAddCropsBox = true;
                 this.editCropsId = this.$route.query.id;
             }
             // 删除作物
-            if(this.selectValue == 2){
+            if(this.selectValue == '删除作物'){
                 this.ajax.post('/api/v1/adam/plants/deletePlants', {
                     id: this.$route.query.id
                 }).then(r => {

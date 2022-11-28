@@ -7,6 +7,9 @@ const app = createApp(App);
 import router from "./router/index";
 app.use(router);
 
+import store from "./store/index.js";
+app.use(store);
+
 import { createPinia } from "pinia";
 app.use(createPinia());
 

@@ -29,9 +29,15 @@
                 </el-select>
             </div>
             <div class="buttons">
-                <el-button type="primary" @click="showBatch = true">批量入库</el-button>
-                <el-button type="success" @click="showReg = true">登记新农资</el-button>
-                <el-button type="warning" @click="gotoRecord">出入库记录</el-button>
+                <el-button type="primary" @click="showBatch = true" v-if="$store.state.power.batchMaterialsIntoBtn"
+                    >批量入库</el-button
+                >
+                <el-button type="success" @click="showReg = true" v-if="$store.state.power.addMaterialsInfoBtn"
+                    >登记新农资</el-button
+                >
+                <el-button type="warning" @click="gotoRecord" v-if="$store.state.power.stockRecordBtn"
+                    >出入库记录</el-button
+                >
             </div>
         </div>
         <div class="tableWrap">
@@ -64,9 +70,27 @@
                     </el-table-column>
                     <el-table-column label="操作" width="260">
                         <template #default="scope">
-                            <el-button link type="primary" @click="viewDetail(scope.row.id)">明细</el-button>
-                            <el-button link type="primary" @click="stock(true, scope.row.id)">入库</el-button>
-                            <el-button link type="primary" @click="stock(false, scope.row.id)">出库</el-button>
+                            <el-button
+                                link
+                                type="primary"
+                                @click="viewDetail(scope.row.id)"
+                                v-if="$store.state.power.materialsStockDetail"
+                                >明细</el-button
+                            >
+                            <el-button
+                                link
+                                type="primary"
+                                @click="stock(true, scope.row.id)"
+                                v-if="$store.state.power.materialsInto"
+                                >入库</el-button
+                            >
+                            <el-button
+                                link
+                                type="primary"
+                                @click="stock(false, scope.row.id)"
+                                v-if="$store.state.power.materialsOut"
+                                >出库</el-button
+                            >
                         </template>
                     </el-table-column>
                 </el-table>

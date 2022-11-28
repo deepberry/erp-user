@@ -10,7 +10,12 @@
             >
         </div>
         <el-empty v-if="list.length == 0" description="暂无数据" />
-        <div class="item" v-for="item in list" :key="item.id" @click="showDialogBox(item.id)">
+        <div
+            class="item"
+            v-for="item in list"
+            :key="item.id"
+            @click="$store.state.power.farmTaskDetail ? showDialogBox(item.id) : () => {}"
+        >
             <div class="itemBox">{{ item.taskContent }}</div>
             <div class="itemBox">截止时间：{{ item.endTime }}</div>
             <div :class="item.opinion ? 'itemBox h' : 'itemBox'">建议：{{ item.opinion || "无" }}</div>

@@ -31,7 +31,11 @@
                         <p>{{ item.agricultural }}</p>
                         <p
                             style="color: #6397fd; cursor: pointer; text-decoration: underline"
-                            @click="showDialogBox('农资使用统计', item.id)"
+                            @click="
+                                $store.state.power.agricultureMaterials
+                                    ? showDialogBox('农资使用统计', item.id)
+                                    : () => {}
+                            "
                         >
                             {{ item.agriculturalCount || 0 }}{{ item.agriculturalUnit }}
                         </p>
@@ -50,7 +54,7 @@
                         <p>{{ item.agricultural }}</p>
                         <p
                             style="color: #6397fd; cursor: pointer; text-decoration: underline"
-                            @click="showDialogBox('工时使用统计', item.id)"
+                            @click="$store.state.power.workingHours ? showDialogBox('工时使用统计', item.id) : () => {}"
                         >
                             {{ item.agriculturalCount || 0 }}
                         </p>

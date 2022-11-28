@@ -67,7 +67,13 @@
                 </div>
                 <div class="buttons">
                     <el-button type="primary" round plain @click="showServer">联系客服</el-button>
-                    <el-button type="primary" @click="submit" :loading="submitting">提交订单</el-button>
+                    <el-button
+                        type="primary"
+                        @click="submit"
+                        :loading="submitting"
+                        v-if="$store.state.power.submitShoppingOrderBtn"
+                        >提交订单</el-button
+                    >
                 </div>
             </div>
         </el-dialog>

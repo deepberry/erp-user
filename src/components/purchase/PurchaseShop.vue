@@ -11,7 +11,12 @@
                     <el-button type="primary" class="searchSubmit" @click="getData">查询</el-button>
                 </div>
                 <div>
-                    <el-button @click="showCar" type="primary" class="searchCreateNewTask" plain
+                    <el-button
+                        v-if="$store.state.power.shoppingCartBtn"
+                        @click="showCar"
+                        type="primary"
+                        class="searchCreateNewTask"
+                        plain
                         ><i class="erp erpgouwuche"></i> 购物车</el-button
                     >
                 </div>
@@ -35,7 +40,13 @@
                     </el-table-column>
                     <el-table-column label="操作" width="180">
                         <template #default="scope">
-                            <el-button link type="primary" @click="viewDetail(scope.row.id)">查看详情</el-button>
+                            <el-button
+                                link
+                                type="primary"
+                                v-if="$store.state.power.materialsPurchaseDetail"
+                                @click="viewDetail(scope.row.id)"
+                                >查看详情</el-button
+                            >
                         </template>
                     </el-table-column>
                 </el-table>

@@ -42,10 +42,20 @@
                             </p>
                         </div>
                         <div class="infoItem">
-                            <el-badge :value="carCount" class="item" @click="showCarBox = true">
+                            <el-badge
+                                :value="carCount"
+                                class="item"
+                                @click="showCarBox = true"
+                                v-if="$store.state.power.shoppingCartBtn"
+                            >
                                 <i class="erp erpgouwuche3-mianxing"></i>
                             </el-badge>
-                            <el-button type="primary" :loading="addToCaring" round @click="addToCar"
+                            <el-button
+                                type="primary"
+                                v-if="$store.state.power.addToShoppingCartBtn"
+                                :loading="addToCaring"
+                                round
+                                @click="addToCar"
                                 >加入购物车</el-button
                             >
                             <el-button type="primary" plain round @click="showServer">联系客服</el-button>

@@ -60,8 +60,20 @@
                         <el-table-column prop="userName" label="申领人"></el-table-column>
                         <el-table-column label="操作" width="260">
                             <template #default="scope">
-                                <el-button link type="primary" @click="showDetail(scope.row.id)">查看详情</el-button>
-                                <el-button link type="primary" @click="out(scope.row.id)">一键出库</el-button>
+                                <el-button
+                                    link
+                                    type="primary"
+                                    @click="showDetail(scope.row.id)"
+                                    v-if="$store.state.power.workOrderDetail"
+                                    >查看详情</el-button
+                                >
+                                <el-button
+                                    link
+                                    type="primary"
+                                    @click="out(scope.row.id)"
+                                    v-if="$store.state.power.simpleMaterialsOut"
+                                    >一键出库</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>

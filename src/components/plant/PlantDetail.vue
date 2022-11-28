@@ -3,7 +3,7 @@
         <el-empty description="暂无数据" v-if="list.length == 0" style="margin-top: 200px" />
         <div class="list" v-loading="loading">
             <div class="item" v-for="(item, index) in list" :key="index">
-                <div class="head" @click="itemClick(item.id)">
+                <div class="head" @click="$store.state.power.plantDetail ? itemClick(item.id) : () => {}">
                     <div class="left">
                         <img :src="item.image" alt="" />
                         <p>{{ item.categoryTitle }}</p>

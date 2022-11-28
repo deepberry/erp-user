@@ -17,14 +17,15 @@
             </div>
             <el-collapse-transition>
                 <div class="itemSons" v-show="item.show">
-                    <p
-                        @click="itemSonClick(index, indexSon)"
-                        :class="activeMenuIndex == index && activeMenuIndexSon == indexSon ? 'active' : ''"
-                        v-for="(itemSon, indexSon) in item.son"
-                        :key="indexSon"
-                    >
-                        {{ itemSon.title }}
-                    </p>
+                    <template v-for="(itemSon, indexSon) in item.son" :key="indexSon">
+                        <p
+                            @click="itemSonClick(index, indexSon)"
+                            :class="activeMenuIndex == index && activeMenuIndexSon == indexSon ? 'active' : ''"
+                            v-if="itemSon.show"
+                        >
+                            {{ itemSon.title }}
+                        </p>
+                    </template>
                 </div>
             </el-collapse-transition>
         </div>
@@ -43,6 +44,28 @@ export default {
         };
     },
     mounted() {
+        if (this.$store.state.power.parkList) {
+            this.menu[1].son[0].show = true;
+        }
+        if (this.$store.state.power.taskList) {
+            this.menu[1].son[1].show = true;
+        }
+        if (this.$store.state.power.materialsPurchaseList) {
+            this.menu[1].son[2].show = true;
+        }
+        if (this.$store.state.power.materialsStockList) {
+            this.menu[1].son[3].show = true;
+        }
+        if (this.$store.state.power.workOrderList) {
+            this.menu[1].son[4].show = true;
+        }
+        if (this.$store.state.power.statistics) {
+            this.menu[1].son[5].show = true;
+        }
+        if (this.$store.state.power.accountRole) {
+            this.menu[2].son[1].show = true;
+        }
+
         // 刷新时菜单高亮
         this.activeMenuIndex = sessionStorage.getItem("erp_menu_current_index") || 0;
         this.menu[this.activeMenuIndex].show = true;

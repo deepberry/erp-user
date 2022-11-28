@@ -6,7 +6,11 @@
                 <el-button type="primary" style="margin-left: 10px">查询</el-button> -->
             </div>
             <div>
-                <el-button type="primary" style="margin-left: 10px" @click="$router.push('/erp/my/get')"
+                <el-button
+                    type="primary"
+                    style="margin-left: 10px"
+                    v-if="$store.state.power.applyBtn"
+                    @click="$router.push('/erp/my/get')"
                     >发起申领</el-button
                 >
                 <el-button type="success" style="margin-left: 10px" @click="$router.push('/erp/my/record')"

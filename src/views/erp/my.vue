@@ -22,20 +22,23 @@ export default {
     name: "stock",
     data() {
         return {
-            headTab: [
-                {
-                    title: "我的农资",
-                    path: "/erp/my/product",
-                },
-                {
-                    title: "我的工时",
-                    path: "/erp/my/work",
-                },
-            ],
+            headTab: [],
             activeTabIndex: 0,
         };
     },
     mounted() {
+        if (this.$store.state.power.myMaterials) {
+            this.headTab.push({
+                title: "我的农资",
+                path: "/erp/my/product",
+            });
+        }
+        if (this.$store.state.power.myWorkHours) {
+            this.headTab.push({
+                title: "我的工时",
+                path: "/erp/my/work",
+            });
+        }
         // 默认进入订单列表
         if (this.$route.name == "erpMy") {
             this.$router.push(this.headTab[0].path);

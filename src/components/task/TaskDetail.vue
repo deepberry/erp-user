@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="todo wrap" v-if="detail.status > 1">
+                <div class="todo wrap" v-if="detail.status > 1 && $store.state.power.checkTaskBtn">
                     <div>任务检查</div>
                     <div>检查结果：{{ detail.status == 2 ? "合格" : "不合格" }}</div>
                     <div>检查意见：</div>

@@ -22,24 +22,29 @@ export default {
     name: "stock",
     data() {
         return {
-            headTab: [
-                {
-                    title: "产量统计",
-                    path: "/erp/statisti/product",
-                },
-                {
-                    title: "出入库统计",
-                    path: "/erp/statisti/stock",
-                },
-                {
-                    title: "工时统计",
-                    path: "/erp/statisti/work",
-                },
-            ],
+            headTab: [],
             activeTabIndex: 0,
         };
     },
     mounted() {
+        if (this.$store.state.power.outputStatistics) {
+            this.headTab.push({
+                title: "产量统计",
+                path: "/erp/statisti/product",
+            });
+        }
+        if (this.$store.state.power.materialsStatistics) {
+            this.headTab.push({
+                title: "出入库统计",
+                path: "/erp/statisti/stock",
+            });
+        }
+        if (this.$store.state.power.workingHoursStatistics) {
+            this.headTab.push({
+                title: "工时统计",
+                path: "/erp/statisti/work",
+            });
+        }
         // 默认进入列表
         this.$router.push(this.headTab[0].path);
     },

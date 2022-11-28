@@ -14,7 +14,12 @@
             <div class="main" v-loading="loading">
                 <el-empty description="暂无数据" v-if="list.length == 0" style="margin-top: 200px" />
                 <div class="list" v-loading="loading">
-                    <div class="item" v-for="(item, index) in list" :key="index" @click="itemClick(item.id)">
+                    <div
+                        class="item"
+                        v-for="(item, index) in list"
+                        :key="index"
+                        @click="$store.state.power.historyPlantDetail ? itemClick(item.id) : () => {}"
+                    >
                         <div class="head">
                             <div class="left">
                                 <img :src="item.image" alt="" />

@@ -40,7 +40,11 @@
                         <div>
                             <p>{{ item.agriculturalBo.manufacturers }}</p>
                             <p>
-                                <el-button type="primary" link @click="viewDetail(item.id)"
+                                <el-button
+                                    v-if="$store.state.power.stockRecordDetail"
+                                    type="primary"
+                                    link
+                                    @click="viewDetail(item.id)"
                                     >查看详情 <i class="erp erphtmal5icon45"></i
                                 ></el-button>
                             </p>

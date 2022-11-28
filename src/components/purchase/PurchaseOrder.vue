@@ -62,7 +62,13 @@
                     </el-table-column>
                     <el-table-column label="操作" width="180">
                         <template #default="scope">
-                            <el-button link type="primary" @click="viewDetail(scope.row.id)">查看详情</el-button>
+                            <el-button
+                                link
+                                type="primary"
+                                v-if="$store.state.power.purchaseOrderDetail"
+                                @click="viewDetail(scope.row.id)"
+                                >查看详情</el-button
+                            >
                         </template>
                     </el-table-column>
                 </el-table>

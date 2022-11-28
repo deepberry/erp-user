@@ -27,7 +27,11 @@
                     <el-button type="primary" class="searchSubmit" @click="getData" :loading="searchLoading"
                         >查询</el-button
                     >
-                    <el-button type="primary" class="searchCreateNewTask" @click="showCreateBox = true"
+                    <el-button
+                        v-if="$store.state.power.createTaskBtn"
+                        type="primary"
+                        class="searchCreateNewTask"
+                        @click="showCreateBox = true"
                         ><i class="erp erpjiufuqianbaoicon06"></i> 创建任务</el-button
                     >
                 </div>
@@ -56,7 +60,13 @@
                         </el-table-column>
                         <el-table-column label="操作" width="200">
                             <template #default="scope">
-                                <el-button link type="primary" @click="showDetail(scope.row.id)">查看详情</el-button>
+                                <el-button
+                                    link
+                                    type="primary"
+                                    v-if="$store.state.power.taskDetail"
+                                    @click="showDetail(scope.row.id)"
+                                    >查看详情</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>

@@ -1,8 +1,12 @@
 <template>
     <el-dialog v-model="dialogVisible" :title="title" width="1200px" :before-close="handleClose" append-to-body>
         <div class="btn">
-            <el-button type="primary" @click="editButton">{{ isEdit ? "保存" : "编辑" }}</el-button>
-            <el-button type="primary" plain @click="del">{{ isEdit ? "取消" : "删除" }}</el-button>
+            <el-button type="primary" @click="editButton" v-if="$store.state.power.editFarmRecordBtn">{{
+                isEdit ? "保存" : "编辑"
+            }}</el-button>
+            <el-button type="primary" plain @click="del" v-if="$store.state.power.delFarmRecordBtn">{{
+                isEdit ? "取消" : "删除"
+            }}</el-button>
         </div>
         <div class="form">
             <div class="item">

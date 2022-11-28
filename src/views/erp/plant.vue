@@ -6,19 +6,21 @@
                     <div>
                         <span class="active">{{ gardenList[currentGarden].title }}</span>
                     </div>
-                    <el-button type="primary" @click="addCrops">新增作物</el-button>
+                    <el-button type="primary" @click="addCrops" v-if="$store.state.power.addPlantBtn"
+                        >新增作物</el-button
+                    >
                 </div>
                 <router-view></router-view>
             </div>
             <div class="nodata" v-if="gardenList.length == 0">
                 <el-empty description="暂无园区" style="padding-top: 200px">
-                    <el-button type="primary" @click="addGarden">
+                    <el-button type="primary" @click="addGarden" v-if="$store.state.power.addParkBtn">
                         <i class="erp erpicon_tianjia" style="font-size: 14px; margin-right: 5px"></i>
                         添加园区</el-button
                     >
                 </el-empty>
             </div>
-            <div class="btn" @click="showGardenList = true">
+            <div class="btn" @click="showGardenList = true" v-if="$store.state.power.parkList">
                 <i class="erp erpanniu_jiantouxiangzuo_o"></i>
                 <p>园区列表</p>
             </div>
@@ -55,9 +57,15 @@
                             <transition name="el-zoom-in-top">
                                 <div v-if="item.showMenu" class="menu" @mouseleave="item.showMenu = false">
                                     <div class="menuPoint"></div>
-                                    <p @click.stop="history(item.id)">历史种植</p>
-                                    <p @click.stop="edit(item.id, index)">编辑园区</p>
-                                    <p @click.stop="del(item.id, index)">删除园区</p>
+                                    <p @click.stop="history(item.id)" v-if="$store.state.power.historyPlantBtn">
+                                        历史种植
+                                    </p>
+                                    <p @click.stop="edit(item.id, index)" v-if="$store.state.power.editParkBtn">
+                                        编辑园区
+                                    </p>
+                                    <p @click.stop="del(item.id, index)" v-if="$store.state.power.delParkBtn">
+                                        删除园区
+                                    </p>
                                 </div>
                             </transition>
                         </div>
