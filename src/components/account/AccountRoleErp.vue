@@ -47,6 +47,7 @@ export default {
         init: async function (t) {
             t.loading = true;
             this.list = [];
+            this.showList = [];
             let list = await t.getList();
             let user = await t.getUserRole();
 
