@@ -46,6 +46,7 @@ export default {
     methods: {
         init: async function (t) {
             t.loading = true;
+            this.list = [];
             let list = await t.getList();
             let user = await t.getUserRole();
 
