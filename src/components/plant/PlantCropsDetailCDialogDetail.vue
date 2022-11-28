@@ -12,7 +12,7 @@
             <div class="item">
                 <p class="title">种植植物：</p>
                 <div class="content">
-                    <p class="text">{{ form.varietyName }}</p>
+                    <p class="text">{{ form.categoryTitle + "-" + form.address }}</p>
                 </div>
             </div>
             <div class="item">
@@ -322,6 +322,7 @@ export default {
                 this.ajax.post("/api/v1/adam/farm/getFarmRecordById", { id: this.id }).then((r) => {
                     r.data.image = r.data.image.length > 0 ? r.data.image.split(",") : [];
                     this.form = r.data;
+                    console.log(this.form);
                     a();
                 });
             });
@@ -358,8 +359,6 @@ export default {
     position: relative;
     top: -20px;
     padding: 10px 0;
-    border-top: 1px solid rgb(228, 228, 228);
-    border-bottom: 1px solid rgb(228, 228, 228);
     display: flex;
     justify-content: flex-end;
     align-items: center;

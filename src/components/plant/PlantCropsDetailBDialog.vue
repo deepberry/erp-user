@@ -4,7 +4,7 @@
             <div class="item">
                 <div class="title">种植植物：</div>
                 <div class="content">
-                    <el-input v-model="categoryTitle" placeholder="请输入种植植物" />
+                    <p class="text">{{ categoryTitle }}</p>
                 </div>
             </div>
             <div class="item">
@@ -149,6 +149,7 @@ export default {
         };
     },
     mounted() {
+        console.log(this.plantName);
         this.getFarmType();
         this.getOperatingType();
         let user = JSON.parse(localStorage.getItem("erp_user"));

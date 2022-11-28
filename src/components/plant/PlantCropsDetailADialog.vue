@@ -97,31 +97,7 @@
                         <div style="display: block">{{ detail.opinion }}</div>
                     </div>
                 </div>
-                <el-button
-                    @click="showTextArea = true"
-                    v-if="!showTextArea && detail.status == 1"
-                    type="primary"
-                    link
-                    style="margin-top: 20px"
-                >
-                    <i class="erp erptianxie" style="margin-right: 5px; font-size: 12px"></i> 填写检查意见</el-button
-                >
-                <div class="form wrap" v-if="showTextArea">
-                    <div>填写检查意见</div>
-                    <div>
-                        <div>
-                            是否合格：
-                            <el-radio-group v-model="isPass" class="ml-4">
-                                <el-radio label="2">合格</el-radio>
-                                <el-radio label="3">不合格</el-radio>
-                            </el-radio-group>
-                        </div>
-                    </div>
-                    <div class="formTextarea">
-                        <p>意见建议：</p>
-                        <el-input v-model="textarea" :rows="5" type="textarea" placeholder="输入检查意见" />
-                    </div>
-                </div>
+
                 <div class="btns" v-if="showTextArea">
                     <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
                     <el-button type="primary" @click="submitCheck" :loading="submitting">确定</el-button>

@@ -32,12 +32,21 @@
                     <div class="table">
                         <el-table size="large" :data="list" style="width: 100%">
                             <el-table-column prop="orderUuid" label="工单号" />
-                            <el-table-column prop="totalCount[0].variety" label="农资名称" />
-                            <el-table-column prop="totalCount[0].title" label="农资类型" />
+                            <el-table-column label="农资名称">
+                                <template #default="scope">
+                                    <p v-for="item in scope.row.totalCount" :key="item.id">{{ item.title }}</p>
+                                </template>
+                            </el-table-column>
+                            <el-table-column label="农资类型">
+                                <template #default="scope">
+                                    <p v-for="item in scope.row.totalCount" :key="item.id">{{ item.variety }}</p>
+                                </template>
+                            </el-table-column>
                             <el-table-column label="数量">
                                 <template #default="scope">
-                                    {{ scope.row.totalCount[0].agriculturalCos
-                                    }}{{ scope.row.totalCount[0].unitweight }}
+                                    <p v-for="item in scope.row.totalCount" :key="item.id">
+                                        {{ item.agriculturalCos }}{{ item.unitweight }}
+                                    </p>
                                 </template>
                             </el-table-column>
                             <el-table-column prop="createTime" label="申请日期" />
@@ -84,7 +93,7 @@ export default {
             currentStatus: -1,
             list: [],
             currentPage: 1,
-            pageSize: 100,
+            pageSize: 10,
             total: 0,
         }
     },

@@ -64,7 +64,7 @@
                             <PlantCropsDetailTabA @gotob="gotob"></PlantCropsDetailTabA>
                         </el-tab-pane>
                         <el-tab-pane label="农事记录" name="2" v-if="$store.state.power.farmRecordList">
-                            <PlantCropsDetailTabB></PlantCropsDetailTabB>
+                            <PlantCropsDetailTabB :plantName="plantName"></PlantCropsDetailTabB>
                         </el-tab-pane>
                         <el-tab-pane label="农事统计" name="3" v-if="$store.state.power.farmStatistics">
                             <PlantCropsDetailTabC></PlantCropsDetailTabC>
@@ -105,7 +105,8 @@ export default {
             detail: {},
             showGuide: false,
             editCropsId: '',
-            showAddCropsBox: false
+            showAddCropsBox: false,
+            plantName: ''
         }
     },
     mounted() {
@@ -215,6 +216,7 @@ export default {
                     r.data.count = new Date().getTime() / 1000 - timer.parse(r.data.plantTime).getTime() / 1000;
                     r.data.count = Math.ceil(r.data.count / 60 / 60 / 24);
                     this.detail = r.data;
+                    this.plantName = r.data.varietyTitle + '-' + r.data.address;
                     a();
                 })
             })

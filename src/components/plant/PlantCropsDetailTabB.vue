@@ -28,14 +28,19 @@
             @close="closeDetail"
             @load="getData"
         ></PlantCropsDetailCDialogDetail>
-        <PlantCropsDetailBDialog @load="getData" v-if="showAdd" @close="closeAdd"></PlantCropsDetailBDialog>
+        <PlantCropsDetailBDialog
+            @load="getData"
+            :plantName="plantName"
+            v-if="showAdd"
+            @close="closeAdd"
+        ></PlantCropsDetailBDialog>
     </div>
 </template>
 <script>
 import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
 import PlantCropsDetailBDialog from "@/components/plant/PlantCropsDetailBDialog";
 export default {
-    props: ["showADialog"],
+    props: ["showADialog", "plantName"],
     data() {
         return {
             list: [],

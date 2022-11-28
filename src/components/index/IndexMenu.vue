@@ -44,32 +44,36 @@ export default {
         };
     },
     mounted() {
-        if (this.$store.state.power.parkList) {
-            this.menu[1].son[0].show = true;
-        }
-        if (this.$store.state.power.taskList) {
-            this.menu[1].son[1].show = true;
-        }
-        if (this.$store.state.power.materialsPurchaseList) {
-            this.menu[1].son[2].show = true;
-        }
-        if (this.$store.state.power.materialsStockList) {
-            this.menu[1].son[3].show = true;
-        }
-        if (this.$store.state.power.workOrderList) {
-            this.menu[1].son[4].show = true;
-        }
-        if (this.$store.state.power.statistics) {
-            this.menu[1].son[5].show = true;
-        }
-        if (this.$store.state.power.accountRole) {
-            this.menu[2].son[1].show = true;
-        }
+        // 获取可见菜单列表
+        this.ajax.post("/api/v1/adam/adminMenu/getUserMenusList").then((r) => {
+            this.$store.commit("setPower", r.data);
+            if (this.$store.state.power.parkList) {
+                this.menu[1].son[0].show = true;
+            }
+            if (this.$store.state.power.taskList) {
+                this.menu[1].son[1].show = true;
+            }
+            if (this.$store.state.power.materialsPurchaseList) {
+                this.menu[1].son[2].show = true;
+            }
+            if (this.$store.state.power.materialsStockList) {
+                this.menu[1].son[3].show = true;
+            }
+            if (this.$store.state.power.workOrderList) {
+                this.menu[1].son[4].show = true;
+            }
+            if (this.$store.state.power.statistics) {
+                this.menu[1].son[5].show = true;
+            }
+            if (this.$store.state.power.accountRole) {
+                this.menu[2].son[1].show = true;
+            }
 
-        // 刷新时菜单高亮
-        this.activeMenuIndex = sessionStorage.getItem("erp_menu_current_index") || 0;
-        this.menu[this.activeMenuIndex].show = true;
-        this.activeMenuIndexSon = sessionStorage.getItem("erp_menu_son_index") || 0;
+            // 刷新时菜单高亮
+            this.activeMenuIndex = sessionStorage.getItem("erp_menu_current_index") || 0;
+            this.menu[this.activeMenuIndex].show = true;
+            this.activeMenuIndexSon = sessionStorage.getItem("erp_menu_son_index") || 0;
+        });
     },
     methods: {
         // 点击菜单标题，展开子菜单
