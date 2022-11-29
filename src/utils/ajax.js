@@ -39,6 +39,16 @@ ajax.get = (url) => {
     });
 };
 
+ajax.getUrl = (url) => {
+    return new Promise((reslove, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader("token", "");
+        xhr.send();
+        callback(xhr, reslove, reject);
+    });
+};
+
 // post请求
 ajax.post = (url, data) => {
     return new Promise((reslove, reject) => {

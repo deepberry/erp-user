@@ -72,9 +72,9 @@
                         placeholder="请选择关联设备"
                     >
                         <el-option
-                            v-for="item in form.smartDeviceBoList"
+                            v-for="item in deviceList"
                             :key="item.id"
-                            :label="item.title"
+                            :label="item.name"
                             :value="item.id"
                         ></el-option>
                     </el-select>
@@ -89,6 +89,7 @@
 </template>
 
 <script lang="js">
+import * as signalR from '@microsoft/signalr';
 export default {
     name: "plantAdd",
     props: ['isEdit', 'id'],
@@ -159,14 +160,24 @@ export default {
         // 获取关联设备列表
         getDevice (){
             return new Promise((a,b) => {
-                this.ajax.post('/api/v1/adam/garden/getSmartDevice', {
-                    "dashboardId": 0,
-                    "id": 0,
-                    "plantsId": 0,
-                    "smartDeviceId": 0,
-                    "title": ""
-                }).then(r => {
-                    this.deviceList = r.data;
+                const token = localStorage.getItem('erp_token');
+                let connection = new signalR.HubConnectionBuilder().withUrl('/hub/overview', {
+                    accessTokenFactory: () => token
+                }).withAutomaticReconnect({
+                    nextRetryDelayInMilliseconds: (_retryContext) => 5000
+                }).build();
+
+                connection.start().then(() => {
+                    connection.invoke('Subscribe').then(r => {
+                        console.log(r)
+                        let list = [];
+                        r.map(item => {
+                            item.nodes.map(i => {
+                                list.push(i);
+                            })
+                        })
+                        this.deviceList = list;
+                    })
                     a();
                 })
             })
@@ -221,8 +232,22 @@ export default {
                 "growthId": this.form.growthId,
                 "area": parseInt(this.form.area),
                 "address": this.form.address,
-                "smartDevice": 0,
-                "smartDeviceBoList": [],
+                "smartDevice": this.form.smartDeviceBoList.length > 0 ? 1 : 0,
+                "smartDeviceBoList": this.form.smartDeviceBoList.map(item => {
+                    let row = {};
+                    this.deviceList.map(i => {
+                        if(item == i.id){
+                            row = {
+                                dashboardId: i.dashboardId,
+                                id: i.id,
+                                plantsId: '',
+                                smartDeviceId: '',
+                                title: i.name
+                            }
+                        }
+                    })
+                    return row;
+                }),
                 "image": this.form.image,
             }
             this.ajax.post("/api/v1/adam/plants/editPlants", data)

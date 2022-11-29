@@ -4,13 +4,13 @@
             <div class="left">
                 <div class="title">作物现场数据</div>
                 <el-select
-                    v-model="sceneSelected"
+                    v-model="selectValue"
                     multiple
                     placeholder="请选择属性，可选择多个"
                     style="width: 100%; margin-top: 20px"
                 >
                     <el-option
-                        v-for="(item, index) in scene"
+                        v-for="(item, index) in select"
                         :key="index"
                         :label="item.title"
                         :value="item.id"
@@ -20,9 +20,8 @@
                     <el-tag
                         style="width: 30%; margin: 5px 1%"
                         size="large"
-                        v-for="(item, index) in sceneTags"
+                        v-for="(item, index) in selected"
                         :key="index"
-                        @close="removeTag(index)"
                         closable
                         >{{ item.title }}</el-tag
                     >
@@ -77,7 +76,7 @@
             <div class="right">
                 <div class="title">农事照片</div>
                 <div class="imgs">
-                    <img v-for="(item, index) in imgs" :key="index" :src="item" alt="" />
+                    <img v-for="(item, index) in imgs" :key="index" src="../../assets/img/ds.png" alt="" />
                     <div v-for="(item, index) in imgSpace" :key="index"></div>
                 </div>
             </div>
@@ -90,10 +89,14 @@ import * as signalR from "@microsoft/signalr";
 export default {
     data() {
         return {
-            sceneSelected: [],
-            scene: [],
-            imgs: [],
-            plantDetail: {},
+            selectValue: [],
+            select: [
+                { id: 1, title: "一" },
+                { id: 2, title: "二" },
+                { id: 3, title: "三" },
+                { id: 4, title: "四" },
+            ],
+            imgs: [1, 2, 3, 4, 5],
         };
     },
     watch: {
@@ -104,10 +107,10 @@ export default {
         },
     },
     computed: {
-        sceneTags() {
-            return this.sceneSelected.map((item) => {
+        selected() {
+            return this.selectValue.map((item) => {
                 let r = {};
-                this.scene.map((i) => {
+                this.select.map((i) => {
                     if (item == i.id) r = i;
                 });
                 return r;
@@ -124,74 +127,18 @@ export default {
         // }
     },
     mounted() {
-        let t = this;
-        let ajax = async function () {
-            await t.getData();
-            await t.getGrow();
-        };
-        ajax();
+        this.device();
     },
     methods: {
-        // 获取作物详情
-        getData() {
-            return new Promise((a, b) => {
-                this.ajax
-                    .post("/api/v1/adam/plants/getPlants", {
-                        id: this.$route.query.id,
-                    })
-                    .then((r) => {
-                        this.plantDetail = r.data;
-                        a();
-                    });
-            });
-        },
-        // 获取生长
-        getGrow() {
-            if (this.plantDetail.smartDeviceBoList.length > 0) {
-                const token = localStorage.getItem("erp_token");
-                let connection = new signalR.HubConnectionBuilder()
-                    .withUrl(`/hub/node`, {
-                        accessTokenFactory: () => token,
-                    })
-                    .withAutomaticReconnect({
-                        nextRetryDelayInMilliseconds: (_retryContext) => {
-                            return 5000;
-                        },
-                    })
-                    .build();
-                connection.start().then(() => {
-                    console.log(this.connection.invoke("Subscribe"));
-                });
-            }
-        },
-        // 移除已选择的标签
-        removeTag(index) {
-            this.sceneSelected.splice(index, 1);
-        },
-        // 获取农事记录照片
-        getFarmRecordImg() {
-            this.ajax
-                .post("/api/v1/adam/task/getFarmRecordImg", {
-                    growPlantId: this.$route.query.id,
-                })
-                .then((r) => {
-                    let imgs = [];
-                    r.data.map((item) => {
-                        item = item.split(",");
-                        imgs = [...imgs, ...item];
-                    });
-                    this.imgs = imgs;
-                });
-        },
         device() {
-            // // 预定义变量
+            // 预定义变量
             const socketApiUrl = "https://io.deepberry.cn";
             const cdnUrl = "https://cdn.deepberry.cn";
             const token = localStorage.getItem("erp_token");
 
             // 初始化
             let connection = new signalR.HubConnectionBuilder()
-                .withUrl(`/hub/node`, {
+                .withUrl(`${socketApiUrl}/hub/node`, {
                     accessTokenFactory: () => token,
                 })
                 .withAutomaticReconnect({
@@ -204,18 +151,6 @@ export default {
             // 启动
             connection.start().then(() => {
                 console.log(this.connection.invoke("Subscribe"));
-            });
-            let dashboardId = 45;
-            let nodeId = 48;
-            this.ajax
-                .getUrl(`/api/dashboard/${dashboardId}/node/${nodeId}/properties?access_token=${token}`)
-                .then((r) => {
-                    console.log(r);
-                });
-
-            let user = JSON.parse(localStorage.getItem("erp_user"));
-            this.ajax.getUrl(`/hub/overview?`).then((r) => {
-                console.log(r);
             });
         },
     },
@@ -254,9 +189,7 @@ export default {
                 align-content: flex-start;
                 flex-wrap: wrap;
                 img {
-                    width: calc(23% - 2px);
-                    height: 120px;
-                    border: 1px solid #f5f5f5;
+                    width: 23%;
                     margin-right: 2%;
                     margin-top: 20px;
                     border-radius: 10px;

@@ -2,7 +2,9 @@ import { createStore } from "vuex";
 
 const Store = createStore({
     state: {
-        power: [],
+        power: {
+            loading: true,
+        },
     },
     mutations: {
         setPower: (state, data) => {

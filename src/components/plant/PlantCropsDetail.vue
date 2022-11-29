@@ -69,7 +69,7 @@
                         <el-tab-pane label="农事统计" name="3" v-if="$store.state.power.farmStatistics">
                             <PlantCropsDetailTabC></PlantCropsDetailTabC>
                         </el-tab-pane>
-                        <el-tab-pane label="种植分析" name="4">
+                        <el-tab-pane label="种植分析" name="4" v-if="showTabD">
                             <PlantCropsDetailTabD></PlantCropsDetailTabD>
                         </el-tab-pane>
                     </el-tabs>
@@ -99,14 +99,15 @@ export default {
     data() {
         return {
             loading: false,
-            activeName: '1',
+            activeName: '4',
             selectValue: '',
             selectList: [],
             detail: {},
             showGuide: false,
             editCropsId: '',
             showAddCropsBox: false,
-            plantName: ''
+            plantName: '',
+            showTabD: false
         }
     },
     mounted() {
@@ -126,6 +127,15 @@ export default {
         if(this.$store.state.power.delPlantBtn){
             this.selectList.push('删除作物')
         }
+
+        // 计算tabd是否显示
+        let interval = setInterval(() => {
+            if(!this.$store.state.power.loading) {
+                t.showTabD = true;
+                clearInterval(interval);
+            }
+        }, 200);
+
     },
     components: {
         PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD, PlantGuide, PlantAddCrops
@@ -133,7 +143,6 @@ export default {
     methods: {
         // 去执行
         gotob (){
-            this.activeName = '2';
             this.showADialog = true;
         },
         onCloseAddCrops(params) {
@@ -193,13 +202,7 @@ export default {
             });
         },
         handleClick (v){
-            let query = JSON.parse(JSON.stringify(this.$route.query));
-            query.tab = v;
-            console.log(query)
-            this.$router.push({
-                path: this.$route.path,
-                query
-            })
+
         },
         // 关闭种植指导
         closeGuide (){
@@ -216,7 +219,7 @@ export default {
                     r.data.count = new Date().getTime() / 1000 - timer.parse(r.data.plantTime).getTime() / 1000;
                     r.data.count = Math.ceil(r.data.count / 60 / 60 / 24);
                     this.detail = r.data;
-                    this.plantName = r.data.varietyTitle + '-' + r.data.address;
+                    this.plantName = r.data.categoryTitle + '-' + r.data.address;
                     a();
                 })
             })

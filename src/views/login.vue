@@ -36,9 +36,14 @@ export default {
                 "phoneNumber": "",
                 "username": this.userName
             }).then(r => {
-                localStorage.setItem('erp_token', r.data.accessToken);
-                this.loading = false;
-                this.$router.push('/');
+                if(r.code == 200 && r.data.accessToken){
+                    localStorage.setItem('erp_token', r.data.accessToken);
+                    this.loading = false;
+                    this.$router.push('/');
+                }else{
+                    this.$message.error('登陆失败');
+                    this.loading = false;
+                }
             }).catch(r => {
                 this.loading = false;
             })
