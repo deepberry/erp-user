@@ -134,7 +134,11 @@ export default {
                 this.ajax.post("/api/v1/adam/plants/getPlants", {
                     id: this.id
                 }).then((r) => {
+                    r.data.smartDeviceBoList = r.data.smartDeviceBoList.map(item => {
+                        return item.smartDeviceId;
+                    })
                     this.form = r.data;
+                    console.log(this.form)
                     a();
                 })
             })
@@ -169,13 +173,13 @@ export default {
 
                 connection.start().then(() => {
                     connection.invoke('Subscribe').then(r => {
-                        console.log(r)
                         let list = [];
                         r.map(item => {
                             item.nodes.map(i => {
                                 list.push(i);
                             })
                         })
+                        console.log(list)
                         this.deviceList = list;
                     })
                     a();
@@ -239,9 +243,9 @@ export default {
                         if(item == i.id){
                             row = {
                                 dashboardId: i.dashboardId,
-                                id: i.id,
+                                id: '',
                                 plantsId: '',
-                                smartDeviceId: '',
+                                smartDeviceId: i.id,
                                 title: i.name
                             }
                         }

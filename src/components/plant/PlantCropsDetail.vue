@@ -118,20 +118,20 @@ export default {
             t.loading = false;
         }
         ajax();
-        if(this.$store.state.power.stopPlantBtn){
-            this.selectList.push('结束种植')
-        }
-        if(this.$store.state.power.editPlantBtn){
-            this.selectList.push('编辑作物')
-        }
-        if(this.$store.state.power.delPlantBtn){
-            this.selectList.push('删除作物')
-        }
 
         // 计算tabd是否显示
         let interval = setInterval(() => {
             if(!this.$store.state.power.loading) {
                 t.showTabD = true;
+                if(this.$store.state.power.stopPlantBtn){
+                    this.selectList.push('结束种植')
+                }
+                if(this.$store.state.power.editPlantBtn){
+                    this.selectList.push('编辑作物')
+                }
+                if(this.$store.state.power.delPlantBtn){
+                    this.selectList.push('删除作物')
+                }
                 clearInterval(interval);
             }
         }, 200);
