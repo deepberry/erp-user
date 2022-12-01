@@ -5,9 +5,9 @@
         </div>
         <div class="userInfo">
             <p class="un">
-                <a>{{ user.name }}</a>
+                <a>{{ user.name }} 你好，{{ user.organization.name }}</a>
             </p>
-            <el-dropdown size="large" trigger="click">
+            <!-- <el-dropdown size="large" trigger="click">
                 <p class="group">
                     你好，{{ user.organization.name }}
                     <i class="erp erp31xiala"></i>
@@ -19,7 +19,7 @@
                         }}</el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
-            </el-dropdown>
+            </el-dropdown> -->
             <p class="logout" @click="logout">退出</p>
         </div>
     </div>

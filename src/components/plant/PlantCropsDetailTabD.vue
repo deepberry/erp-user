@@ -7,7 +7,7 @@
                     <el-select
                         v-model="sceneSelected"
                         multiple
-                        placeholder="请选择属性，可选择多个"
+                        placeholder="请选择节点，可选择多个"
                         style="width: 100%; margin-top: 20px"
                         @change="setHistoryAnalyze"
                     >
@@ -19,6 +19,7 @@
                         ></el-option>
                     </el-select>
                     <div class="tags">
+                        <el-empty description="暂无现场数据" style="margin: 0 auto" v-if="sceneTags.length == 0" />
                         <el-tag
                             style="width: 30%; margin: 5px 1%"
                             size="large"
@@ -36,6 +37,7 @@
                     </div>
                     <div style="margin-top: 20px">环境数据：</div>
                     <div style="width: 100%; overflow-x: auto">
+                        <el-empty description="暂无环境数据" style="margin: 0 auto" v-if="ambient.length == 0" />
                         <div class="items" :style="{ width: ambient.length * 130 + 'px' }">
                             <div v-for="(item, index) in ambient" :key="index">
                                 <p>
@@ -51,7 +53,7 @@
             <div class="wrap">
                 <div class="left">
                     <div class="title">数据图表</div>
-                    <div class="echartBox">
+                    <div class="echartBox" v-if="sceneTags.length > 0">
                         <div class="btn">
                             <el-button
                                 :type="index === activeCharts ? 'primary' : ''"
@@ -63,6 +65,7 @@
                         </div>
                         <div class="charts" ref="charts"></div>
                     </div>
+                    <el-empty description="暂无图表数据" style="margin: 0 auto" v-if="sceneTags.length == 0" />
                 </div>
                 <div class="right">
                     <div class="title">农事照片</div>
@@ -116,7 +119,6 @@ export default {
                     diff: 12,
                 },
             ],
-            echarts: null,
         };
     },
     watch: {
@@ -145,20 +147,25 @@ export default {
     mounted() {
         let t = this;
         let ajax = async function () {
-            t.echarts = echarts.init(t.$refs.charts);
             await t.getData();
-            await t.getHistoryAnalyze();
             await t.getGrow();
-            t.setCharts(1);
+            await t.getHistoryAnalyze();
+            if (t.sceneSelected.length > 0) {
+                t.setCharts();
+            }
+            t.getFarmRecordImg();
         };
         ajax();
     },
     methods: {
         // 渲染图表
-        setCharts(index) {
-            this.activeCharts = index;
-            this.chartsData(index).then((r) => {
-                this.echarts.setOption(r);
+        setCharts(index = -1) {
+            if (index > -1) this.activeCharts = index;
+            this.chartsData(this.activeCharts).then((r) => {
+                let ec = echarts.init(this.$refs.charts);
+                ec.clear();
+                ec.setOption(r);
+                console.log(r);
             });
         },
         // 处理图表数据
@@ -179,15 +186,16 @@ export default {
                     );
                 });
                 Promise.all(list).then((r) => {
-                    console.log(r);
                     r.map((item) => {
+                        item.data = item.data || [];
                         legend.push(item.propertyName);
                         let data = this.clip(item.data);
                         let row = {
                             name: item.propertyName,
                             data: data.map((d) => d[1]),
                             type: "line",
-                            smooth: true,
+                            // smooth: true,
+                            // areaStyle: {},
                         };
                         series.push(row);
                         xAxis = data.map((d) => d[0]);
@@ -196,6 +204,7 @@ export default {
                         tooltip: {
                             trigger: "axis",
                             show: true,
+                            triggerOn: "mousemove",
                         },
                         legend: {
                             data: legend,
@@ -203,6 +212,10 @@ export default {
                         xAxis: {
                             type: "category",
                             data: xAxis,
+                            // axisLabel: {
+                            //     interval: 0,
+                            //     rotate: 45
+                            // }
                         },
                         yAxis: {
                             type: "value",
@@ -215,9 +228,8 @@ export default {
         },
         // 修剪数据
         clip(data) {
-            console.log(data);
             let r = [];
-            let num = this.chartList[this.activeCharts].diff * 10;
+            let num = this.chartList[this.activeCharts].diff;
             data.map((item, index) => {
                 if (index % num == 0) {
                     r.push(item);
@@ -233,15 +245,16 @@ export default {
             switch (index) {
                 case 0:
                     start = timer.time("y-m-d+00:00:00", (unix - 86400) * 1000);
+                    stop = timer.time("y-m-d+23:59:59", (unix - 86400) * 1000);
                     break;
                 case 1:
                     start = timer.time("y-m-d+00:00:00", unix * 1000);
                     break;
                 case 2:
-                    start = timer.time("y-m-d+00:00:00", (unix - 86400 * 3) * 1000);
+                    start = timer.time("y-m-d+00:00:00", (unix - 86400 * 2) * 1000);
                     break;
                 case 3:
-                    start = timer.time("y-m-d+00:00:00", (unix - 86400 * 7) * 1000);
+                    start = timer.time("y-m-d+00:00:00", (unix - 86400 * 6) * 1000);
                     break;
             }
             let url = `/api/dashboard/${dashboardId}/node/${nodeId}/property/${propertyId}/chart?start=${start}&stop=${stop}&access_token=${token}`;
@@ -255,6 +268,7 @@ export default {
                         id: this.$route.query.id,
                     })
                     .then((r) => {
+                        r.data.smartDeviceBoList = r.data.smartDeviceBoList || [];
                         this.plantDetail = r.data;
                         a();
                     });
@@ -290,7 +304,7 @@ export default {
                             });
                     };
                     t.plantDetail.smartDeviceBoList.map((item) => {
-                        sceneList.push(getData(item.dashboardId, item.id));
+                        sceneList.push(getData(item.dashboardId, item.smartDeviceId));
                     });
                     Promise.all(sceneList).then((res) => {
                         let r = [];
@@ -321,6 +335,8 @@ export default {
                             }
                         });
                     });
+                } else {
+                    a();
                 }
             });
         },
@@ -332,7 +348,9 @@ export default {
                     growPlantId: this.$route.query.id,
                 })
                 .then(() => {
-                    this.setCharts(this.activeCharts);
+                    this.getHistoryAnalyze().then(() => {
+                        this.setCharts();
+                    });
                 });
         },
         // 获取已选中的现场数据
@@ -343,7 +361,13 @@ export default {
                         growPlantId: this.$route.query.id,
                     })
                     .then((r) => {
-                        this.sceneSelected = JSON.parse(r.data.analyzeOption);
+                        if (JSON.parse(r.data.analyzeOption) && JSON.parse(r.data.analyzeOption).length > 0) {
+                            this.sceneSelected = JSON.parse(r.data.analyzeOption);
+                        } else {
+                            this.sceneSelected = this.scene.slice(0, 3).map((item) => {
+                                return item.id;
+                            });
+                        }
                         a();
                     });
             });
@@ -355,6 +379,7 @@ export default {
         // 移除已选择的标签
         removeTag(index) {
             this.sceneSelected.splice(index, 1);
+            this.setHistoryAnalyze();
         },
         // 获取农事记录照片
         getFarmRecordImg() {
