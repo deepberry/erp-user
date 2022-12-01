@@ -396,41 +396,6 @@ export default {
                     this.imgs = imgs;
                 });
         },
-        device() {
-            // // 预定义变量
-            const socketApiUrl = "https://io.deepberry.cn";
-            const cdnUrl = "https://cdn.deepberry.cn";
-            const token = localStorage.getItem("erp_token");
-
-            // 初始化
-            let connection = new signalR.HubConnectionBuilder()
-                .withUrl(`/hub/node`, {
-                    accessTokenFactory: () => token,
-                })
-                .withAutomaticReconnect({
-                    nextRetryDelayInMilliseconds: (_retryContext) => {
-                        return 5000;
-                    },
-                })
-                .build();
-
-            // 启动
-            connection.start().then(() => {
-                console.log(this.connection.invoke("Subscribe"));
-            });
-            let dashboardId = 45;
-            let nodeId = 48;
-            this.ajax
-                .getUrl(`/api/dashboard/${dashboardId}/node/${nodeId}/properties?access_token=${token}`)
-                .then((r) => {
-                    console.log(r);
-                });
-
-            let user = JSON.parse(localStorage.getItem("erp_user"));
-            this.ajax.getUrl(`/hub/overview?`).then((r) => {
-                console.log(r);
-            });
-        },
     },
 };
 </script>

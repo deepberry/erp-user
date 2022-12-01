@@ -4,7 +4,7 @@
             <div class="left">
                 <div class="box">
                     <div class="boxTitle">生长阶段：</div>
-                    <div class="boxTitle">萌芽阶段</div>
+                    <div class="boxTitle">{{ stepList[swiperIndex] && stepList[swiperIndex].phaseName }}</div>
                 </div>
                 <div class="box">
                     <div class="boxTitle">参考模型：</div>
@@ -13,22 +13,16 @@
                             class="swiper-wrapper"
                             :style="{ left: swiperIndex * 370 * -1 + 'px', width: swiperWidth + 'px' }"
                         >
-                            <div class="swiper-slide">
-                                <img src="../../assets/img/ds.png" alt="" />
-                            </div>
-                            <div class="swiper-slide">
-                                <img src="../../assets/img/ds.png" alt="" />
-                            </div>
-                            <div class="swiper-slide">
-                                <img src="../../assets/img/ds.png" alt="" />
+                            <div class="swiper-slide" v-for="(item, index) in stepList" :key="index">
+                                <img :src="item.image" alt="" />
                             </div>
                         </div>
                         <div class="swiper-pagination">
                             <span
-                                @click="swiperIndex = item - 1"
-                                v-for="item in 3"
-                                :key="item"
-                                :class="swiperIndex == item - 1 ? 'active' : ''"
+                                @click="swiperIndex = index"
+                                v-for="(item, index) in stepList"
+                                :key="index"
+                                :class="swiperIndex == index ? 'active' : ''"
                             ></span>
                         </div>
                         <div class="swiper-button-prev" @click="swiperRun(0)">
@@ -54,20 +48,10 @@
                             <p>当前值</p>
                         </div>
                         <div class="tableContent">
-                            <div class="tableItem">
-                                <p>参数名</p>
-                                <p>参考值</p>
-                                <p>当前值</p>
-                            </div>
-                            <div class="tableItem">
-                                <p>参数名</p>
-                                <p>参考值</p>
-                                <p>当前值</p>
-                            </div>
-                            <div class="tableItem">
-                                <p>参数名</p>
-                                <p>参考值</p>
-                                <p>当前值</p>
+                            <div class="tableItem" v-for="(item, index) in tableData" :key="index">
+                                <p>{{ item.parameterName }}</p>
+                                <p>{{ item.leastValue }}-{{ item.maxValue }}{{ item.unit }}</p>
+                                <p>{{ item.nowValue || "--" }}</p>
                             </div>
                         </div>
                     </div>
@@ -139,68 +123,106 @@ export default {
             step: "",
             stepList: [],
             swiperIndex: 0,
-            swiperWidth: 370 * 3,
+            plantDetail: {},
+            getPlantOperationGuidanceListText: "",
+            getPlantPreventionGuidanceListText: "",
         };
     },
+    computed: {
+        swiperWidth() {
+            return 370 * this.stepList.length;
+        },
+        tableData() {
+            return this.stepList[this.swiperIndex] ? this.stepList[this.swiperIndex].growPlantModelDetailBos : [];
+        },
+    },
     mounted() {
-        this.getGrowthStage();
-        this.getGuide();
-        this.getGuide2();
+        let t = this;
+        let ajax = async function () {
+            await t.getDetail();
+            await t.getGrowthStage();
+            await t.getGuide();
+        };
+        ajax();
     },
     methods: {
         handleClose(done) {
             done();
         },
+        // 获取作物详情
+        getDetail() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/plants/getPlants", {
+                        id: this.$route.query.id,
+                    })
+                    .then((r) => {
+                        r.data.smartDeviceBoList = r.data.smartDeviceBoList || [];
+                        this.plantDetail = r.data;
+                        a();
+                    });
+            });
+        },
         // 轮播
         swiperRun(v) {
             if (v == 0) {
                 if (this.swiperIndex == 0) {
-                    this.swiperIndex = 3;
+                    this.swiperIndex = this.stepList.length;
                 }
                 if (this.swiperIndex > 0) {
                     this.swiperIndex--;
                 }
             }
             if (v == 1) {
-                if (this.swiperIndex < 3) {
+                if (this.swiperIndex < this.stepList.length) {
                     this.swiperIndex++;
                 }
-                if (this.swiperIndex == 3) {
+                if (this.swiperIndex == this.stepList.length) {
                     this.swiperIndex = 0;
                 }
             }
         },
         // 获取生长阶段
         getGrowthStage() {
-            this.ajax
-                .post("/api/v1/adam/adminGrowModel/getGrowthStage", {
-                    id: this.$route.query.id,
-                })
-                .then((r) => {
-                    this.stepList = r.data;
-                });
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/farm/getGrowthStageByPlantId", {
+                        id: this.$route.query.id,
+                        device: [],
+                    })
+                    .then((r) => {
+                        this.stepList = r.data;
+                        a();
+                    });
+            });
         },
         // 农事操作指导
         getGuide() {
-            this.ajax
-                .post("/api/v1/adam/farm/getPlantOperationGuidanceList", {
-                    id: this.$route.query.id,
-                    text: "",
-                })
-                .then((r) => {
-                    console.log(r);
-                });
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/farm/getPlantOperationGuidanceList", {
+                        id: this.$route.query.id,
+                        text: this.getPlantOperationGuidanceListText,
+                    })
+                    .then((r) => {
+                        console.log(r);
+                        a();
+                    });
+            });
         },
         // 病虫害防治指导
         getGuide2() {
-            this.ajax
-                .post("/api/v1/adam/farm/getPlantPreventionGuidanceList", {
-                    id: this.$route.query.id,
-                    text: "",
-                })
-                .then((r) => {
-                    console.log(r);
-                });
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/farm/getPlantPreventionGuidanceList", {
+                        id: this.$route.query.id,
+                        text: this.getPlantPreventionGuidanceListText,
+                    })
+                    .then((r) => {
+                        console.log(r);
+                        a();
+                    });
+            });
         },
     },
 };
