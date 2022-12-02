@@ -81,6 +81,7 @@
 </template>
 
 <script>
+const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
 import timer from "@/utils/timer";
 import * as signalR from "@microsoft/signalr";
 import * as echarts from "echarts";
@@ -255,7 +256,7 @@ export default {
                     start = timer.time("y-m-d+00:00:00", (unix - 86400 * 6) * 1000);
                     break;
             }
-            let url = `/api/dashboard/${dashboardId}/node/${nodeId}/property/${propertyId}/chart?start=${start}&stop=${stop}&access_token=${token}`;
+            let url = `${iourl}/api/dashboard/${dashboardId}/node/${nodeId}/property/${propertyId}/chart?start=${start}&stop=${stop}&access_token=${token}`;
             return url;
         },
         // 获取作物详情
@@ -279,7 +280,7 @@ export default {
                 if (t.plantDetail.smartDeviceBoList.length > 0) {
                     const token = localStorage.getItem("erp_token");
                     let connection = new signalR.HubConnectionBuilder()
-                        .withUrl(`/hub/node`, {
+                        .withUrl(`${iourl}/hub/node`, {
                             accessTokenFactory: () => token,
                         })
                         .withAutomaticReconnect({
@@ -293,7 +294,9 @@ export default {
                     let sceneList = [];
                     const getData = function (dashboardId, nodeId) {
                         return t.ajax
-                            .getUrl(`/api/dashboard/${dashboardId}/node/${nodeId}/properties?access_token=${token}`)
+                            .getUrl(
+                                `${iourl}/api/dashboard/${dashboardId}/node/${nodeId}/properties?access_token=${token}`
+                            )
                             .then((r) => {
                                 return r.map((item) => {
                                     item.dashboardId = dashboardId;
