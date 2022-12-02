@@ -202,7 +202,12 @@ export default {
             });
         },
         handleClick (v){
-
+            let query = JSON.parse(JSON.stringify(this.$route.query));
+            query.tab = v;
+            this.$router.push({
+                path: this.$route.path,
+                query
+            })
         },
         // 关闭种植指导
         closeGuide (){

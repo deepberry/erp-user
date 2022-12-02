@@ -123,16 +123,6 @@ export default {
             }
         }
     },
-    mounted() {
-        let t = this;
-        let ajax = async function (){
-            t.loading = true;
-            await t.getReap();
-            await t.getStat();
-            t.loading = false;
-        }
-        ajax();
-    },
     methods: {
         showDialogBox (title, id){
             this.dialogTitle = title;

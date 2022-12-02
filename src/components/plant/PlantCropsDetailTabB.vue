@@ -50,9 +50,6 @@ export default {
             showAdd: false,
         };
     },
-    mounted() {
-        this.getData();
-    },
     watch: {
         $route(v) {
             if (v.query.tab == 2) {

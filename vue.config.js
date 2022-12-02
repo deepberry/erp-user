@@ -4,8 +4,7 @@ module.exports = {
     devServer: {
         proxy: {
             "/api/dashboard": {
-                // target: process.env["DEV_SERVER"] == "true" ? "http://localhost:8080" : "https://io.deepberry.cn"
-                target: "https://io.deepberry.cn",
+                target: process.env["DEV_SERVER"] == "true" ? "http://localhost:8080" : "https://io.deepberry.cn",
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {
@@ -13,7 +12,7 @@ module.exports = {
                 },
             },
             "/hub": {
-                target: "https://io.deepberry.cn",
+                target: process.env["DEV_SERVER"] == "true" ? "http://localhost:8080" : "https://io.deepberry.cn",
                 ws: true,
                 changeOrigin: true,
                 pathRewrite: {

@@ -123,8 +123,19 @@ export default {
     },
     watch: {
         $route(v) {
+            console.log(v);
             if (v.query.tab == 4) {
-                console.log(4);
+                let t = this;
+                let ajax = async function () {
+                    await t.getData();
+                    await t.getGrow();
+                    await t.getHistoryAnalyze();
+                    if (t.sceneSelected.length > 0) {
+                        t.setCharts();
+                    }
+                    t.getFarmRecordImg();
+                };
+                ajax();
             }
         },
     },
@@ -143,19 +154,6 @@ export default {
             r = 4 - (this.imgs.length % 4);
             return r;
         },
-    },
-    mounted() {
-        let t = this;
-        let ajax = async function () {
-            await t.getData();
-            await t.getGrow();
-            await t.getHistoryAnalyze();
-            if (t.sceneSelected.length > 0) {
-                t.setCharts();
-            }
-            t.getFarmRecordImg();
-        };
-        ajax();
     },
     methods: {
         // 渲染图表
