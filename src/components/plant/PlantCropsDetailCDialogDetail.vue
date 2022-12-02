@@ -126,52 +126,24 @@
             <div class="item itemBig">
                 <p class="title">环境数据：</p>
                 <div class="content hj">
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0℃</p>
-                        <p>空气温度</p>
+                    <div class="hjbox" :style="{ width: `${form.smartDevice.length * 150}px` }">
+                        <div class="huanjing" v-for="item in form.smartDevice" :key="item.id">
+                            <img :src="getIconUrl(item.icon)" alt="" />
+                            <p>{{ item.value || "&nbsp;" }}{{ item.unit || "&nbsp;" }}</p>
+                            <p>{{ item.displayName }}</p>
+                        </div>
                     </div>
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0 μmol/㎡·s</p>
-                        <p>光合有效辐射</p>
-                    </div>
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0 uS/cm</p>
-                        <p>土壤EC</p>
-                    </div>
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0%</p>
-                        <p>土壤含水量</p>
-                    </div>
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0%</p>
-                        <p>空气相对湿度</p>
-                    </div>
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0 cm</p>
-                        <p>株高</p>
-                    </div>
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0 c㎡</p>
-                        <p>叶面积</p>
-                    </div>
-                    <div class="huanjing">
-                        <img src="../../assets/img/hj/icon-wendu.png" alt="" />
-                        <p>0 g</p>
-                        <p>单株重量</p>
-                    </div>
+                    <p class="text" v-if="form.smartDevice.length == 0">暂无数据</p>
                 </div>
             </div>
-            <div class="item">
+            <div class="item itemBig">
                 <p class="title">现场照片：</p>
-                <div class="content">
-                    <p class="text">暂无数据</p>
+                <div class="content hj">
+                    <div class="hjbox" :style="{ width: `${imgs.length * 200}px` }">
+                        <img class="picsimg" v-for="(item, index) in imgs" :key="index" :src="item" alt="" />
+                        <div v-for="(item, index) in imgSpace" :key="index"></div>
+                    </div>
+                    <el-empty description="暂无农事照片" style="margin: 0 auto" v-if="imgs.length == 0" />
                 </div>
             </div>
         </div>
@@ -194,9 +166,11 @@ export default {
             dialogVisible: true,
             searchKey: "",
             list: [],
+            imgs: [],
             form: {
                 image: [],
                 farmUseBos: [],
+                smartDevice: [],
             },
             farmType: [],
             operatingType: [],
@@ -215,14 +189,38 @@ export default {
             await t.getData();
             await t.getFarmType();
             await t.getOperatingType();
+            await t.getFarmRecordImg();
         };
         ajax();
     },
+    computed: {
+        imgSpace() {
+            let r = 0;
+            r = 4 - (this.imgs.length % 4);
+            return r;
+        },
+    },
     methods: {
+        // 获取农事记录照片
+        getFarmRecordImg() {
+            this.ajax
+                .post("/api/v1/adam/task/getFarmRecordImg", {
+                    growPlantId: this.$route.query.id,
+                })
+                .then((r) => {
+                    let imgs = [];
+                    r.data.map((item) => {
+                        item = item.split(",");
+                        imgs = [...imgs, ...item];
+                    });
+                    this.imgs = imgs;
+                });
+        },
         // 保存农资
         editButton() {
             if (this.isEdit) {
                 let data = JSON.parse(JSON.stringify(this.form));
+                data.smartDevice = JSON.stringify(data.smartDevice);
                 data.image = data.image.join(",");
                 this.ajax.post("/api/v1/adam/farm/editeFarm", data).then((r) => {
                     if (r.code == 200) {
@@ -245,6 +243,10 @@ export default {
         // 移除农资项
         removeNz(index) {
             this.form.farmUseBos.splice(index, 1);
+        },
+        // 获取属性icon地址
+        getIconUrl(icon) {
+            return `https://cdn.deepberry.cn/img/common/node-props/${icon || "default"}.svg`;
         },
         chose(v) {
             console.log(v);
@@ -321,6 +323,7 @@ export default {
             return new Promise((a, b) => {
                 this.ajax.post("/api/v1/adam/farm/getFarmRecordById", { id: this.id }).then((r) => {
                     r.data.image = r.data.image.length > 0 ? r.data.image.split(",") : [];
+                    r.data.smartDevice = JSON.parse(r.data.smartDevice);
                     this.form = r.data;
                     console.log(this.form);
                     a();
@@ -510,9 +513,19 @@ export default {
         }
         .hj {
             width: 1000px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+            .hjbox {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+            }
+            img.picsimg {
+                width: 180px;
+                height: 100px;
+                border-radius: 5px;
+                margin-right: 10px;
+            }
             .huanjing {
                 width: 120px;
                 height: 70px;

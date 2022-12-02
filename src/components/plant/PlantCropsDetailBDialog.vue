@@ -122,6 +122,8 @@
 </template>
 
 <script>
+const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
+import * as signalR from "@microsoft/signalr";
 import timer from "@/utils/timer";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
@@ -146,6 +148,8 @@ export default {
             workTime: "",
             workAid: "",
             workAname: "",
+            plantDetail: {},
+            device: [],
         };
     },
     mounted() {
@@ -157,11 +161,26 @@ export default {
         this.workAname = user.name;
         this.workTime = timer.time("y-m-d");
         this.categoryTitle = this.plantName;
+        this.getDetail();
     },
     components: {
         PlantCropsDetailBDialogChose,
     },
     methods: {
+        // 获取作物详情
+        getDetail() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/plants/getPlants", {
+                        id: this.$route.query.id,
+                    })
+                    .then((r) => {
+                        r.data.smartDeviceBoList = r.data.smartDeviceBoList || [];
+                        this.plantDetail = r.data;
+                        a();
+                    });
+            });
+        },
         // 移除农资项
         removeNz(index) {
             this.farmUseBos.splice(index, 1);
@@ -192,6 +211,45 @@ export default {
             this.farmUseBos.push(params);
         },
         submit() {
+            console.log(1);
+            console.log(this.plantDetail);
+            let t = this;
+            if (t.plantDetail.smartDeviceBoList.length > 0) {
+                const token = localStorage.getItem("erp_token");
+                let connection = new signalR.HubConnectionBuilder()
+                    .withUrl(`${iourl}/hub/node`, {
+                        accessTokenFactory: () => token,
+                    })
+                    .withAutomaticReconnect({
+                        nextRetryDelayInMilliseconds: (_retryContext) => {
+                            return 5000;
+                        },
+                    })
+                    .build();
+
+                let list = [];
+                connection.start().then(() => {
+                    t.plantDetail.smartDeviceBoList.map((item) => {
+                        list.push(connection.invoke("Subscribe", item.smartDeviceId));
+                    });
+                    Promise.all(list).then((res) => {
+                        if (res && res.length > 0) {
+                            res.forEach((item) => {
+                                if (item && item.properties) {
+                                    item.properties.forEach((child) => {
+                                        t.device.push(child);
+                                    });
+                                }
+                            });
+                        }
+                        t.submitPost(1);
+                    });
+                });
+            } else {
+                t.submitPost(0);
+            }
+        },
+        submitPost(device) {
             let data = {
                 categoryTitle: this.categoryTitle,
                 farmId: this.farmId,
@@ -205,6 +263,7 @@ export default {
                 workAid: this.workAid,
                 plantsId: this.$route.query.id,
             };
+            if (device) data.smartDevice = JSON.stringify(this.device);
             if (!data.farmId) {
                 this.$message.warning("请选择农事类型");
                 return;

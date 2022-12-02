@@ -60,31 +60,19 @@
             <div class="right">
                 <div class="box">
                     <div class="wrap2Title">农事操作指导</div>
-                    <div class="wrap2Title" style="margin-top: 30px; color: #6f9aff">增加有效光照，降低空气湿度</div>
+                    <div class="wrap2Title" style="margin-top: 30px; color: #6f9aff"></div>
                     <div class="video">
-                        <div class="videoItem">
-                            <video controls src="../../assets/video/movie.mp4"></video>
-                            <p>LED增加有效光照</p>
+                        <div class="videoItem" v-for="item in guide" :key="item.id">
+                            <video v-if="item.isVideo" controls :src="item.video"></video>
+                            <img v-if="!item.isVideo" :src="item.video" alt="" />
+                            <p>{{ item.title }}</p>
                             <div class="videoTips">
-                                <span>#有效光合</span>
-                                <span>#增加光照</span>
-                                <span>#LED</span>
-                                <span>#补光</span>
-                            </div>
-                        </div>
-                        <div class="videoItem">
-                            <video controls src="../../assets/video/movie.mp4"></video>
-                            <p>LED增加有效光照</p>
-                            <div class="videoTips">
-                                <span>#有效光合</span>
-                                <span>#增加光照</span>
-                                <span>#LED</span>
-                                <span>#补光</span>
+                                <span>{{ item.text }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="box" style="margin-top: 40px">
+                <!-- <div class="box" style="margin-top: 40px">
                     <div class="wrap2Title">病虫害防治指导：</div>
                     <div class="video">
                         <div class="videoItem">
@@ -108,13 +96,15 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </el-dialog>
 </template>
 
 <script>
+const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
+import * as signalR from "@microsoft/signalr";
 export default {
     props: [],
     data() {
@@ -126,6 +116,10 @@ export default {
             plantDetail: {},
             getPlantOperationGuidanceListText: "",
             getPlantPreventionGuidanceListText: "",
+            device: [],
+            growthStageList: [],
+            selectedStageId: "",
+            guide: [], // 操作指导
         };
     },
     computed: {
@@ -136,10 +130,16 @@ export default {
             return this.stepList[this.swiperIndex] ? this.stepList[this.swiperIndex].growPlantModelDetailBos : [];
         },
     },
+    watch: {
+        swiperIndex() {
+            this.getGuide();
+        },
+    },
     mounted() {
         let t = this;
         let ajax = async function () {
             await t.getDetail();
+            await t.getReady();
             await t.getGrowthStage();
             await t.getGuide();
         };
@@ -148,6 +148,46 @@ export default {
     methods: {
         handleClose(done) {
             done();
+        },
+        // 获取参数数据
+        getReady() {
+            let t = this;
+            return new Promise((a, b) => {
+                if (t.plantDetail.smartDeviceBoList.length > 0) {
+                    const token = localStorage.getItem("erp_token");
+                    let connection = new signalR.HubConnectionBuilder()
+                        .withUrl(`${iourl}/hub/node`, {
+                            accessTokenFactory: () => token,
+                        })
+                        .withAutomaticReconnect({
+                            nextRetryDelayInMilliseconds: (_retryContext) => {
+                                return 5000;
+                            },
+                        })
+                        .build();
+
+                    let list = [];
+                    connection.start().then(() => {
+                        t.plantDetail.smartDeviceBoList.map((item) => {
+                            list.push(connection.invoke("Subscribe", item.smartDeviceId));
+                        });
+                        Promise.all(list).then((res) => {
+                            if (res && res.length > 0) {
+                                res.forEach((item) => {
+                                    if (item && item.properties) {
+                                        item.properties.forEach((child) => {
+                                            t.device.push(child);
+                                        });
+                                    }
+                                });
+                            }
+                            a();
+                        });
+                    });
+                } else {
+                    a();
+                }
+            });
         },
         // 获取作物详情
         getDetail() {
@@ -188,24 +228,42 @@ export default {
                 this.ajax
                     .post("/api/v1/adam/farm/getGrowthStageByPlantId", {
                         id: this.$route.query.id,
-                        device: [],
+                        device: this.device,
                     })
                     .then((r) => {
                         this.stepList = r.data;
+                        this.growthStageList = r.data.map((item) => {
+                            // text重新赋值
+                            item.suggestion = item.text;
+                            item.text = item.phaseName;
+                            item.value = item.id;
+                            return item;
+                        });
+                        this.selectedStageId = this.growthStageList[0] && this.growthStageList[0].id;
                         a();
                     });
             });
         },
         // 农事操作指导
         getGuide() {
+            let t = this;
             return new Promise((a, b) => {
-                this.ajax
+                let plantModelId;
+                let text;
+                if (t.growthStageList[t.swiperIndex]) {
+                    plantModelId = t.growthStageList[t.swiperIndex].growModelId;
+                    text = t.growthStageList[t.swiperIndex].suggestion;
+                }
+                t.ajax
                     .post("/api/v1/adam/farm/getPlantOperationGuidanceList", {
-                        id: this.$route.query.id,
-                        text: this.getPlantOperationGuidanceListText,
+                        id: plantModelId,
+                        text,
                     })
                     .then((r) => {
-                        console.log(r);
+                        this.guide = r.data.map((item) => {
+                            item.isVideo = item.video.split(".").pop() == "mp4" ? true : false;
+                            return item;
+                        });
                         a();
                     });
             });
@@ -357,6 +415,7 @@ export default {
                 width: 180px;
                 video {
                     width: 180px;
+                    height: 120px;
                     border-radius: 5px;
                 }
                 p {
