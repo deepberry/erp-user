@@ -8,7 +8,8 @@
                 </div>
                 <div class="box">
                     <div class="boxTitle">参考模型：</div>
-                    <div class="swiper2">
+                    <el-empty v-if="stepList.length == 0" description="暂无数据" />
+                    <div class="swiper2" v-if="stepList.legnth > 0">
                         <div
                             class="swiper-wrapper"
                             :style="{ left: swiperIndex * 370 * -1 + 'px', width: swiperWidth + 'px' }"
@@ -35,9 +36,10 @@
                 </div>
                 <div class="box">
                     <div class="boxTitle">
-                        数据对比：<span style="color: #f59103; margin-left: 10px; text-decoration: underline"
+                        数据对比：
+                        <!-- <span style="color: #f59103; margin-left: 10px; text-decoration: underline"
                             >种植建议：光合积分、积温和株高指标值偏低</span
-                        >
+                        > -->
                     </div>
                 </div>
                 <div class="box">
@@ -53,6 +55,7 @@
                                 <p>{{ item.leastValue }}-{{ item.maxValue }}{{ item.unit }}</p>
                                 <p>{{ item.nowValue || "--" }}</p>
                             </div>
+                            <el-empty v-if="tableData.length == 0" description="暂无数据" />
                         </div>
                     </div>
                 </div>
@@ -62,6 +65,7 @@
                     <div class="wrap2Title">农事操作指导</div>
                     <div class="wrap2Title" style="margin-top: 30px; color: #6f9aff"></div>
                     <div class="video">
+                        <el-empty v-if="guide.length == 0" description="暂无数据" />
                         <div class="videoItem" v-for="item in guide" :key="item.id">
                             <video v-if="item.isVideo" controls :src="item.video"></video>
                             <img v-if="!item.isVideo" :src="item.video" alt="" />
@@ -231,6 +235,7 @@ export default {
                         device: this.device,
                     })
                     .then((r) => {
+                        if (!r.data) return;
                         this.stepList = r.data;
                         this.growthStageList = r.data.map((item) => {
                             // text重新赋值
