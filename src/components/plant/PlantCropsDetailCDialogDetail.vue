@@ -323,7 +323,7 @@ export default {
             return new Promise((a, b) => {
                 this.ajax.post("/api/v1/adam/farm/getFarmRecordById", { id: this.id }).then((r) => {
                     r.data.image = r.data.image.length > 0 ? r.data.image.split(",") : [];
-                    r.data.smartDevice = JSON.parse(r.data.smartDevice);
+                    r.data.smartDevice = JSON.parse(r.data.smartDevice) || [];
                     this.form = r.data;
                     console.log(this.form);
                     a();

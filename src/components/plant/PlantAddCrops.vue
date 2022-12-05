@@ -89,6 +89,7 @@
 </template>
 
 <script lang="js">
+const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
 import * as signalR from '@microsoft/signalr';
 export default {
     name: "plantAdd",
@@ -165,7 +166,7 @@ export default {
         getDevice (){
             return new Promise((a,b) => {
                 const token = localStorage.getItem('erp_token');
-                let connection = new signalR.HubConnectionBuilder().withUrl('/hub/overview', {
+                let connection = new signalR.HubConnectionBuilder().withUrl(iourl + '/hub/overview', {
                     accessTokenFactory: () => token
                 }).withAutomaticReconnect({
                     nextRetryDelayInMilliseconds: (_retryContext) => 5000

@@ -74,16 +74,16 @@
                             <p class="a">{{ detail.farmRecordBo.title }}</p>
                             <p>{{ detail.farmRecordBo.workTime }}</p>
                         </div>
-                        <div style="display: block">
-                            <p>{{ detail.farmRecordBo.workText }}</p>
-                        </div>
                         <div>
-                            <p class="b" v-for="item in detail.farmRecordBo.farmUseBos" :key="item.id">
+                            <p class="u" v-for="item in detail.farmRecordBo.farmUseBos" :key="item.id">
                                 {{ item.agricultural }} &nbsp;&nbsp;&nbsp;&nbsp;
                                 {{ item.agriculturalCount }}
                                 {{ item.agriculturalUnit }}
                             </p>
-                            <p>张三</p>
+                        </div>
+                        <div>
+                            <p>{{ detail.farmRecordBo.workText || "无备注" }}</p>
+                            <p>{{ detail.farmRecordBo.userName }}</p>
                         </div>
                     </div>
                 </div>
@@ -266,6 +266,7 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-start;
+                flex-wrap: wrap;
                 padding: 5px 0;
                 p {
                     width: auto;
@@ -275,6 +276,10 @@ export default {
                     color: rgba(80, 80, 80, 1);
                 }
                 p.b {
+                    color: rgba(232, 161, 69, 1);
+                }
+                p.u {
+                    width: 100%;
                     color: rgba(232, 161, 69, 1);
                 }
             }
