@@ -14,30 +14,30 @@
                         <el-option
                             v-for="(item, index) in scene"
                             :key="index"
-                            :label="item.displayName"
+                            :label="item.gardenName + '-' + item.displayName"
                             :value="item.id"
                         ></el-option>
                     </el-select>
                 </div>
                 <div class="right">
-                    <div class="title">
+                    <div class="title" style="position: relative; top: -20px">
                         <div>作物实时数据 <span>（获取更多作物生长环境数据，请联系客服接入相关设备）</span></div>
                         <el-select
                             v-model="ambientSelected"
                             multiple
                             collapse-tags
                             placeholder="请选择节点"
-                            style="width: 240px; margin-top: 20px"
+                            style="width: 280px; margin-top: 20px; position: relative; top: -8px"
                         >
                             <el-option
-                                v-for="(item, index) in ambient"
+                                v-for="(item, index) in tempList"
                                 :key="index"
-                                :label="item.displayName"
+                                :label="item.gardenName + '-' + item.name"
                                 :value="item.id"
                             ></el-option>
                         </el-select>
                     </div>
-                    <div style="width: 100%; overflow-x: auto">
+                    <div style="width: 100%; overflow-x: auto; position: relative; top: -35px">
                         <el-empty description="暂无环境数据" style="margin: 0 auto" v-if="ambient.length == 0" />
                         <div class="items" :style="{ width: ambientSelectedArray.length * 130 + 'px' }">
                             <div v-for="(item, index) in ambientSelectedArray" :key="index">
@@ -122,6 +122,8 @@ export default {
                     diff: 12,
                 },
             ],
+            tempList: [],
+            tempListSon: [],
         };
     },
     watch: {
@@ -153,13 +155,15 @@ export default {
             });
         },
         ambientSelectedArray() {
-            return this.ambientSelected.map((item) => {
-                let r = {};
-                this.ambient.map((i) => {
-                    if (item == i.id) r = i;
+            let data = [];
+            this.ambientSelected.map((item) => {
+                this.tempList.map((i) => {
+                    if (item == i.id) {
+                        data = [...i.properties, ...data];
+                    }
                 });
-                return r;
             });
+            return data;
         },
         imgSpace() {
             let r = 0;
@@ -208,9 +212,12 @@ export default {
                             // areaStyle: {},
                         };
                         series.push(row);
-                        xAxis = data.map((d) => {
-                            return this.activeCharts > 1 ? timer.time("m-d", d[0]) : timer.time("h:i", d[0]);
-                        });
+                        if (xAxis.length == 0) {
+                            xAxis = data.map((d) => {
+                                return this.activeCharts > 1 ? timer.time("m-d", d[0]) : timer.time("h:i", d[0]);
+                            });
+                        }
+                        console.log(xAxis);
                     });
                     let data = {
                         tooltip: {
@@ -317,13 +324,19 @@ export default {
                                 });
                             });
                     };
+                    let sceneNames = [];
                     t.plantDetail.smartDeviceBoList.map((item) => {
+                        if (item.title) {
+                            sceneNames.push(item.title.split("-")[0]);
+                        }
                         sceneList.push(getData(item.dashboardId, item.smartDeviceId));
                     });
                     Promise.all(sceneList).then((res) => {
                         let r = [];
-                        res.map((item) => {
+                        res.map((item, index) => {
+                            item.gardenName = sceneNames[index];
                             item.map((i) => {
+                                i.gardenName = item.gardenName;
                                 r.push(i);
                             });
                         });
@@ -334,18 +347,27 @@ export default {
                     // 环境数据
                     let ambientList = [];
                     connection.start().then(() => {
+                        let names = [];
                         t.plantDetail.smartDeviceBoList.map((item) => {
+                            if (item.title) {
+                                names.push(item.title.split("-")[0]);
+                            }
                             ambientList.push(connection.invoke("Subscribe", item.smartDeviceId));
                         });
                         Promise.all(ambientList).then((res) => {
                             if (res && res.length > 0) {
-                                res.forEach((item) => {
+                                console.log(res);
+                                this.tempList = res.map((item, index) => {
+                                    item.gardenName = names[index];
                                     if (item && item.properties) {
-                                        item.properties.forEach((child) => {
+                                        item.properties.map((child) => {
+                                            child.gardenName = item.gardenName;
                                             t.ambient.push(child);
                                         });
                                     }
+                                    return item;
                                 });
+                                t.ambientSelected = [res[0].id];
                             }
                         });
                     });

@@ -239,7 +239,7 @@ export default {
         },
         // 获取农资类型
         getAgriculturalCategory() {
-            this.ajax.post("/api/v1/adam/farmLand/getAgriculturalCategory").then((r) => {
+            this.ajax.post("/api/v1/adam/farm/getAgriculturalCategory").then((r) => {
                 this.agriculturalCategory = r.data;
                 this.agriculturalCategory.unshift({
                     id: -1,
