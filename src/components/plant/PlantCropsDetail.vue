@@ -25,12 +25,7 @@
                     </div>
                     <div class="tips">
                         <div>
-                            <el-alert
-                                title="光合作用、积温和株高指标值偏低"
-                                :closable="false"
-                                type="warning"
-                                show-icon
-                            />
+                            <el-alert v-if="proposal" :title="proposal" :closable="false" type="warning" show-icon />
                             &nbsp;
                         </div>
                         <div class="select">
@@ -87,6 +82,8 @@
 </template>
 
 <script lang="js">
+const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
+import * as signalR from '@microsoft/signalr';
 import timer from "@/utils/timer.js";
 import PlantCropsDetailTabA from './PlantCropsDetailTabA';
 import PlantCropsDetailTabB from './PlantCropsDetailTabB';
@@ -107,7 +104,12 @@ export default {
             editCropsId: '',
             showAddCropsBox: false,
             plantName: '',
-            showTabD: false
+            showTabD: false,
+            proposal: '',
+            device: [],
+            growthStageList: [],
+            selectedStageId: "",
+            guide: [], // 操作指导
         }
     },
     mounted() {
@@ -115,6 +117,8 @@ export default {
         let ajax = async function (){
             t.loading = true;
             await t.getData();
+            await t.getProposal();
+            await t.getGrowthStage();
             t.loading = false;
         }
         ajax();
@@ -141,6 +145,72 @@ export default {
         PlantCropsDetailTabA, PlantCropsDetailTabB, PlantCropsDetailTabC, PlantCropsDetailTabD, PlantGuide, PlantAddCrops
     },
     methods: {
+        // 获取环境建议
+        getProposal (){
+            let t = this;
+            return new Promise((a, b) => {
+                if (t.detail.smartDeviceBoList.length > 0) {
+                    const token = localStorage.getItem("erp_token");
+                    let connection = new signalR.HubConnectionBuilder()
+                        .withUrl(`${iourl}/hub/node`, {
+                            accessTokenFactory: () => token,
+                        })
+                        .withAutomaticReconnect({
+                            nextRetryDelayInMilliseconds: (_retryContext) => {
+                                return 5000;
+                            },
+                        })
+                        .build();
+
+                    let list = [];
+                    connection.start().then(() => {
+                        t.detail.smartDeviceBoList.map((item) => {
+                            list.push(connection.invoke("Subscribe", item.smartDeviceId));
+                        });
+                        Promise.all(list).then((res) => {
+                            if (res && res.length > 0) {
+                                res.forEach((item) => {
+                                    if (item && item.properties) {
+                                        item.properties.forEach((child) => {
+                                            t.device.push(child);
+                                        });
+                                    }
+                                });
+                            }
+                            a();
+                        });
+                    });
+                } else {
+                    a();
+                }
+            });
+        },
+        // 获取生长阶段
+        getGrowthStage() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/farm/getGrowthStageByPlantId", {
+                        id: this.$route.query.id,
+                        device: this.device,
+                    })
+                    .then((r) => {
+                        if (!r.data) return;
+                        this.stepList = r.data;
+                        this.growthStageList = r.data.map((item) => {
+                            if(item.isIn == 1){
+                                this.proposal = item.text;
+                            }
+                            // text重新赋值
+                            item.suggestion = item.text;
+                            item.text = item.phaseName;
+                            item.value = item.id;
+                            return item;
+                        });
+                        this.selectedStageId = this.growthStageList[0] && this.growthStageList[0].id;
+                        a();
+                    });
+            });
+        },
         // 去执行
         gotob (){
             this.showADialog = true;
@@ -223,6 +293,7 @@ export default {
                 }).then(r => {
                     r.data.count = new Date().getTime() / 1000 - timer.parse(r.data.plantTime).getTime() / 1000;
                     r.data.count = Math.ceil(r.data.count / 60 / 60 / 24);
+                    r.data.smartDeviceBoList = r.data.smartDeviceBoList || [];
                     this.detail = r.data;
                     this.plantName = r.data.categoryTitle + '-' + r.data.address;
                     a();

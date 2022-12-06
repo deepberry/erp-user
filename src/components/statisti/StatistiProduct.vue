@@ -7,7 +7,9 @@
         <div class="table" v-loading="loading">
             <el-table size="large" :data="list" style="width: 100%">
                 <el-table-column prop="cateGoryTitle" label="种类" width="280" />
-                <el-table-column prop="weight" label="重量" />
+                <el-table-column label="重量">
+                    <template #default="scope"> {{ scope.row.weight }}公斤 </template>
+                </el-table-column>
             </el-table>
         </div>
         <div class="pages" v-if="list.length > 0">

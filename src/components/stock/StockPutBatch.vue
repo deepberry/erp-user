@@ -136,7 +136,7 @@ export default {
             userlist: [], // 用户列表
             userName: "",
             num: "", // 出库数量
-            outInTime: "",
+            outInTime: new Date(),
             note: "",
             showReg: false,
             uploading: false,

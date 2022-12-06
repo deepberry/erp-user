@@ -27,26 +27,31 @@ export default {
         };
     },
     mounted() {
-        if (this.$store.state.power.outputStatistics) {
-            this.headTab.push({
-                title: "产量统计",
-                path: "/erp/statisti/product",
-            });
-        }
-        if (this.$store.state.power.materialsStatistics) {
-            this.headTab.push({
-                title: "出入库统计",
-                path: "/erp/statisti/stock",
-            });
-        }
-        if (this.$store.state.power.workingHoursStatistics) {
-            this.headTab.push({
-                title: "工时统计",
-                path: "/erp/statisti/work",
-            });
-        }
         // 默认进入列表
-        this.$router.push(this.headTab[0].path);
+        let timer = setInterval(() => {
+            if (!this.$store.state.power.loading) {
+                if (this.$store.state.power.outputStatistics) {
+                    this.headTab.push({
+                        title: "产量统计",
+                        path: "/erp/statisti/product",
+                    });
+                }
+                if (this.$store.state.power.materialsStatistics) {
+                    this.headTab.push({
+                        title: "出入库统计",
+                        path: "/erp/statisti/stock",
+                    });
+                }
+                if (this.$store.state.power.workingHoursStatistics) {
+                    this.headTab.push({
+                        title: "工时统计",
+                        path: "/erp/statisti/work",
+                    });
+                }
+                if (this.headTab.length > 0) this.$router.push(this.headTab[0].path);
+                clearInterval(timer);
+            }
+        }, 200);
     },
     methods: {
         // 去采购

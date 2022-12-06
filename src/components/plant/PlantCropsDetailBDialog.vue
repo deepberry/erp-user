@@ -9,8 +9,8 @@
             </div>
             <div class="item">
                 <div class="title"><span>*</span>农事类型：</div>
-                <div class="content">
-                    <el-select style="width: 100%" v-model="farmId" placeholder="请选择农事类型">
+                <div class="content f">
+                    <el-select style="width: 100%" @change="selectType" v-model="farmId" placeholder="请选择农事类型">
                         <el-option
                             v-for="item in farmType"
                             :key="item.id"
@@ -18,6 +18,14 @@
                             :value="item.id"
                         ></el-option>
                     </el-select>
+                    <el-input
+                        style="width: 300px; margin-left: 10px"
+                        v-if="showPickCount"
+                        v-model="pickCount"
+                        :placeholder="pickCountText"
+                    >
+                        <template v-if="pickCountText == '采摘重量'" #append>公斤</template>
+                    </el-input>
                 </div>
             </div>
             <div class="item">
@@ -150,6 +158,9 @@ export default {
             workAname: "",
             plantDetail: {},
             device: [],
+            pickCount: "", // 采摘重量
+            showPickCount: false,
+            pickCountText: "",
         };
     },
     mounted() {
@@ -167,6 +178,18 @@ export default {
         PlantCropsDetailBDialogChose,
     },
     methods: {
+        selectType(a) {
+            let title = false;
+            this.farmType.map((item) => {
+                if (item.id == a) {
+                    title = item.title;
+                }
+            });
+            this.showPickCount = title == "采摘" || title == "自定义" ? true : false;
+            if (this.showPickCount) {
+                this.pickCountText = title == "采摘" ? "采摘重量" : "输入农事类型";
+            }
+        },
         // 获取作物详情
         getDetail() {
             return new Promise((a, b) => {
@@ -263,6 +286,14 @@ export default {
                 workAid: this.workAid,
                 plantsId: this.$route.query.id,
             };
+            if (this.showPickCount) {
+                if (this.pickCountText == "采摘重量") {
+                    data.pickCount = this.pickCount;
+                }
+                if (this.pickCountText == "输入农事类型") {
+                    data.title = this.pickCount;
+                }
+            }
             if (device) data.smartDevice = JSON.stringify(this.device);
             if (!data.farmId) {
                 this.$message.warning("请选择农事类型");
@@ -497,6 +528,9 @@ export default {
             p.text {
                 line-height: 30px;
             }
+        }
+        .content.f {
+            display: flex;
         }
     }
     .btn {

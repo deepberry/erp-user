@@ -19,7 +19,11 @@
                 </div>
                 <el-table size="large" :data="detail.agriculturalCartBos" style="width: 100%; margin-top: 20px">
                     <el-table-column prop="agriculturalBo.title" label="农资名称" show-overflow-tooltip />
-                    <el-table-column prop="agriculturalBo.agriculturalCategory" label="类型" show-overflow-tooltip />
+                    <el-table-column label="类型" show-overflow-tooltip>
+                        <template #default="scope">
+                            <span class="tag">{{ scope.row.agriculturalBo.agriculturalCategory }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="id" label="规格" show-overflow-tooltip>
                         <template #default="scope">
                             {{
@@ -39,7 +43,11 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="agriculturalBo.agriculturalPrice" label="参考单价" show-overflow-tooltip>
-                        <template #default="scope"> ￥{{ scope.row.agriculturalBo.agriculturalPrice }}.00元 </template>
+                        <template #default="scope"
+                            ><span style="color: red"
+                                >￥{{ scope.row.agriculturalBo.agriculturalPrice }}.00元
+                            </span></template
+                        >
                     </el-table-column>
                 </el-table>
                 <div class="bottom">
@@ -113,4 +121,12 @@ export default {
 
 <style lang="less" scoped>
 @import url("@/assets/css/purchase.order.less");
+.tag {
+    background: #c3f8c7;
+    color: #000000;
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 12px;
+    border-radius: 3px;
+}
 </style>

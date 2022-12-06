@@ -4,12 +4,26 @@
             <div class="left">
                 <div class="box">
                     <div class="boxTitle">生长阶段：</div>
-                    <div class="boxTitle">{{ stepList[swiperIndex] && stepList[swiperIndex].phaseName }}</div>
+                    <div class="boxTitle">
+                        <el-select
+                            v-model="currentStep"
+                            @change="stepRun"
+                            placeholder="请选择阶段"
+                            style="width: 370px"
+                        >
+                            <el-option
+                                v-for="item in stepList"
+                                :key="item.id"
+                                :label="item.phaseName"
+                                :value="item.id"
+                            />
+                        </el-select>
+                    </div>
                 </div>
                 <div class="box">
                     <div class="boxTitle">参考模型：</div>
                     <el-empty v-if="stepList.length == 0" description="暂无数据" />
-                    <div class="swiper2" v-if="stepList.legnth > 0">
+                    <div class="swiper2" v-if="stepList.length > 0">
                         <div
                             class="swiper-wrapper"
                             :style="{ left: swiperIndex * 370 * -1 + 'px', width: swiperWidth + 'px' }"
@@ -35,12 +49,7 @@
                     </div>
                 </div>
                 <div class="box">
-                    <div class="boxTitle">
-                        数据对比：
-                        <!-- <span style="color: #f59103; margin-left: 10px; text-decoration: underline"
-                            >种植建议：光合积分、积温和株高指标值偏低</span
-                        > -->
-                    </div>
+                    <div class="boxTitle">数据对比：</div>
                 </div>
                 <div class="box">
                     <div class="table">
@@ -53,7 +62,9 @@
                             <div class="tableItem" v-for="(item, index) in tableData" :key="index">
                                 <p>{{ item.parameterName }}</p>
                                 <p>{{ item.leastValue }}-{{ item.maxValue }}{{ item.unit }}</p>
-                                <p>{{ item.nowValue || "--" }}</p>
+                                <p :style="{ color: item.color }">
+                                    {{ item.nowValue || "--" }} <i :class="item.icon"></i>
+                                </p>
                             </div>
                             <el-empty v-if="tableData.length == 0" description="暂无数据" />
                         </div>
@@ -63,7 +74,7 @@
             <div class="right">
                 <div class="box">
                     <div class="wrap2Title">农事操作指导</div>
-                    <div class="wrap2Title" style="margin-top: 30px; color: #6f9aff"></div>
+                    <div class="wrap2Title" style="margin-top: 30px; color: #6f9aff">{{ text }}</div>
                     <div class="video">
                         <el-empty v-if="guide.length == 0" description="暂无数据" />
                         <div class="videoItem" v-for="item in guide" :key="item.id">
@@ -76,31 +87,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="box" style="margin-top: 40px">
-                    <div class="wrap2Title">病虫害防治指导：</div>
-                    <div class="video">
-                        <div class="videoItem">
-                            <video controls src="../../assets/video/movie.mp4"></video>
-                            <p>LED增加有效光照</p>
-                            <div class="videoTips">
-                                <span>#有效光合</span>
-                                <span>#增加光照</span>
-                                <span>#LED</span>
-                                <span>#补光</span>
-                            </div>
-                        </div>
-                        <div class="videoItem">
-                            <video controls src="../../assets/video/movie.mp4"></video>
-                            <p>LED增加有效光照</p>
-                            <div class="videoTips">
-                                <span>#有效光合</span>
-                                <span>#增加光照</span>
-                                <span>#LED</span>
-                                <span>#补光</span>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </div>
     </el-dialog>
@@ -121,6 +107,7 @@ export default {
             getPlantOperationGuidanceListText: "",
             getPlantPreventionGuidanceListText: "",
             device: [],
+            currentStep: "",
             growthStageList: [],
             selectedStageId: "",
             guide: [], // 操作指导
@@ -131,12 +118,30 @@ export default {
             return 370 * this.stepList.length;
         },
         tableData() {
-            return this.stepList[this.swiperIndex] ? this.stepList[this.swiperIndex].growPlantModelDetailBos : [];
+            let r = this.stepList[this.swiperIndex] ? this.stepList[this.swiperIndex].growPlantModelDetailBos : [];
+            r = r.map((item) => {
+                if (item.nowValue > item.maxValue) {
+                    item.icon = "erp erppiangao";
+                    item.color = "red";
+                }
+                if (item.nowValue < item.leastValue) {
+                    item.icon = "erp erppiandi";
+                    item.color = "green";
+                }
+                return item;
+            });
+            return r;
+        },
+        text() {
+            return this.stepList[this.swiperIndex] ? this.stepList[this.swiperIndex].suggestion : "";
         },
     },
     watch: {
         swiperIndex() {
             this.getGuide();
+            if (this.stepList.length > 0) {
+                this.currentStep = this.stepList[this.swiperIndex].id;
+            }
         },
     },
     mounted() {
@@ -150,6 +155,13 @@ export default {
         ajax();
     },
     methods: {
+        stepRun(v) {
+            this.stepList.map((item, index) => {
+                if (item.id == v) {
+                    this.swiperIndex = index;
+                }
+            });
+        },
         handleClose(done) {
             done();
         },
@@ -237,7 +249,13 @@ export default {
                     .then((r) => {
                         if (!r.data) return;
                         this.stepList = r.data;
-                        this.growthStageList = r.data.map((item) => {
+                        this.growthStageList = r.data.map((item, index) => {
+                            if (item.isIn == 1) {
+                                this.swiperIndex = index;
+                            }
+                            if (this.stepList.length > 0) {
+                                this.currentStep = this.stepList[this.swiperIndex].id;
+                            }
                             // text重新赋值
                             item.suggestion = item.text;
                             item.text = item.phaseName;
@@ -245,6 +263,7 @@ export default {
                             return item;
                         });
                         this.selectedStageId = this.growthStageList[0] && this.growthStageList[0].id;
+                        console.log(this.stepList);
                         a();
                     });
             });

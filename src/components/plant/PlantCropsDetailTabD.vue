@@ -18,28 +18,29 @@
                             :value="item.id"
                         ></el-option>
                     </el-select>
-                    <div class="tags">
-                        <el-empty description="暂无现场数据" style="margin: 0 auto" v-if="sceneTags.length == 0" />
-                        <el-tag
-                            style="width: 30%; margin: 5px 1%"
-                            size="large"
-                            v-for="(item, index) in sceneTags"
-                            :key="index"
-                            @close="removeTag(index)"
-                            closable
-                            >{{ item.displayName }}</el-tag
-                        >
-                    </div>
                 </div>
                 <div class="right">
                     <div class="title">
-                        作物实时数据 <span>（获取更多作物生长环境数据，请联系客服接入相关设备）</span>
+                        <div>作物实时数据 <span>（获取更多作物生长环境数据，请联系客服接入相关设备）</span></div>
+                        <el-select
+                            v-model="ambientSelected"
+                            multiple
+                            collapse-tags
+                            placeholder="请选择节点"
+                            style="width: 240px; margin-top: 20px"
+                        >
+                            <el-option
+                                v-for="(item, index) in ambient"
+                                :key="index"
+                                :label="item.displayName"
+                                :value="item.id"
+                            ></el-option>
+                        </el-select>
                     </div>
-                    <div style="margin-top: 20px">环境数据：</div>
                     <div style="width: 100%; overflow-x: auto">
                         <el-empty description="暂无环境数据" style="margin: 0 auto" v-if="ambient.length == 0" />
-                        <div class="items" :style="{ width: ambient.length * 130 + 'px' }">
-                            <div v-for="(item, index) in ambient" :key="index">
+                        <div class="items" :style="{ width: ambientSelectedArray.length * 130 + 'px' }">
+                            <div v-for="(item, index) in ambientSelectedArray" :key="index">
                                 <p>
                                     <img :src="getIconUrl(item.icon)" alt="" />
                                 </p>
@@ -93,6 +94,7 @@ export default {
             imgs: [],
             plantDetail: {},
             ambient: [],
+            ambientSelected: [],
             activeCharts: 1,
             chartList: [
                 {
@@ -150,6 +152,15 @@ export default {
                 return r;
             });
         },
+        ambientSelectedArray() {
+            return this.ambientSelected.map((item) => {
+                let r = {};
+                this.ambient.map((i) => {
+                    if (item == i.id) r = i;
+                });
+                return r;
+            });
+        },
         imgSpace() {
             let r = 0;
             r = 4 - (this.imgs.length % 4);
@@ -197,7 +208,9 @@ export default {
                             // areaStyle: {},
                         };
                         series.push(row);
-                        xAxis = data.map((d) => d[0]);
+                        xAxis = data.map((d) => {
+                            return this.activeCharts > 1 ? timer.time("m-d", d[0]) : timer.time("h:i", d[0]);
+                        });
                     });
                     let data = {
                         tooltip: {
@@ -414,6 +427,9 @@ export default {
             justify-content: flex-start;
             align-items: flex-start;
             .title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
                 span {
                     color: #1c82d7;
                     font-size: 12px;

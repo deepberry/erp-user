@@ -177,10 +177,10 @@ export default {
                         let list = [];
                         r.map(item => {
                             item.nodes.map(i => {
+                                i.name = item.name + '-' + i.name;
                                 list.push(i);
                             })
                         })
-                        console.log(list)
                         this.deviceList = list;
                     })
                     a();

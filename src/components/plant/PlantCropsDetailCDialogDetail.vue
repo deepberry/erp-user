@@ -139,11 +139,11 @@
             <div class="item itemBig">
                 <p class="title">现场照片：</p>
                 <div class="content hj">
-                    <div class="hjbox" :style="{ width: `${imgs.length * 200}px` }">
+                    <div class="hjbox" :style="{ width: `${imgs.length * 200}px` }" v-if="false">
                         <img class="picsimg" v-for="(item, index) in imgs" :key="index" :src="item" alt="" />
                         <div v-for="(item, index) in imgSpace" :key="index"></div>
                     </div>
-                    <el-empty description="暂无农事照片" style="margin: 0 auto" v-if="imgs.length == 0" />
+                    <p class="text">暂无数据</p>
                 </div>
             </div>
         </div>

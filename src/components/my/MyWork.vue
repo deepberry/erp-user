@@ -14,13 +14,13 @@
         <div class="table">
             <el-table size="large" :data="list" style="width: 100%" v-loading="loading">
                 <el-table-column prop="workTime" label="时间" />
+                <el-table-column prop="title" label="农事类型" />
                 <el-table-column label="农资名称">
                     <template #default="scope">
                         <p v-for="item in scope.row.farmUseBos" :key="item.id">{{ item.agricultural }}</p>
                     </template>
                 </el-table-column>
-                <el-table-column prop="title" label="农事类型" />
-                <el-table-column label="数量">
+                <el-table-column label="农资数量">
                     <template #default="scope">
                         <p v-for="item in scope.row.farmUseBos" :key="item.id">
                             {{ item.agriculturalCount }}{{ item.agriculturalUnit }}

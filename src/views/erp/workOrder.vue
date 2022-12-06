@@ -67,13 +67,6 @@
                                     v-if="$store.state.power.workOrderDetail"
                                     >查看详情</el-button
                                 >
-                                <el-button
-                                    link
-                                    type="primary"
-                                    @click="out(scope.row.id)"
-                                    v-if="$store.state.power.simpleMaterialsOut"
-                                    >一键出库</el-button
-                                >
                             </template>
                         </el-table-column>
                     </el-table>
@@ -95,7 +88,6 @@
 </template>
 
 <script>
-import { ElMessage, ElMessageBox } from "element-plus";
 import WorkOrderDetail from "@/components/workOrder/WorkOrderDetail.vue";
 export default {
     name: "workOrder",
@@ -233,31 +225,6 @@ export default {
                 this.showDetailBox = false;
                 clearTimeout(timer);
             }, 500);
-        },
-        // 出库
-        out(id) {
-            ElMessageBox.confirm(
-                "农资名称：史丹利复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、百草枯2号 <br> 确定要出库吗？",
-                "一键出库",
-                {
-                    confirmButtonText: "确定",
-                    cancelButtonText: "取消",
-                    type: "warning",
-                    dangerouslyUseHTMLString: true,
-                }
-            )
-                .then(() => {
-                    ElMessage({
-                        type: "success",
-                        message: "Delete completed",
-                    });
-                })
-                .catch(() => {
-                    ElMessage({
-                        type: "info",
-                        message: "Delete canceled",
-                    });
-                });
         },
     },
 };

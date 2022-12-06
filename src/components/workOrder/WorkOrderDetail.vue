@@ -69,9 +69,26 @@
                         <span>{{ item.checkTime }}</span>
                     </p>
                 </div>
-                <div class="formButton" v-if="showBtn && $store.state.power.reviewOrderBtn">
-                    <el-button type="primary" @click="check(2)" plain>不通过</el-button>
-                    <el-button type="primary" @click="check(1)">通过</el-button>
+                <div class="formButton">
+                    <el-button
+                        type="primary"
+                        @click="check(2)"
+                        plain
+                        v-if="$store.state.power.reviewOrderBtn && detail.isCheckBth == 1"
+                        >不通过</el-button
+                    >
+                    <el-button
+                        type="primary"
+                        @click="check(1)"
+                        v-if="$store.state.power.reviewOrderBtn && detail.isCheckBth == 1"
+                        >通过</el-button
+                    >
+                    <el-button
+                        type="primary"
+                        @click="out(detail.id)"
+                        v-if="$store.state.power.simpleMaterialsOut && detail.isOutBth == 1"
+                        >一键出库</el-button
+                    >
                 </div>
             </div>
         </el-dialog>
@@ -79,6 +96,7 @@
 </template>
 
 <script>
+import { ElMessage, ElMessageBox } from "element-plus";
 export default {
     name: "workOrderDetail",
     props: ["id"],
@@ -87,13 +105,32 @@ export default {
             detailLoading: false,
             showDetailBox: true, // 是否显示详情弹窗
             detail: {},
-            showBtn: false,
         };
     },
     mounted() {
         this.getData();
     },
     methods: {
+        // 出库
+        out(id) {
+            ElMessageBox.confirm(
+                "农资名称：史丹利复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、百草枯2号 <br> 确定要出库吗？",
+                "一键出库",
+                {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    type: "warning",
+                    dangerouslyUseHTMLString: true,
+                }
+            )
+                .then(() => {
+                    ElMessage({
+                        type: "success",
+                        message: "Delete completed",
+                    });
+                })
+                .catch(() => {});
+        },
         // 审核工单
         check(v) {
             this.ajax
@@ -116,11 +153,6 @@ export default {
                 .then((r) => {
                     // 是否显示审核按钮
                     let user = JSON.parse(localStorage.getItem("erp_user")).id;
-                    r.data.orderManagerBoList.map((item) => {
-                        if (item.aid == user && item.isCheck == 0) {
-                            this.showBtn = true;
-                        }
-                    });
 
                     switch (r.data.orderStatus) {
                         case 0:

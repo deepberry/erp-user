@@ -63,9 +63,11 @@
                     </el-table-column>
                     <el-table-column label="库存">
                         <template #default="scope">
-                            {{ scope.row.agriculturalUnit }}{{ scope.row.agriculturalBo.unitmeasurement }}（共{{
-                                scope.row.agriculturalCount
-                            }}{{ scope.row.agriculturalBo.unitweight }}）
+                            <span :style="{ color: scope.row.agriculturalCount > 0 ? '#606266' : 'red' }">
+                                {{ scope.row.agriculturalUnit }}{{ scope.row.agriculturalBo.unitmeasurement }}（共{{
+                                    scope.row.agriculturalCount
+                                }}{{ scope.row.agriculturalBo.unitweight }}）
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="260">
