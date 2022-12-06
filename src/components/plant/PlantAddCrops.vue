@@ -135,6 +135,7 @@ export default {
                 this.ajax.post("/api/v1/adam/plants/getPlants", {
                     id: this.id
                 }).then((r) => {
+                    r.data.smartDeviceBoList = r.data.smartDeviceBoList || [];
                     r.data.smartDeviceBoList = r.data.smartDeviceBoList.map(item => {
                         return item.smartDeviceId;
                     })

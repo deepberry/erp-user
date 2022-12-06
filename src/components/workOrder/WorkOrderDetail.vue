@@ -113,21 +113,30 @@ export default {
     methods: {
         // 出库
         out(id) {
-            ElMessageBox.confirm(
-                "农资名称：史丹利复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、百草枯2号 <br> 确定要出库吗？",
-                "一键出库",
-                {
-                    confirmButtonText: "确定",
-                    cancelButtonText: "取消",
-                    type: "warning",
-                    dangerouslyUseHTMLString: true,
-                }
-            )
+            let data = this.detail.agriculturalCartBos.map((item) => {
+                return item.agriculturalBo.title;
+            });
+            ElMessageBox.confirm("农资名称：" + data.join(",") + " <br> 确定要出库吗？", "一键出库", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+                dangerouslyUseHTMLString: true,
+            })
                 .then(() => {
-                    ElMessage({
-                        type: "success",
-                        message: "Delete completed",
-                    });
+                    this.ajax
+                        .post("/api/v1/adam/farmLand/saveAgriculturalOutIn", {
+                            checkStatus: 0,
+                            id: this.detail.id,
+                            orderNo: this.detail.orderNo,
+                        })
+                        .then((r) => {
+                            if (r.code == 200) {
+                                this.$message.success("出库成功");
+                                this.onClose(1);
+                            } else {
+                                this.$message.error(r.message);
+                            }
+                        });
                 })
                 .catch(() => {});
         },

@@ -194,7 +194,10 @@ export default {
                         device: this.device,
                     })
                     .then((r) => {
-                        if (!r.data) return;
+                        if (!r.data){
+                            a();
+                            return;
+                        }
                         this.stepList = r.data;
                         this.growthStageList = r.data.map((item) => {
                             if(item.isIn == 1){
