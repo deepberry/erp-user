@@ -285,6 +285,7 @@ export default {
                 taskId: this.taskId || "",
                 workAid: this.workAid,
                 plantsId: this.$route.query.id,
+                title: "",
             };
             if (this.showPickCount) {
                 if (this.pickCountText == "采摘重量") {
@@ -293,6 +294,12 @@ export default {
                 if (this.pickCountText == "输入农事类型") {
                     data.title = this.pickCount;
                 }
+            } else {
+                this.farmType.map((item) => {
+                    if (item.id == this.farmId) {
+                        data.title = item.title;
+                    }
+                });
             }
             if (device) data.smartDevice = JSON.stringify(this.device);
             if (!data.farmId) {

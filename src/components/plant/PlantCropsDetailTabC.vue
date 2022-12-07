@@ -33,7 +33,7 @@
                             style="color: #6397fd; cursor: pointer; text-decoration: underline"
                             @click="
                                 $store.state.power.agricultureMaterials
-                                    ? showDialogBox('农资使用统计', item.id)
+                                    ? showDialogBox('农资使用统计', '', item.id)
                                     : () => {}
                             "
                         >
@@ -54,7 +54,11 @@
                         <p>{{ item.agricultural }}</p>
                         <p
                             style="color: #6397fd; cursor: pointer; text-decoration: underline"
-                            @click="$store.state.power.workingHours ? showDialogBox('工时使用统计', item.id) : () => {}"
+                            @click="
+                                $store.state.power.workingHours
+                                    ? showDialogBox('工时使用统计', item.agricultural, item.id)
+                                    : () => {}
+                            "
                         >
                             {{ item.agriculturalCount || 0 }}
                         </p>
@@ -69,6 +73,7 @@
         <PlantCropsDetailCDialog
             :id="dialogId"
             :title="dialogTitle"
+            :title2="dialogTitle2"
             v-if="showDialog"
             @close="closeDialog"
         ></PlantCropsDetailCDialog>
@@ -87,6 +92,7 @@ export default {
             farmWorkBos: [],
             showDialog: false,
             dialogTitle: '',
+            dialogTitle2: '',
             dialogId: ''
         }
     },
@@ -124,8 +130,9 @@ export default {
         }
     },
     methods: {
-        showDialogBox (title, id){
+        showDialogBox (title, title2, id){
             this.dialogTitle = title;
+            this.dialogTitle2 = title2;
             this.dialogId = id;
             this.showDialog = true;
         },

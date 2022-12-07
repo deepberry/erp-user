@@ -46,7 +46,7 @@
 import timer from "@/utils/timer";
 import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
 export default {
-    props: ["title", "id"],
+    props: ["title", "id", "title2"],
     data() {
         return {
             dialogVisible: true,
@@ -95,8 +95,9 @@ export default {
                 url = "/api/v1/adam/farm/getFarmRecordByAgriculturalId";
             } else {
                 data = {
+                    title: this.title2,
                     endTime: "",
-                    farmId: this.id,
+                    farmId: this.id || 1,
                     keyWord: this.searchKey,
                     plantsId: this.$route.query.id,
                     startTime: "",
