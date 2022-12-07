@@ -81,8 +81,10 @@
                 <div class="left">
                     <div class="title">农事照片</div>
                     <div class="imgs">
-                        <img v-for="(item, index) in imgs" :key="index" :src="item" alt="" />
-                        <div v-for="(item, index) in imgSpace" :key="index"></div>
+                        <div class="pic" v-for="(item, index) in imgs" :key="index">
+                            <img :src="item" alt="" />
+                        </div>
+                        <div class="space" v-for="(item, index) in imgSpace" :key="index"></div>
                         <el-empty description="暂无农事照片" style="margin: 0 auto" v-if="imgs.length == 0" />
                     </div>
                 </div>
@@ -439,7 +441,11 @@ export default {
                         item = item.split(",");
                         imgs = [...imgs, ...item];
                     });
-                    this.imgs = imgs;
+                    let imgsResult = [];
+                    imgs.map((item) => {
+                        if (item) imgsResult.push(item);
+                    });
+                    this.imgs = imgsResult;
                 });
         },
     },
@@ -493,15 +499,23 @@ export default {
                     align-content: flex-start;
                     flex-wrap: wrap;
                     padding-bottom: 20px;
-                    img {
+                    .pic {
                         width: calc(23% - 2px);
                         height: 120px;
-                        border: 1px solid #f5f5f5;
+                        overflow: hidden;
                         margin-right: 2%;
                         margin-top: 20px;
                         border-radius: 10px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        img {
+                            width: 100%;
+                            height: auto;
+                            border: 1px solid #f5f5f5;
+                        }
                     }
-                    div {
+                    .space {
                         width: 23%;
                         margin-right: 2%;
                     }
