@@ -3,12 +3,13 @@
         <div class="box">
             <div class="wrap">
                 <div class="left">
-                    <div class="title">作物现场数据</div>
+                    <div class="title">作物历史数据</div>
                     <el-select
                         v-model="sceneSelected"
                         multiple
+                        collapse-tags
                         placeholder="请选择节点，可选择多个"
-                        style="width: 100%; margin-top: 20px"
+                        style="width: 800px; margin-top: 20px"
                         @change="setHistoryAnalyze"
                     >
                         <el-option
@@ -19,9 +20,34 @@
                         ></el-option>
                     </el-select>
                 </div>
-                <div class="right">
-                    <div class="title" style="position: relative; top: -20px">
-                        <div>作物实时数据 <span>（获取更多作物生长环境数据，请联系客服接入相关设备）</span></div>
+                <div class="right"></div>
+            </div>
+            <div class="wrap">
+                <div class="left">
+                    <div class="title">数据图表</div>
+                    <el-empty
+                        description="暂无图表数据"
+                        style="margin: 0 auto; width: 800px"
+                        v-if="sceneTags.length == 0"
+                    />
+                    <div class="echartBox" v-if="sceneTags.length > 0">
+                        <div class="btn">
+                            <el-button
+                                :type="index === activeCharts ? 'primary' : ''"
+                                v-for="(item, index) in chartList"
+                                :key="index"
+                                @click="setCharts(index)"
+                                >{{ item.title }}</el-button
+                            >
+                        </div>
+                        <div class="charts" ref="charts"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="wrap">
+                <div class="left">
+                    <div class="title" style="position: relative">
+                        <div>作物现场数据 <span>（获取更多作物生长环境数据，请联系客服接入相关设备）</span></div>
                         <el-select
                             v-model="ambientSelected"
                             multiple
@@ -37,7 +63,7 @@
                             ></el-option>
                         </el-select>
                     </div>
-                    <div style="width: 100%; overflow-x: auto; position: relative; top: -35px">
+                    <div class="deviceList">
                         <el-empty description="暂无环境数据" style="margin: 0 auto" v-if="ambient.length == 0" />
                         <div class="items" :style="{ width: ambientSelectedArray.length * 130 + 'px' }">
                             <div v-for="(item, index) in ambientSelectedArray" :key="index">
@@ -53,22 +79,6 @@
             </div>
             <div class="wrap">
                 <div class="left">
-                    <div class="title">数据图表</div>
-                    <div class="echartBox" v-if="sceneTags.length > 0">
-                        <div class="btn">
-                            <el-button
-                                :type="index === activeCharts ? 'primary' : ''"
-                                v-for="(item, index) in chartList"
-                                :key="index"
-                                @click="setCharts(index)"
-                                >{{ item.title }}</el-button
-                            >
-                        </div>
-                        <div class="charts" ref="charts"></div>
-                    </div>
-                    <el-empty description="暂无图表数据" style="margin: 0 auto" v-if="sceneTags.length == 0" />
-                </div>
-                <div class="right">
                     <div class="title">农事照片</div>
                     <div class="imgs">
                         <img v-for="(item, index) in imgs" :key="index" :src="item" alt="" />
@@ -458,7 +468,6 @@ export default {
                 }
             }
             .left {
-                width: 50%;
                 overflow-x: hidden;
                 overflow-y: auto;
                 .tags {
@@ -472,21 +481,18 @@ export default {
                     margin-top: 20px;
                 }
                 .charts {
-                    width: 100%;
+                    width: 800px;
                     height: 500px;
-                    padding-bottom: 30px;
                     margin-top: 20px;
                     pointer-events: auto;
                 }
-            }
-            .right {
-                width: 50%;
-                margin-left: 100px;
                 .imgs {
+                    width: 800px;
                     display: flex;
                     justify-content: space-between;
                     align-content: flex-start;
                     flex-wrap: wrap;
+                    padding-bottom: 20px;
                     img {
                         width: calc(23% - 2px);
                         height: 120px;
@@ -500,13 +506,18 @@ export default {
                         margin-right: 2%;
                     }
                 }
-                .items {
-                    overflow-x: auto;
-                    overflow-y: hidden;
-                    margin-top: 20px;
+                .deviceList {
+                    width: 800px;
                     display: flex;
                     justify-content: flex-start;
-                    align-items: center;
+                    flex-wrap: wrap;
+                }
+                .items {
+                    width: 800px;
+                    display: flex;
+                    justify-content: flex-start;
+                    flex-wrap: wrap;
+                    margin-top: 20px;
                     div {
                         width: 120px;
                         height: 100px;
@@ -514,6 +525,7 @@ export default {
                         border: 1px solid #ccc;
                         border-radius: 5px;
                         margin-right: 10px;
+                        margin-top: 10px;
                         img {
                             width: 25px;
                             margin-top: 10px;
@@ -529,9 +541,6 @@ export default {
                     }
                 }
             }
-        }
-        .wrap:first-child {
-            border-bottom: 1px solid #ccc;
         }
     }
 }

@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="dialogVisible" :title="title" width="1200px" :before-close="handleClose" append-to-body>
+    <el-dialog v-model="dialogVisible" :title="title" width="580px" :before-close="handleClose" append-to-body>
         <div class="btn">
             <el-button type="primary" @click="editButton" v-if="$store.state.power.editFarmRecordBtn">{{
                 isEdit ? "保存" : "编辑"
@@ -125,7 +125,7 @@
             </div>
             <div class="item itemBig">
                 <p class="title">环境数据：</p>
-                <div class="content hj">
+                <div class="content hj" style="width: 460px">
                     <div class="hjbox" :style="{ width: `${form.smartDevice.length * 150}px` }">
                         <div class="huanjing" v-for="item in form.smartDevice" :key="item.id">
                             <img :src="getIconUrl(item.icon)" alt="" />
@@ -138,7 +138,7 @@
             </div>
             <div class="item itemBig">
                 <p class="title">现场照片：</p>
-                <div class="content hj">
+                <div class="content hj" style="width: 460px">
                     <div class="hjbox" :style="{ width: `${imgs.length * 200}px` }" v-if="false">
                         <img class="picsimg" v-for="(item, index) in imgs" :key="index" :src="item" alt="" />
                         <div v-for="(item, index) in imgSpace" :key="index"></div>
@@ -374,7 +374,7 @@ export default {
     position: relative;
     top: -20px;
     .item {
-        width: 560px;
+        width: 100%;
         display: flex;
         justify-content: flex-start;
         align-items: flex-start;
@@ -429,7 +429,7 @@ export default {
             }
         }
         .title {
-            width: 100px;
+            width: 70px;
             text-align: right;
             line-height: 30px;
         }

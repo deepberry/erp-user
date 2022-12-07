@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="showGuide" append-to-body title="种植指导" width="1000px" :before-close="handleClose">
+    <el-dialog v-model="showGuide" append-to-body title="种植指导" width="500px" :before-close="handleClose">
         <div class="main">
             <div class="left">
                 <div class="box">
@@ -21,12 +21,11 @@
                     </div>
                 </div>
                 <div class="box">
-                    <div class="boxTitle">参考模型：</div>
-                    <el-empty v-if="stepList.length == 0" description="暂无数据" />
+                    <el-empty style="width: 450px" v-if="stepList.length == 0" description="暂无数据" />
                     <div class="swiper2" v-if="stepList.length > 0">
                         <div
                             class="swiper-wrapper"
-                            :style="{ left: swiperIndex * 370 * -1 + 'px', width: swiperWidth + 'px' }"
+                            :style="{ left: swiperIndex * 450 * -1 + 'px', width: swiperWidth + 'px' }"
                         >
                             <div class="swiper-slide" v-for="(item, index) in stepList" :key="index">
                                 <img :src="item.image" alt="" />
@@ -66,17 +65,17 @@
                                     {{ item.nowValue || "--" }} <i :class="item.icon"></i>
                                 </p>
                             </div>
-                            <el-empty v-if="tableData.length == 0" description="暂无数据" />
+                            <el-empty style="width: 450px" v-if="tableData.length == 0" description="暂无数据" />
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="right">
-                <div class="box">
-                    <div class="wrap2Title">农事操作指导</div>
-                    <div class="wrap2Title" style="margin-top: 30px; color: #6f9aff">{{ text }}</div>
+                <div class="box" style="margin-top: 20px">
+                    <div class="boxTitle">
+                        <p>种植建议</p>
+                        <div style="color: #6f9aff">{{ text }}</div>
+                    </div>
                     <div class="video">
-                        <el-empty v-if="guide.length == 0" description="暂无数据" />
+                        <el-empty style="width: 450px" v-if="guide.length == 0" description="暂无数据" />
                         <div class="videoItem" v-for="item in guide" :key="item.id">
                             <video v-if="item.isVideo" controls :src="item.video"></video>
                             <img v-if="!item.isVideo" :src="item.video" alt="" />
@@ -88,6 +87,7 @@
                     </div>
                 </div>
             </div>
+            <div class="right"></div>
         </div>
     </el-dialog>
 </template>
@@ -115,7 +115,7 @@ export default {
     },
     computed: {
         swiperWidth() {
-            return 370 * this.stepList.length;
+            return 450 * this.stepList.length;
         },
         tableData() {
             let r = this.stepList[this.swiperIndex] ? this.stepList[this.swiperIndex].growPlantModelDetailBos : [];
@@ -312,6 +312,9 @@ export default {
 
 <style lang="less" scoped>
 .main {
+    max-height: 600px;
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
     top: -20px;
     display: flex;
@@ -331,11 +334,12 @@ export default {
                 margin-right: 10px;
             }
             .swiper2 {
-                width: 370px;
+                width: 450px;
                 height: 240px;
                 position: relative;
                 overflow: hidden;
                 .swiper-wrapper {
+                    width: 450px;
                     height: 240px;
                     display: flex;
                     position: absolute;
@@ -391,7 +395,7 @@ export default {
                     --swiper-navigation-size: 20px;
                 }
                 img {
-                    width: 370px;
+                    width: 450px;
                     height: 240px;
                 }
             }
@@ -417,9 +421,6 @@ export default {
                 }
             }
         }
-    }
-    .right {
-        width: 49%;
         .tips {
             width: 100%;
             padding-top: 20px;
@@ -430,23 +431,23 @@ export default {
             color: #3d3d3d;
         }
         .video {
-            width: 370px;
+            width: 450px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             margin-top: 10px;
             .videoItem {
-                width: 180px;
+                width: 220px;
                 video {
-                    width: 180px;
-                    height: 120px;
+                    width: 220px;
+                    height: 140px;
                     border-radius: 5px;
                 }
                 p {
                     padding: 10px 0;
                 }
                 div {
-                    width: 140px;
+                    width: 180px;
                     padding: 5px 20px;
                     background: #caf982;
                     display: flex;
@@ -460,6 +461,9 @@ export default {
                 }
             }
         }
+    }
+    .right {
+        width: 49%;
     }
 }
 </style>

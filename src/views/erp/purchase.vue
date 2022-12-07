@@ -43,7 +43,7 @@ export default {
         }
         if(this.$store.state.power.materialsPurchaseList){
             this.headTab.push({
-                title: '平台农资',
+                title: '农资采购',
                 path: '/erp/purchase/shop'
             })
         }
