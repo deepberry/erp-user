@@ -121,6 +121,7 @@
 </template>
 
 <script>
+import upload from "@/utils/upload";
 import { ElMessage, ElMessageBox } from "element-plus";
 import StockReg from "@/components/stock/StockReg.vue";
 export default {
@@ -206,21 +207,13 @@ export default {
         uploadFile() {
             this.uploading = true;
             let file = this.$refs.file.files[0];
-            this.ajax
-                .upload(
-                    "/api/v1/adam/upload",
-                    {
-                        file,
-                    },
-                    (num) => {
-                        this.percentage = parseInt(num);
-                    }
-                )
-                .then((r) => {
-                    this.imgs.push(r.data.imageUrl);
+            upload(file, `erp/batchMaterialsInto/${file.name}`).then((r) => {
+                if (r.url) {
+                    this.imgs.push(r.url);
                     this.uploading = false;
                     this.percentage = 0;
-                });
+                }
+            });
         },
         // 移除图片
         removeImg(index) {

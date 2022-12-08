@@ -163,6 +163,7 @@
 </template>
 
 <script>
+import upload from "@/utils/upload.js";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
     props: ["title", "id"],
@@ -288,21 +289,13 @@ export default {
         uploadFile() {
             this.uploading = true;
             let file = this.$refs.file.files[0];
-            this.ajax
-                .upload(
-                    "/api/v1/adam/upload",
-                    {
-                        file,
-                    },
-                    (num) => {
-                        this.percentage = parseInt(num);
-                    }
-                )
-                .then((r) => {
-                    this.form.image.push(r.data.imageUrl);
+            upload(file, `erp/farmingHistory/${file.name}`).then((r) => {
+                if (r.url) {
+                    this.form.image.push(r.url);
                     this.uploading = false;
                     this.percentage = 0;
-                });
+                }
+            });
         },
         del() {
             if (this.isEdit) {

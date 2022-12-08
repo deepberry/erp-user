@@ -47,6 +47,7 @@
 </template>
 
 <script lang="js">
+import upload from '@/utils/upload';
 export default {
     name: "plantAdd",
     props: ['isEdit', 'id'],
@@ -126,21 +127,13 @@ export default {
         uploadFile() {
             this.form.uploading = true;
             let file = this.$refs.file.files[0];
-            this.ajax
-                .upload(
-                    "/api/v1/adam/upload",
-                    {
-                        file,
-                    },
-                    (num) => {
-                        this.form.percentage = parseInt(num);
-                    }
-                )
-                .then((r) => {
-                    this.form.img = r.data.imageUrl;
+            upload(file, `erp/park/${file.name}`).then(r => {
+                if(r.url){
+                    this.form.img = r.url;
                     this.form.uploading = false;
                     this.form.percentage = 0;
-                });
+                }
+            })
         },
         submit() {
             if (!this.form.title) {

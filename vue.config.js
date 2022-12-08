@@ -20,6 +20,12 @@ module.exports = {
                     "^/hub": "/hub",
                 },
             },
+            "/api/cms": {
+                target: "https://cms.deepberry.cn",
+                pathRewrite: {
+                    "^/api/cms": "/api/cms",
+                },
+            },
         },
     },
 

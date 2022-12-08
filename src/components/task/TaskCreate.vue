@@ -101,6 +101,7 @@
 </template>
 
 <script>
+import upload from "../../utils/upload.js";
 export default {
     name: "taskDetail",
     props: ["id"],
@@ -192,21 +193,13 @@ export default {
         uploadFile() {
             this.uploading = true;
             let file = this.$refs.file.files[0];
-            this.ajax
-                .upload(
-                    "/api/v1/adam/upload",
-                    {
-                        file,
-                    },
-                    (num) => {
-                        this.percentage = parseInt(num);
-                    }
-                )
-                .then((r) => {
-                    this.video = r.data.imageUrl;
+            upload(file, `erp/park/${file.name}`).then((r) => {
+                if (r.url) {
+                    this.video = r.url;
                     this.uploading = false;
                     this.percentage = 0;
-                });
+                }
+            });
         },
         // 搜索作物
         searchCrop() {},

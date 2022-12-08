@@ -33,7 +33,7 @@ ajax.get = (url) => {
     return new Promise((reslove, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open("GET", `${HOST}${url}`, true);
-        xhr.setRequestHeader("token", "");
+        xhr.setRequestHeader("token", localStorage.getItem("erp_token") || "1");
         xhr.send();
         callback(xhr, reslove, reject);
     });
@@ -43,7 +43,17 @@ ajax.getUrl = (url) => {
     return new Promise((reslove, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
-        xhr.setRequestHeader("token", "");
+        xhr.setRequestHeader("token", localStorage.getItem("erp_token") || "1");
+        xhr.send();
+        callback(xhr, reslove, reject);
+    });
+};
+
+ajax.getUrlBearer = (url) => {
+    return new Promise((reslove, reject) => {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", url, true);
+        xhr.setRequestHeader("Authorization", "Bearer " + (localStorage.getItem("erp_token") || "1"));
         xhr.send();
         callback(xhr, reslove, reject);
     });
@@ -88,6 +98,7 @@ ajax.upload = (url, data, progress) => {
 };
 
 export default {
+    ajax,
     install: (app) => {
         app.config.globalProperties.ajax = ajax;
     },

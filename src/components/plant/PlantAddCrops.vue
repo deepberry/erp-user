@@ -89,6 +89,7 @@
 </template>
 
 <script lang="js">
+import upload from '@/utils/upload';
 const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
 import * as signalR from '@microsoft/signalr';
 import timer from '@/utils/timer';
@@ -194,21 +195,13 @@ export default {
         uploadFile() {
             this.form.uploading = true;
             let file = this.$refs.file.files[0];
-            this.ajax
-                .upload(
-                    "/api/v1/adam/upload",
-                    {
-                        file,
-                    },
-                    (num) => {
-                        this.form.percentage = parseInt(num);
-                    }
-                )
-                .then((r) => {
-                    this.form.image = r.data.imageUrl;
+            upload(file, `erp/plant/${file.name}`).then(r => {
+                if(r.url){
+                    this.form.image = r.url;
                     this.form.uploading = false;
                     this.form.percentage = 0;
-                });
+                }
+            })
         },
         submit() {
             if (!this.form.categoryTitle) {
