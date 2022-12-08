@@ -157,7 +157,7 @@ export default {
                 return {
                     agriculturalType: item.agriculturalBo.agriculturalCategory,
                     agricultural: item.agriculturalBo.title,
-                    agriculturalId: item.id,
+                    agriculturalId: item.agriculturalBo.id,
                     agriculturalCount: item.useNum,
                     agriculturalUnit: item.agriculturalBo.unitweight,
                     definition: 0,
