@@ -161,6 +161,10 @@ export default {
                 this.$message.warning(`请输入[${err.agriculturalBo.title}]的使用数量`);
                 return;
             }
+            if (arr.length == 0) {
+                this.$message.warning(`请选择农资`);
+                return;
+            }
             arr = arr.map((item) => {
                 return {
                     agriculturalType: item.agriculturalBo.agriculturalCategory,
@@ -308,6 +312,7 @@ export default {
         overflow-y: auto;
     }
     .tab1 {
+        overflow-x: hidden;
         .btn {
             margin-top: 20px;
             display: flex;
