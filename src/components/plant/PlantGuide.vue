@@ -62,7 +62,7 @@
                                 <p>{{ item.parameterName }}</p>
                                 <p>{{ item.leastValue }}-{{ item.maxValue }}{{ item.unit }}</p>
                                 <p :style="{ color: item.color }">
-                                    {{ item.nowValue || "--" }} <i :class="item.icon"></i>
+                                    {{ item.nowValue || "--" }} <i v-if="item.nowValue" :class="item.icon"></i>
                                 </p>
                             </div>
                             <el-empty style="width: 450px" v-if="tableData.length == 0" description="暂无数据" />

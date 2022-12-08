@@ -26,12 +26,12 @@
                             <span>{{ item.agriculturalBo.manufacturers }}</span>
                         </div>
                         <div>
-                            <span
-                                >{{ item.agriculturalUnit }}{{ item.agriculturalBo.unitmeasurement }}（共{{
+                            <span>
+                                库存量：
+                                {{ item.agriculturalUnit }}{{ item.agriculturalBo.unitmeasurement }}（共{{
                                     item.agriculturalCount
-                                }}{{ item.agriculturalBo.unitweight }}）</span
-                            >
-                            <span style="color: #6095fd">库存量</span>
+                                }}{{ item.agriculturalBo.unitweight }}）
+                            </span>
                             <div>
                                 使用量：<el-input style="width: 160px" v-model="item.useNum" placeholder="输入数量"
                                     ><template #append>{{ item.agriculturalBo.unitweight }}</template></el-input
