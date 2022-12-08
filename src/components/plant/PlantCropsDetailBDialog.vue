@@ -289,6 +289,7 @@ export default {
             };
             if (this.showPickCount) {
                 if (this.pickCountText == "采摘重量") {
+                    data.title = "采摘";
                     data.pickCount = this.pickCount;
                 }
                 if (this.pickCountText == "输入农事类型") {

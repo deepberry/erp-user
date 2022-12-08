@@ -7,7 +7,7 @@
             </div>
             <div class="tabbox tab1" v-show="tab == 0">
                 <el-empty description="暂无数据" v-if="list.length == 0" />
-                <div class="item" v-for="item in list" :key="item.id">
+                <div class="item" v-for="(item, index) in list" :key="item.id">
                     <i
                         @click="item.use = !item.use"
                         :class="item.use ? 'erp erpduoxuankuangxuanzhong' : 'erp erpduoxuan-01'"
@@ -33,7 +33,11 @@
                                 }}{{ item.agriculturalBo.unitweight }}）
                             </span>
                             <div>
-                                使用量：<el-input style="width: 160px" v-model="item.useNum" placeholder="输入数量"
+                                使用量：<el-input
+                                    style="width: 160px"
+                                    @blur="item.useNum > item.agriculturalCount ? inputNum(index) : () => {}"
+                                    v-model="item.useNum"
+                                    placeholder="输入数量"
                                     ><template #append>{{ item.agriculturalBo.unitweight }}</template></el-input
                                 >
                             </div>
@@ -138,6 +142,10 @@ export default {
         this.getUnitMeasurement();
     },
     methods: {
+        inputNum(index) {
+            this.$message.warning("库存不足");
+            this.list[index].useNum = "";
+        },
         // 选择农资
         chose() {
             let arr = [];

@@ -21,7 +21,7 @@
                     <el-select
                         :disabled="!isEdit"
                         style="width: 100%"
-                        v-model="form.title"
+                        v-model="form.farmId"
                         placeholder="请选择农事类型"
                     >
                         <el-option
@@ -34,11 +34,17 @@
                 </div>
             </div>
             <div class="item">
-                <p class="title">使用农资：</p>
-                <div class="content" v-if="form.farmUseBos.length == 0 && !isEdit">
+                <p class="title" v-if="form.title != '采摘'">使用农资：</p>
+                <div class="content" v-if="form.farmUseBos.length == 0 && !isEdit && form.title != '采摘'">
                     <p class="text">暂无数据</p>
                 </div>
-                <div class="content nz" v-if="form.farmUseBos.length > 0 || isEdit">
+                <p class="title" v-if="form.title == '采摘'">采摘重量：</p>
+                <div class="content" v-if="form.title == '采摘'">
+                    <el-input :disabled="!isEdit" v-model="form.pickCount" placeholder="输入采摘重量">
+                        <template #append>公斤</template>
+                    </el-input>
+                </div>
+                <div class="content nz" v-if="form.farmUseBos.length > 0 || (isEdit && form.title != '采摘')">
                     <div class="nzItem" v-for="(item, index) in form.farmUseBos" :key="item.id">
                         <div class="nzBox" :style="{ width: isEdit ? '400px' : '438px' }">
                             <span>
@@ -49,7 +55,7 @@
                         </div>
                         <i class="erp erpshanchu" v-if="isEdit" @click="removeNz(index)"></i>
                     </div>
-                    <div class="nzAdd" @click="showChose = true" v-if="isEdit">
+                    <div class="nzAdd" @click="showChose = true" v-if="isEdit && form.title != '采摘'">
                         <i class="erp erpicon_tianjia"></i> 添加农资
                     </div>
                 </div>
@@ -335,11 +341,6 @@ export default {
             return new Promise((a, b) => {
                 this.ajax.post("/api/v1/adam/farm/getFarmType").then((r) => {
                     this.farmType = r.data;
-                    r.data.map((item) => {
-                        if (item.title == this.form.title) {
-                            this.form.title = item.id;
-                        }
-                    });
                     a();
                 });
             });
