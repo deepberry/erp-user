@@ -31,7 +31,7 @@
                     </div>
                     <div class="table">
                         <el-table size="large" :data="list" style="width: 100%">
-                            <el-table-column prop="orderUuid" label="工单号" />
+                            <el-table-column prop="orderUuid" label="工单号" width="150" />
                             <el-table-column label="农资名称">
                                 <template #default="scope">
                                     <p v-for="item in scope.row.totalCount" :key="item.id">{{ item.title }}</p>
@@ -55,6 +55,7 @@
                                     <span :style="{ color: scope.row.color }">{{ scope.row.orderStatusString }}</span>
                                 </template>
                             </el-table-column>
+                            <el-table-column prop="userName" label="当前审批人" />
                         </el-table>
                     </div>
                     <div class="pages" v-if="list.length > 0">

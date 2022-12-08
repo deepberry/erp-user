@@ -33,7 +33,7 @@
                 <el-input v-model="form.address" placeholder="如：棚区、地块、村组" />
             </div>
             <div class="item">
-                <p class="itemLabel">移植方式：</p>
+                <p class="itemLabel"><span>*</span>移植方式：</p>
                 <div class="userList">
                     <el-select style="width: 475px" v-model="form.growthId" placeholder="请选择移植方式">
                         <el-option
@@ -91,6 +91,7 @@
 <script lang="js">
 const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
 import * as signalR from '@microsoft/signalr';
+import timer from '@/utils/timer';
 export default {
     name: "plantAdd",
     props: ['isEdit', 'id'],
@@ -104,7 +105,8 @@ export default {
                 percentage: 0,
                 varietyTitle: '',
                 growthId: '', // 当前选中的移植方式
-                smartDeviceBoList: []
+                smartDeviceBoList: [],
+                plantTime: timer.time('y-m-d')
             },
             plantType: [], // 移植方式列表
             deviceList: [], // 关联设备列表
@@ -213,11 +215,15 @@ export default {
                 this.$message.warning("请输入种类名称");
                 return;
             }
-            if (!this.form.plantTime) {
+            if (!this.form.address) {
                 this.$message.warning("请输入棚区");
                 return;
             }
-            if (!this.form.address) {
+            if (!this.form.growthId) {
+                this.$message.warning("请选择移植时方式");
+                return;
+            }
+            if (!this.form.plantTime) {
                 this.$message.warning("请选择移植时间");
                 return;
             }

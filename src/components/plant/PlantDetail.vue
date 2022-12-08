@@ -8,11 +8,11 @@
                         <img :src="item.image" alt="" />
                         <p>{{ item.categoryTitle }}</p>
                     </div>
-                    <div class="right">第{{ item.count }}天</div>
+                    <div class="right">棚区：{{ item.address }}</div>
                 </div>
                 <div class="content" @click="itemClick(item.id)">
                     <div class="contentItem">
-                        <p><span>棚区：</span>{{ item.address }}</p>
+                        <p><span>天数：</span>第{{ item.count }}天</p>
                         <p><span>品种：</span>{{ item.varietyTitle }}</p>
                     </div>
                     <div class="contentItem">
@@ -21,7 +21,7 @@
                     </div>
                 </div>
                 <div class="btn">
-                    <p v-if="item.smartDevice > 0"><i class="erp erpjiekouyunwei"></i> 智能设备</p>
+                    <p v-if="item.smartDevice > 0" @click="openUrl"><i class="erp erpjiekouyunwei"></i> 智能设备</p>
                     <p @click="itemClick(item.id)">
                         <i class="erp erprili">
                             <span v-if="item.task > 0"></span>
@@ -55,6 +55,9 @@ export default {
         },
     },
     methods: {
+        openUrl() {
+            window.open("https://io.deepberry.cn/insights");
+        },
         // 获取数据
         getData() {
             this.loading = true;
