@@ -1,5 +1,5 @@
 <template>
-    <div class="StatistiProduct">
+    <div class="StatisticsProduct">
         <div class="head">
             <div>
                 <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农资类型、农资名称" />
@@ -40,7 +40,7 @@
 <script>
 import timer from "@/utils/timer";
 export default {
-    name: "StatistiProduct",
+    name: "StatisticsProduct",
     data() {
         return {
             list: [],
@@ -81,7 +81,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StatistiProduct {
+.StatisticsProduct {
     .head {
         display: flex;
         justify-content: space-between;

@@ -12,7 +12,7 @@
                 <span style="position: relative; top: 2px; font-size: 15px">我的工时统计</span>
             </div>
             <div class="content">
-                <div class="StatistiProduct">
+                <div class="StatisticsProduct">
                     <div class="head">
                         <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农资类型" />
                         <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
@@ -79,7 +79,7 @@ export default {
     overflow-y: auto;
     padding: 20px;
     padding-top: 0;
-    .StatistiProduct {
+    .StatisticsProduct {
         .head {
             display: flex;
             justify-content: flex-start;

@@ -1,18 +1,13 @@
 <template>
-    <div class="StatistiProduct">
+    <div class="StatisticsProduct">
         <div class="head">
-            <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农资名称、厂家名称" />
+            <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农户姓名" />
             <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
         </div>
         <div class="table" v-loading="loading">
             <el-table size="large" :data="list" style="width: 100%" max-height="600">
-                <el-table-column prop="title" label="农资" width="280" />
-                <el-table-column prop="type" label="入库量" width="280">
-                    <template #default="scope"> {{ scope.row.inCount || 0 }}{{ scope.row.unitWeight }} </template>
-                </el-table-column>
-                <el-table-column prop="type" label="出库量">
-                    <template #default="scope"> {{ scope.row.outCount || 0 }}{{ scope.row.unitWeight }} </template>
-                </el-table-column>
+                <el-table-column prop="userName" label="姓名" width="280" />
+                <el-table-column prop="workHours" label="工时" />
             </el-table>
         </div>
     </div>
@@ -20,7 +15,7 @@
 
 <script>
 export default {
-    name: "StatistiProduct",
+    name: "StatisticsProduct",
     data() {
         return {
             loading: false,
@@ -38,7 +33,7 @@ export default {
         getData() {
             this.loading = true;
             this.ajax
-                .post("/api/v1/adam/task/repertoryDetailSta", {
+                .post("/api/v1/adam/task/workHoursSta", {
                     endTime: "",
                     keyWord: this.searchKey,
                     startTime: "",
@@ -46,7 +41,7 @@ export default {
                 .then((r) => {
                     this.loading = false;
                     if (r.code == 200) {
-                        this.list = r.data;
+                        this.list = r.data.workDetailHoursList;
                         // this.total = r.total;
                     }
                 });
@@ -56,7 +51,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StatistiProduct {
+.StatisticsProduct {
     .head {
         display: flex;
         justify-content: flex-start;
