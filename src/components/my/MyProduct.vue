@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="table">
-            <el-table size="large" :data="list" style="width: 100%" v-loading="loading">
+            <el-table size="large" :data="list" style="width: 100%" max-height="600" v-loading="loading">
                 <el-table-column prop="agriculturalBo.title" label="农资名称" />
                 <el-table-column label="农资类型">
                     <template #default="scope">
@@ -40,16 +40,6 @@
                     </template>
                 </el-table-column>
             </el-table>
-        </div>
-        <div class="pages" v-if="list.length > 0">
-            <span class="total">共 {{ total }} 条</span>
-            <el-pagination
-                v-model:currentPage="currentPage"
-                v-model:page-size="pageSize"
-                background
-                layout="prev, pager, next, jumper"
-                :total="total"
-            />
         </div>
     </div>
 </template>

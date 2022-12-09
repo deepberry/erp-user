@@ -5,7 +5,7 @@
             <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
         </div>
         <div class="table" v-loading="loading">
-            <el-table size="large" :data="list" style="width: 100%">
+            <el-table size="large" :data="list" style="width: 100%" max-height="600">
                 <el-table-column prop="title" label="农资" width="280" />
                 <el-table-column prop="type" label="入库量" width="280">
                     <template #default="scope"> {{ scope.row.inCount || 0 }}{{ scope.row.unitWeight }} </template>
@@ -14,16 +14,6 @@
                     <template #default="scope"> {{ scope.row.outCount || 0 }}{{ scope.row.unitWeight }} </template>
                 </el-table-column>
             </el-table>
-        </div>
-        <div class="pages" v-if="list.length > 0">
-            <span class="total">共 {{ total }} 条</span>
-            <el-pagination
-                v-model:currentPage="currentPage"
-                v-model:page-size="pageSize"
-                background
-                layout="prev, pager, next, jumper"
-                :total="total"
-            />
         </div>
     </div>
 </template>

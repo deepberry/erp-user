@@ -235,7 +235,7 @@ export default {
                 "plantTime": plantTime,
                 "gardenId": gardenId,
                 "growthId": this.form.growthId,
-                "area": parseInt(this.form.area),
+                "area": Number(this.form.area),
                 "address": this.form.address,
                 "smartDevice": this.form.smartDeviceBoList.length > 0 ? 1 : 0,
                 "smartDeviceBoList": this.form.smartDeviceBoList.map(item => {

@@ -94,7 +94,7 @@
                                     style="color: #6397fd; cursor: pointer; text-decoration: underline"
                                     @click="
                                         $store.state.power.workingHoursBtn
-                                            ? showDialogBox('工时使用统计', item.id)
+                                            ? showDialogBox('工时使用统计', item.id, item.agricultural)
                                             : () => {}
                                     "
                                 >
@@ -113,6 +113,7 @@
         <PlantCropsDetailCDialog
             :id="dialogId"
             :title="dialogTitle"
+            :title2="dialogTitle2"
             v-if="showDialog"
             @close="closeDialog"
         ></PlantCropsDetailCDialog>
@@ -133,6 +134,7 @@ export default {
             farmWorkBos: [],
             showDialog: false,
             dialogTitle: '',
+            dialogTitle2: '',
             dialogId: ''
         }
     },
@@ -167,9 +169,11 @@ export default {
         ajax();
     },
     methods: {
-        showDialogBox (title, id){
+        showDialogBox (title, id, title2){
             this.dialogTitle = title;
+            this.dialogTitle2 = title2;
             this.dialogId = id;
+            console.log(title2)
             this.showDialog = true;
         },
         closeDialog (){

@@ -18,21 +18,10 @@
                         <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
                     </div>
                     <div class="table">
-                        <el-table size="large" :data="list" style="width: 100%" v-loading="loading">
+                        <el-table size="large" :data="list" style="width: 100%" max-height="600" v-loading="loading">
                             <el-table-column prop="agricultural" label="农资类型" width="250" />
                             <el-table-column prop="agriculturalCount" label="工时" />
                         </el-table>
-                    </div>
-                    <div class="pages" v-if="list.length > 0">
-                        <span class="total">共 {{ total }} 条</span>
-                        <el-pagination
-                            v-model:currentPage="currentPage"
-                            v-model:page-size="pageSize"
-                            :page-sizes="[100, 200, 300, 400]"
-                            background
-                            layout="prev, pager, next, jumper"
-                            :total="total"
-                        />
                     </div>
                 </div>
             </div>

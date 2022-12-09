@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="table">
-            <el-table size="large" :data="list" style="width: 100%" v-loading="loading">
+            <el-table size="large" :data="list" style="width: 100%" max-height="600" v-loading="loading">
                 <el-table-column prop="workTime" label="时间" />
                 <el-table-column prop="title" label="农事类型" />
                 <el-table-column label="农资名称">
@@ -32,16 +32,6 @@
                 <el-table-column prop="workHour" label="工时数" />
             </el-table>
         </div>
-        <div class="pages" v-if="list.length > 0">
-            <span class="total">共 {{ total }} 条</span>
-            <el-pagination
-                v-model:currentPage="currentPage"
-                v-model:page-size="pageSize"
-                background
-                layout="prev, pager, next, jumper"
-                :total="total"
-            />
-        </div>
     </div>
 </template>
 
@@ -53,8 +43,7 @@ export default {
         return {
             list: [],
             currentPage: 1,
-            pageSize: 10,
-            total: 2,
+            total: 0,
             searchKey: "",
             loading: false,
         };
@@ -68,6 +57,8 @@ export default {
             this.loading = true;
             this.ajax
                 .post("/api/v1/adam/farm/getMyWorkTime", {
+                    pageSize: 10,
+                    pageNum: this.currentPage,
                     endTime: "",
                     keyWord: this.searchKey,
                     startTime: "",
@@ -79,6 +70,7 @@ export default {
                             item.workTime = timer.time("y-m-d h:i:s", item.workTime);
                             return item;
                         });
+                        this.total = this.list.length;
                     }
                 });
         },

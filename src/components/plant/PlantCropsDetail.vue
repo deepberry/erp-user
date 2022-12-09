@@ -126,6 +126,12 @@ export default {
         // 计算tabd是否显示
         let interval = setInterval(() => {
             if(!this.$store.state.power.loading) {
+                let query = JSON.parse(JSON.stringify(this.$route.query));
+                query.tab = 1;
+                this.$router.push({
+                    path: this.$route.path,
+                    query
+                })
                 t.showTabD = true;
                 if(this.$store.state.power.stopPlantBtn){
                     this.selectList.push('结束种植')
