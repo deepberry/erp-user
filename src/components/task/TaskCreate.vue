@@ -11,68 +11,97 @@
             <div v-loading="detailLoading" class="taskDetailInner purchaseDetailBoxInner">
                 <div class="item">
                     <p class="title">园区：</p>
-                    <el-select v-model="value" style="width: 650px" class="m-2" placeholder="请选择园区">
-                        <el-option label="item.label" value="item.value" />
-                        <el-option label="item.label" value="item.value" />
-                        <el-option label="item.label" value="item.value" />
-                        <el-option label="item.label" value="item.value" />
+                    <el-select v-model="selectedGarden" style="width: 650px" class="m-2" placeholder="请选择园区">
+                        <el-option
+                            v-for="(item, gardenIndex) in gardenList"
+                            :key="gardenIndex"
+                            :label="item.title"
+                            :value="item.id"
+                        />
                     </el-select>
                 </div>
                 <div class="item">
                     <p class="title">作物：</p>
-                    <el-input v-model="input" style="width: 650px" placeholder="请输入作物" />
+                    <el-select
+                        v-model="selectedPlant"
+                        multiple
+                        style="width: 650px"
+                        class="m-2"
+                        placeholder="请选择作物"
+                    >
+                        <el-option
+                            v-for="(item, plantIndex) in plantList"
+                            :key="plantIndex"
+                            :label="item.categoryTitle + '-' + item.address"
+                            :value="item.id"
+                        />
+                    </el-select>
                 </div>
                 <div class="item">
                     <p class="title">具体内容：</p>
-                    <el-input v-model="input" style="width: 650px" placeholder="请输入内容" />
+                    <el-input v-model="taskContent" style="width: 650px" placeholder="请输入内容" />
                 </div>
                 <div class="item">
                     <p class="title">操作指导：</p>
-                    <div class="pics">
-                        <div class="img">
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <i class="erp erpguanbi"></i>
-                        </div>
-                        <div class="upload">
-                            <p><i class="erp erpshangchuan"></i></p>
-                            <p>点击上传视频</p>
+                    <div class="upload">
+                        <video v-if="video" controls :src="video" alt="" />
+                        <i class="erp erpguanbi" @click="video = ''" v-if="video"></i>
+                        <div class="uploadBox" v-if="!video">
+                            <input v-if="!uploading" @change="uploadFile" ref="file" type="file" />
+                            <p v-if="!uploading"><i class="erp erpshangchuan"></i></p>
+                            <p v-if="!uploading">点击上传视频</p>
+                            <el-progress v-if="uploading" :width="90" type="circle" :percentage="percentage" />
                         </div>
                     </div>
                 </div>
                 <div class="item">
                     <p class="title">执行人：</p>
-                    <el-input v-model="input" style="width: 650px" placeholder="请输入内容" />
+                    <el-select
+                        v-model="selectedUser"
+                        multiple
+                        style="width: 650px"
+                        class="m-2"
+                        placeholder="请选择执行人"
+                    >
+                        <el-option
+                            v-for="(item, userIndex) in userlist"
+                            :key="userIndex"
+                            :label="item.name"
+                            :value="item.id"
+                        />
+                    </el-select>
                 </div>
                 <div class="item">
                     <p class="title">开始时间：</p>
                     <el-date-picker
+                        value-format="YYYY-MM-DD"
                         style="width: 650px"
-                        v-model="value1"
+                        v-model="startTime"
                         type="date"
                         placeholder="请选择开始时间"
-                        :size="size"
                     />
                 </div>
                 <div class="item">
                     <p class="title">截止时间：</p>
                     <el-date-picker
                         style="width: 650px"
-                        v-model="value1"
+                        value-format="YYYY-MM-DD"
+                        v-model="endTime"
                         type="date"
                         placeholder="请选择截止时间"
-                        :size="size"
                     />
                 </div>
             </div>
             <div class="btns">
-                <el-button plain>取消</el-button>
-                <el-button type="primary">确定</el-button>
+                <el-button plain @click="onClose">取消</el-button>
+                <el-button type="primary" @click="submit" :loading="submitting">确定</el-button>
             </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
+import upload from "../../utils/upload.js";
 export default {
     name: "taskDetail",
     props: ["id"],
@@ -84,13 +113,165 @@ export default {
             showTextArea: false,
             textarea: "",
             isPass: "1",
+            selectedGarden: "", // 当前选择的园区
+            selectedPlant: [], // 当前选择的作物
+            selectedUser: [], // 当前选择的人员
+            gardenList: [], // 园区列表
+            plantList: [], // 作物列表
+            userlist: [], // 用户列表
+            taskContent: "", // 任务内容
+            startTime: "",
+            endTime: "",
+            video: "",
+            uploading: false,
+            percentage: 0, // 上传进度
+            searchCropLoading: false, // 作物搜索中
+            submitting: false,
         };
     },
-    mounted() {},
+    mounted() {
+        let t = this;
+        let ajax = async function () {
+            await t.getGardenList();
+            await t.getUserlist();
+        };
+        ajax();
+    },
+    watch: {
+        selectedGarden() {
+            this.plantList = [];
+            this.selectedPlant = "";
+            this.ajax
+                .post("/api/v1/adam/task/getPlantsByGarden", {
+                    gardenId: this.selectedGarden,
+                })
+                .then((r) => {
+                    console.log(r.data);
+                    this.plantList = r.data;
+                });
+        },
+    },
     methods: {
-        onClose() {
-            this.$emit("onCloseDetail", 0);
+        // 获取园区列表
+        getGardenList() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/garden/list", {
+                        pageNum: 1,
+                        pageSize: 100,
+                        param: {},
+                    })
+                    .then((r) => {
+                        this.gardenList = r.data;
+                        a();
+                    });
+            });
+        },
+        // 获取人员列表
+        getUserlist() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/task/getOrganizationUsers", {
+                        pageNum: 1,
+                        pageSize: 100,
+                        param: {},
+                    })
+                    .then((r) => {
+                        this.userlist = r.data;
+                        a();
+                    });
+            });
+        },
+        onClose(params = null) {
+            if (typeof params == "function") {
+                params = null;
+            }
+            this.$emit("onCloseCreate", params);
             this.showDetailBox = false;
+        },
+        // 上传视频
+        uploadFile() {
+            this.uploading = true;
+            let file = this.$refs.file.files[0];
+            upload(file, `erp/park/${file.name}`).then((r) => {
+                if (r.url) {
+                    this.video = r.url;
+                    this.uploading = false;
+                    this.percentage = 0;
+                }
+            });
+        },
+        // 搜索作物
+        searchCrop() {},
+        // 提交表单
+        submit() {
+            let gardenTitle = "";
+            this.gardenList.map((item) => {
+                if (item.id == this.selectedGarden) {
+                    gardenTitle = item.title;
+                }
+            });
+
+            if (!this.selectedGarden) {
+                this.$message.warning("请选择园区");
+                return;
+            }
+            if (this.selectedPlant.length == 0) {
+                this.$message.warning("请选择作物");
+                return;
+            }
+            if (!this.taskContent) {
+                this.$message.warning("请输入具体内容");
+                return;
+            }
+            if (this.selectedUser.length == 0) {
+                this.$message.warning("请选择执行人");
+                return;
+            }
+            if (!this.startTime) {
+                this.$message.warning("请选择开始时间");
+                return;
+            }
+            if (!this.endTime) {
+                this.$message.warning("请选择截止时间");
+                return;
+            }
+
+            let executors = this.selectedUser.map((item) => {
+                let json = {
+                    id: "",
+                    name: "",
+                };
+                this.userlist.map((i) => {
+                    if (item == i.id) {
+                        json.id = i.id;
+                        json.name = i.name;
+                    }
+                });
+                return json;
+            });
+            this.submitting = true;
+            this.ajax
+                .post("/api/v1/adam/task/createTask", {
+                    endTime: this.endTime,
+                    executors: JSON.stringify(executors),
+                    gardenId: this.selectedGarden,
+                    gardenTitle: gardenTitle,
+                    growPlants: this.selectedPlant,
+                    opinion: "",
+                    reWire: this.video,
+                    startTime: this.startTime,
+                    taskContent: this.taskContent,
+                })
+                .then((r) => {
+                    this.submitting = false;
+                    if (r.code == 200 && r.data == true) {
+                        this.onClose(1);
+                        this.showDetailBox = false;
+                    } else {
+                        this.$message.error(r.message);
+                    }
+                });
         },
     },
 };
@@ -112,49 +293,42 @@ export default {
         p.title {
             width: 90px;
         }
-        .pics {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            flex-wrap: wrap;
+        .upload {
+            width: 180px;
+            height: 100px;
             position: relative;
             left: -10px;
-            .img {
-                width: 140px;
+            background: #ffffff;
+            video {
+                width: 180px;
                 height: 100px;
-                border-radius: 5px;
-                position: relative;
-                overflow: hidden;
-                img {
-                    width: 140px;
-                    height: 100px;
-                }
-                i {
-                    display: inline-block;
-                    font-size: 14px;
-                    color: #ffffff;
-                    position: absolute;
-                    top: 0;
-                    right: 0;
-                    cursor: pointer;
-                    background: rgba(0, 0, 0, 0.5);
-                    padding: 5px;
-                }
+                border-radius: 10px;
             }
-            .upload {
-                width: 140px;
+            .erpguanbi {
+                position: absolute;
+                top: 0;
+                right: 0;
+                z-index: 999;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 5px;
+                font-size: 12px;
+                border-top-right-radius: 5px;
+                color: #ffffff;
+                cursor: pointer;
+            }
+            .uploadBox {
+                width: 180px;
                 height: 100px;
                 border-radius: 5px;
                 background: rgba(244, 248, 251, 1);
                 display: flex;
-                border: 1px solid #e6e6e6;
                 justify-content: center;
                 align-content: center;
                 flex-wrap: wrap;
                 font-size: 12px;
                 color: rgba(107, 145, 242, 1);
-                margin-left: 10px;
                 cursor: pointer;
+                position: relative;
                 p {
                     width: 100%;
                     text-align: center;
@@ -162,6 +336,21 @@ export default {
                     i {
                         font-size: 22px;
                     }
+                }
+                input {
+                    width: 180px;
+                    height: 100px;
+                    background: rgba(0, 0, 0, 0.5);
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    cursor: pointer;
+                    opacity: 0;
+                }
+                .el-progress--circle {
+                    position: absolute;
+                    top: 5px;
+                    z-index: 10;
                 }
             }
         }

@@ -18,7 +18,7 @@ export default {
             };
             data.map((item) => {
                 if (this.findAttr(item, tagBy) == tag) {
-                    rows.num += Number(item.agriculturalBo.agriculturalCount);
+                    rows.num += item.agriculturalBo.agriculturalCount * item.unit;
                 }
             });
             return rows;

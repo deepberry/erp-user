@@ -1,25 +1,14 @@
 <template>
     <div class="StatistiProduct">
         <div class="head">
-            <el-input style="width: 300px" v-model="input" placeholder="关键字搜索：农户姓名、日期" />
-            <el-button type="primary" style="margin-left: 10px">查询</el-button>
+            <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农户姓名" />
+            <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
         </div>
-        <div class="table">
-            <el-table :data="list" style="width: 100%">
-                <el-table-column prop="title" label="姓名" />
-                <el-table-column prop="num" label="工时" />
+        <div class="table" v-loading="loading">
+            <el-table size="large" :data="list" style="width: 100%" max-height="600">
+                <el-table-column prop="userName" label="姓名" width="280" />
+                <el-table-column prop="workHours" label="工时" />
             </el-table>
-        </div>
-        <div class="pages" v-if="list.length > 0">
-            <span class="total">共 {{ total }} 条</span>
-            <el-pagination
-                v-model:currentPage="currentPage"
-                v-model:page-size="pageSize"
-                :page-sizes="[100, 200, 300, 400]"
-                background
-                layout="prev, pager, next, jumper"
-                :total="total"
-            />
         </div>
     </div>
 </template>
@@ -29,28 +18,34 @@ export default {
     name: "StatistiProduct",
     data() {
         return {
-            list: [
-                {
-                    title: "张三",
-                    num: 1000,
-                },
-                {
-                    title: "张三",
-                    num: 1000,
-                },
-                {
-                    title: "张三",
-                    num: 1000,
-                },
-                {
-                    title: "张三",
-                    num: 1000,
-                },
-            ],
+            loading: false,
+            list: [],
             currentPage: 1,
             pageSize: 10,
-            total: 2,
+            total: 0,
+            searchKey: "",
         };
+    },
+    mounted() {
+        this.getData();
+    },
+    methods: {
+        getData() {
+            this.loading = true;
+            this.ajax
+                .post("/api/v1/adam/task/workHoursSta", {
+                    endTime: "",
+                    keyWord: this.searchKey,
+                    startTime: "",
+                })
+                .then((r) => {
+                    this.loading = false;
+                    if (r.code == 200) {
+                        this.list = r.data.workDetailHoursList;
+                        // this.total = r.total;
+                    }
+                });
+        },
     },
 };
 </script>

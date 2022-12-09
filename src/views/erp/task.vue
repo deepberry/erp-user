@@ -9,7 +9,7 @@
                     <el-badge
                         class="statusItem"
                         :value="item.sup > 0 ? item.sup : ''"
-                        @click="selectClick(item.value)"
+                        @click="statusClick(item.value)"
                         v-for="item in status"
                         :key="item.value"
                     >
@@ -24,23 +24,49 @@
                         class="searchInput"
                         placeholder="关键词搜索：任务内容、检查建议..."
                     ></el-input>
-                    <el-button type="primary" class="searchSubmit" :loading="searchLoading">查询</el-button>
-                    <el-button type="primary" class="searchCreateNewTask" @click="showCreateBox = true"
+                    <el-button type="primary" class="searchSubmit" @click="getData" :loading="searchLoading"
+                        >查询</el-button
+                    >
+                    <el-button
+                        v-if="$store.state.power.createTaskBtn"
+                        type="primary"
+                        class="searchCreateNewTask"
+                        @click="showCreateBox = true"
                         ><i class="erp erpjiufuqianbaoicon06"></i> 创建任务</el-button
                     >
                 </div>
             </div>
             <div class="tableWrap">
                 <div class="table">
-                    <el-table :data="list" style="width: 100%" size="large" max-height="600px">
-                        <el-table-column prop="id" label="任务单号" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="title" label="所属棚区" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="type" label="执行人"></el-table-column>
-                        <el-table-column prop="num" label="任务内容"></el-table-column>
-                        <el-table-column prop="status" label="状态"></el-table-column>
-                        <el-table-column label="操作" width="260">
+                    <el-table size="large" :data="list" style="width: 100%" max-height="600px" v-loading="loading">
+                        <el-table-column label="任务单号" width="150" show-overflow-tooltip>
+                            <template #default="scope"> RW{{ scope.row.id }} </template>
+                        </el-table-column>
+                        <el-table-column label="所属棚区" width="300" show-overflow-tooltip>
                             <template #default="scope">
-                                <el-button link type="primary" @click="showDetail(scope.row.id)">查看详情</el-button>
+                                {{ scope.row.gardenTitle }}-{{ scope.row.growPlantTitle }}-{{ scope.row.address }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="执行人">
+                            <template #default="scope">
+                                <p v-for="item in scope.row.executors" :key="item.id">{{ item.name }}</p>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="taskContent" label="任务内容"></el-table-column>
+                        <el-table-column label="状态" width="200">
+                            <template #default="scope">
+                                <span :style="{ color: scope.row.color }">{{ scope.row.statusText }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" width="200">
+                            <template #default="scope">
+                                <el-button
+                                    link
+                                    type="primary"
+                                    v-if="$store.state.power.taskDetail"
+                                    @click="showDetail(scope.row.id)"
+                                    >查看详情</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>
@@ -49,7 +75,7 @@
                         <el-pagination
                             v-model:currentPage="currentPage"
                             v-model:page-size="pageSize"
-                            :page-sizes="[100, 200, 300, 400]"
+                            @current-change="getData"
                             background
                             layout="prev, pager, next, jumper"
                             :total="total"
@@ -58,8 +84,8 @@
                 </div>
             </div>
         </div>
-        <TaskDetail v-if="showDetailBox" @onCloseDetail="onCloseDetail"></TaskDetail>
-        <TaskCreate v-if="showCreateBox" @onCloseDetail="onCloseCreate"></TaskCreate>
+        <TaskDetail v-if="showDetailBox" :id="currentId" @onCloseDetail="onCloseDetail"></TaskDetail>
+        <TaskCreate v-if="showCreateBox" @onCloseCreate="onCloseCreate"></TaskCreate>
     </div>
 </template>
 
@@ -74,8 +100,8 @@ export default {
                 // 状态列表
                 {
                     title: "全部",
-                    value: "",
-                    sup: 10,
+                    value: "-1",
+                    sup: 0,
                 },
                 {
                     title: "待执行",
@@ -94,70 +120,116 @@ export default {
                 },
                 {
                     title: "不合格",
-                    value: "2",
+                    value: "3",
                     sup: 0,
                 },
             ],
-            currentStatus: "", // 当前选定的状态
+            loading: false,
+            currentStatus: "-1", // 当前选定的状态
             searchKey: "", // 搜索关键词
             searchLoading: false, // 搜索中状态,
-            list: [
-                // 数据列表
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-                {
-                    id: "1477125",
-                    title: "西区A棚B栏",
-                    type: "Mins",
-                    num: "给玉米打除草剂",
-                    status: "已完成",
-                },
-            ],
+            list: [],
             currentPage: 1,
-            pageSize: 100,
-            total: 4,
+            pageSize: 10,
+            total: 0,
             showDetailBox: false, // 是否显示详情弹窗
             showCreateBox: false,
+            currentId: "", // 显示详情的ID
         };
     },
     components: {
         TaskDetail,
         TaskCreate,
     },
-    mounted() {},
+    mounted() {
+        this.getData();
+        this.getStatus_1();
+    },
     methods: {
+        // 切换状态
+        statusClick(v) {
+            this.currentStatus = v;
+            this.getData();
+        },
+        // 获取待检查的数据
+        getStatus_1() {
+            this.ajax
+                .post("/api/v1/adam/task/manageTaskList", {
+                    pageNum: this.currentPage,
+                    pageSize: 10,
+                    param: {
+                        gardenId: "",
+                        growPlantId: "",
+                        status: 1,
+                        keyWord: "",
+                    },
+                })
+                .then((r) => {
+                    this.status[2].sup = r.total;
+                });
+        },
+        // 获取数据
+        getData() {
+            this.loading = true;
+            this.ajax
+                .post("/api/v1/adam/task/manageTaskList", {
+                    pageNum: this.currentPage,
+                    pageSize: 10,
+                    param: {
+                        gardenId: -1,
+                        growPlantId: -1,
+                        status: this.currentStatus,
+                        keyWord: this.searchKey,
+                    },
+                })
+                .then((r) => {
+                    this.list = r.data.map((item) => {
+                        item.executors = JSON.parse(item.executors);
+                        switch (item.status) {
+                            case 0:
+                                item.statusText = "待执行";
+                                item.color = "#A8A8A8";
+                                break;
+                            case 1:
+                                item.statusText = "待检查";
+                                item.color = "#1890FF";
+                                break;
+                            case 2:
+                                item.statusText = "合格";
+                                item.color = "#0DD71C";
+                                break;
+                            case 3:
+                                item.statusText = "不合格";
+                                item.color = "#FF4949";
+                                break;
+                        }
+                        return item;
+                    });
+                    this.total = r.total;
+                    this.loading = false;
+                });
+        },
         // 打开详情
         showDetail(id) {
-            console.log(this.showDetailBox);
+            this.currentId = id;
             this.showDetailBox = true;
         },
         // 关闭详情
-        onCloseDetail() {
+        onCloseDetail(params) {
+            if (params == 1) {
+                this.getData();
+            }
             let timer = setTimeout(() => {
                 this.showDetailBox = false;
                 clearTimeout(timer);
             }, 500);
         },
-        onCloseCreate() {
+        // 创建任务弹窗关闭时
+        onCloseCreate(params) {
+            if (params == 1) {
+                this.getData();
+            }
+            console.log(params);
             let timer = setTimeout(() => {
                 this.showCreateBox = false;
                 clearTimeout(timer);

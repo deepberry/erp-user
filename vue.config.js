@@ -3,9 +3,28 @@ module.exports = {
     //⚛️ Proxy ~
     devServer: {
         proxy: {
-            // TODO:本地代理端口
-            "/api": {
-                target: process.env["DEV_SERVER"] == "true" ? "http://localhost:5120" : "https://io.deepberry.cn",
+            "/api/dashboard": {
+                // target: process.env["DEV_SERVER"] == "true" ? "http://localhost:8080" : "https://io.deepberry.cn"
+                target: "https://io.deepberry.cn",
+                ws: true,
+                changeOrigin: true,
+                pathRewrite: {
+                    "^/api/dashboard": "/api/dashboard",
+                },
+            },
+            "/hub": {
+                target: "https://io.deepberry.cn",
+                ws: true,
+                changeOrigin: true,
+                pathRewrite: {
+                    "^/hub": "/hub",
+                },
+            },
+            "/api/cms": {
+                target: "https://cms.deepberry.cn",
+                pathRewrite: {
+                    "^/api/cms": "/api/cms",
+                },
             },
         },
     },

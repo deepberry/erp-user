@@ -8,32 +8,31 @@
             title="库存明细"
             width="600px"
         >
-            <div class="stockDetailBoxInner">
+            <div class="stockDetailBoxInner" v-loading="loading">
                 <div class="head">
-                    <p>硝酸复合肥</p>
-                    <p>20袋 (共1000公斤)</p>
-                    <p><span>化肥</span></p>
-                    <p>内蒙古xx化肥有限公司</p>
-                    <p>(50公斤/袋)</p>
+                    <p>{{ detail.agriculturalBo.title }}</p>
+                    <p>{{ detail.agriculturalUnit }}袋 (共{{ detail.agriculturalCount }}公斤)</p>
+                    <p>
+                        <span>{{ detail.agriculturalBo.agriculturalCategory }}</span>
+                    </p>
+                    <p>{{ detail.agriculturalBo.manufacturers }}</p>
+                    <p>
+                        ({{ detail.agriculturalBo.agriculturalCount }}{{ detail.agriculturalBo.unitweight }}/{{
+                            detail.agriculturalBo.unitmeasurement
+                        }})
+                    </p>
                 </div>
-                <div class="card">
+                <div class="card" v-for="(item, index) in list" :key="index">
                     <div>
-                        <p>已领用退回</p>
-                        <p>2022.10.14</p>
+                        <p>{{ item.workTypeName }}</p>
+                        <p>{{ item.outInTime }}</p>
                     </div>
                     <div>
-                        <p class="add">+1000公斤</p>
-                        <p>张三</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div>
-                        <p>领用出库</p>
-                        <p>2022.10.14</p>
-                    </div>
-                    <div>
-                        <p class="miuns">-1000公斤</p>
-                        <p>张三</p>
+                        <p :class="item.type == 0 ? 'add' : 'miuns'">
+                            {{ item.type == 0 ? "+" : "-" }}{{ item.agriculturalCount
+                            }}{{ item.agriculturalBo.unitweight }}
+                        </p>
+                        <p>{{ item.username }}</p>
                     </div>
                 </div>
             </div>
@@ -43,13 +42,55 @@
 
 <script lang="js">
 export default {
+    props: ['id'],
     name: 'stockDetail',
     data (){
         return {
+            loading: false,
+            detail: {
+                agriculturalBo: {}
+            },
+            list: [], // 明细列表
             showDetailBox: true
         }
     },
+    mounted (){
+        let t = this;
+        const ajax = async function (){
+            t.loading = true;
+            await t.getDetail();
+            await t.getList();
+            t.loading = false;
+        }
+        ajax();
+    },
     methods: {
+        // 获取详情数据
+        getDetail (){
+            return new Promise ((a ,b) => {
+                this.ajax.post('/api/v1/adam/farmLand/agricultural-detail', {
+                    id: this.id
+                }).then(r => {
+                    this.detail = r.data;
+                    a();
+                })
+            })
+        },
+        // 获取明细
+        getList (){
+            return new Promise ((a ,b) => {
+                this.ajax.post('/api/v1/adam/farmLand/inventoryDetail-list', {
+                    "pageNum": 1,
+                    "pageSize": 10,
+                    "param": {
+                        "id": this.id
+                    }
+                }).then(r => {
+                    this.list = r.data;
+                    a();
+                })
+            })
+        },
         onClose (){
             this.$emit("closeDetailBox", 0);
             this.showDetailBox = false;

@@ -11,149 +11,181 @@
                 >
                 <span style="position: relative; top: 2px; font-size: 15px">农资详情</span>
             </div>
-            <div class="content">
+            <div class="content" v-loading="loading">
                 <div class="top">
-                    <div class="swiper">
-                        <img src="../../assets/img/ds.png" alt="" />
+                    <div class="swiperBox">
+                        <div class="swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide" v-for="(item, swiperIndex) in bannerList" :key="swiperIndex">
+                                    <img :src="item" alt="" />
+                                </div>
+                            </div>
+                            <div class="swiper-pagination"></div>
+                            <div class="swiper-button-prev"></div>
+                            <div class="swiper-button-next"></div>
+                        </div>
                     </div>
                     <div class="info">
                         <div class="infoItem">
-                            <p>硝酸复合肥</p>
-                            <p class="price">￥150元</p>
+                            <p>{{ detail.agriculturalBo.title }}</p>
+                            <p class="price">￥{{ detail.agriculturalBo.agriculturalPrice }}元</p>
                         </div>
                         <div class="infoItem">
-                            <span class="tag">复合肥</span>
+                            <span class="tag">{{ detail.agriculturalBo.agriculturalCategory }}</span>
                         </div>
                         <div class="infoItem">
-                            <p>内蒙古xx肥料有限公司</p>
-                            <p class="unit">(50公斤/袋)</p>
+                            <p>{{ detail.agriculturalBo.manufacturers }}</p>
+                            <p class="unit">
+                                ({{ detail.agriculturalBo.agriculturalCount }}{{ detail.agriculturalBo.unitweight }}/{{
+                                    detail.agriculturalBo.unitmeasurement
+                                }})
+                            </p>
                         </div>
                         <div class="infoItem">
-                            <el-badge :value="12" class="item">
+                            <el-badge
+                                :value="carCount"
+                                class="item"
+                                @click="showCarBox = true"
+                                v-if="$store.state.power.shoppingCartBtn"
+                            >
                                 <i class="erp erpgouwuche3-mianxing"></i>
                             </el-badge>
-                            <el-button type="primary" round>加入购物车</el-button>
-                            <el-button type="primary" plain round>联系客服</el-button>
+                            <el-button
+                                type="primary"
+                                v-if="$store.state.power.addToShoppingCartBtn"
+                                :loading="addToCaring"
+                                round
+                                @click="addToCar"
+                                >加入购物车</el-button
+                            >
+                            <el-button type="primary" plain round @click="showServer">联系客服</el-button>
                         </div>
                     </div>
                 </div>
                 <div class="detail">
                     <p class="title">产品详情：</p>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
-                    <div class="detailContent">
-                        <p>
-                            不同植物对硝态氮和铵态氮的“喜好”不同。适宜在pH值较高的石灰性土壤上生长的喜钙植物优先利用硝态氮，适宜酸性土壤生长的嫌钙植物和适宜低氧化还原势土壤条件下生长的植物嗜好铵态氮。以全部用硝态氮的相对产量为100%，当铵态氮比例超过30%时蔬菜就减产，全部用铵态氮的产量不到全部用硝态氮产量的20%。在《中国蔬菜栽培》一书中明确指出，“蔬菜为喜硝态氮作物，铵态氮量超过50%时，洋葱产量显著下降，而菠菜对铵态氮更敏感，在硝态氮100%条件下，产量最高”。
-                        </p>
-                        <p>
-                            <img src="../../assets/img/ds.png" alt="" />
-                            <img src="../../assets/img/ds.png" alt="" />
-                        </p>
-                    </div>
+                    <div class="detailContent" v-html="detail.richContent"></div>
                 </div>
             </div>
         </div>
+        <PurchaseCar v-if="showCarBox" @closeCarBox="closeCarBox"></PurchaseCar>
     </div>
 </template>
 
 <script>
-import timer from "@/utils/timer.js";
+import PurchaseCar from "@/components/purchase/PurchaseCar.vue";
+import Swiper, { Autoplay, Navigation, Pagination } from "swiper";
+Swiper.use(Autoplay);
+Swiper.use(Navigation);
+Swiper.use(Pagination);
 export default {
     name: "purchaseShopDetail",
-    props: ["id"],
     data() {
-        return {};
+        return {
+            loading: false,
+            detail: {
+                agriculturalBo: {},
+            },
+            bannerList: [],
+            showCarBox: false,
+            carCount: "",
+            addToCaring: false,
+        };
     },
-    mounted() {},
+    components: {
+        PurchaseCar,
+    },
+    mounted() {
+        let t = this;
+        let ajax = async function () {
+            await t.getData();
+            await t.getCarCount();
+            t.$nextTick(() => {
+                t.swiper();
+            });
+        };
+        ajax();
+    },
     methods: {
+        // 初始化swiper
+        swiper() {
+            new Swiper(".swiper", {
+                autoplay: {
+                    delay: 2000,
+                },
+                loop: true,
+                pagination: {
+                    el: ".swiper-pagination",
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+            });
+        },
+
+        // 获取数据
+        getData() {
+            return new Promise((a, b) => {
+                this.loading = true;
+                this.ajax
+                    .post("/api/v1/adam/agricultural/getAgriculturalById", {
+                        id: this.$route.query.id,
+                    })
+                    .then((r) => {
+                        this.detail = r.data;
+                        this.bannerList = r.data.bannerList.split(",");
+                        this.loading = false;
+                        a();
+                    });
+            });
+        },
+        // 获取购物车数量
+        getCarCount() {
+            return new Promise((a, b) => {
+                this.ajax.post("/api/v1/adam/agricultural/cart-count").then((r) => {
+                    this.carCount = r.data || "";
+                    a();
+                });
+            });
+        },
+        addToCar() {
+            this.addToCaring = true;
+            this.ajax
+                .post("/api/v1/adam/agricultural/cart-in", {
+                    id: this.$route.query.id,
+                })
+                .then((r) => {
+                    this.addToCaring = false;
+                    if (r.code == 200) {
+                        this.$message.success("添加成功");
+                        this.carCount++;
+                    } else {
+                        this.$message.error(r.message);
+                    }
+                });
+        },
+        showServer() {
+            this.$alert("客服电话：13606870818", "联系客服");
+        },
         // 返回列表
         back() {
             this.$router.push("/erp/purchase/shop");
+        },
+        // 关闭购物车
+        closeCarBox() {
+            this.getCarCount();
+            let timer = setTimeout(() => {
+                this.showCarBox = false;
+                clearTimeout(timer);
+            }, 500);
         },
     },
 };
 </script>
 
 <style lang="less" scoped>
+@import url("../../../node_modules/swiper/swiper-bundle.min.css");
 @import url("@/assets/css/inner.less");
 .content {
     width: calc(100% - 200px);
@@ -167,11 +199,23 @@ export default {
         align-items: center;
         padding-bottom: 20px;
         border-bottom: 1px solid rgba(0, 0, 0, 0.09);
-        .swiper {
+        .swiperBox {
             width: 270px;
             height: 150px;
             overflow: hidden;
             border-radius: 10px;
+            .swiper-pagination {
+                position: relative;
+                top: -30px;
+            }
+            .swiper-button-prev,
+            .swiper-button-next {
+                top: 75px;
+            }
+            .swiper {
+                --swiper-theme-color: rgba(255, 255, 255);
+                --swiper-navigation-size: 20px;
+            }
             img {
                 width: 270px;
                 height: 150px;
@@ -226,7 +270,9 @@ export default {
             color: #333333;
         }
         .detailContent {
+            margin-top: 20px;
             line-height: 34px;
+            color: #535353;
             p {
                 padding: 10px 0;
             }

@@ -8,6 +8,28 @@ export default [
         name: "erpPlant",
         path: "/erp/plant",
         component: () => import("../views/erp/plant.vue"),
+        children: [
+            {
+                name: "erpPlantDetail",
+                path: "/erp/plant/detail",
+                component: () => import("../components/plant/PlantDetail.vue"),
+            },
+        ],
+    },
+    {
+        name: "erpPlantHistory",
+        path: "/erp/plant/history",
+        component: () => import("../components/plant/PlantHistory.vue"),
+    },
+    {
+        name: "erpPlantHistoryDetail",
+        path: "/erp/plant/history/detail",
+        component: () => import("../components/plant/PlantHistoryDetail.vue"),
+    },
+    {
+        name: "erpPlantCropsDetail",
+        path: "/erp/plant/crops/detail",
+        component: () => import("../components/plant/PlantCropsDetail.vue"),
     },
     {
         name: "erpTask",
@@ -119,7 +141,7 @@ export default [
     },
     {
         name: "erpMyWorkTime",
-        path: "/erp/my/work",
+        path: "/erp/my/workTime",
         component: () => import("../components/my/MyWorkTime.vue"),
     },
     {

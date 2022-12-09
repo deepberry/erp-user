@@ -8,10 +8,15 @@
                         class="searchInput"
                         placeholder="关键词搜索：农资类型、农资名称、厂家名称"
                     ></el-input>
-                    <el-button type="primary" class="searchSubmit" @click="search">查询</el-button>
+                    <el-button type="primary" class="searchSubmit" @click="getData">查询</el-button>
                 </div>
                 <div>
-                    <el-button @click="showCar" type="primary" class="searchCreateNewTask" plain
+                    <el-button
+                        v-if="$store.state.power.shoppingCartBtn"
+                        @click="showCar"
+                        type="primary"
+                        class="searchCreateNewTask"
+                        plain
                         ><i class="erp erpgouwuche"></i> 购物车</el-button
                     >
                 </div>
@@ -19,7 +24,7 @@
         </div>
         <div class="tableWrap">
             <div class="table">
-                <el-table :data="list" style="width: 100%" size="large" max-height="600px">
+                <el-table size="large" :data="list" style="width: 100%" max-height="600px">
                     <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
                     <el-table-column prop="agriculturalCategory" label="农资类型"></el-table-column>
                     <el-table-column label="规格">
@@ -28,15 +33,20 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="manufacturers" label="厂家" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="" label="数量"></el-table-column>
                     <el-table-column label="参考单价">
                         <template #default="scope">
-                            <span style="color: rgba(224, 29, 29, 1)">￥{{ scope.row.agriculturalPrice }}元</span>
+                            <span style="color: rgba(224, 29, 29, 1)">￥{{ scope.row.agriculturalPrice }}.00元</span>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="180">
                         <template #default="scope">
-                            <el-button link type="primary" @click="viewDetail(scope.row.id)">查看详情</el-button>
+                            <el-button
+                                link
+                                type="primary"
+                                v-if="$store.state.power.materialsPurchaseDetail"
+                                @click="viewDetail(scope.row.id)"
+                                >查看详情</el-button
+                            >
                         </template>
                     </el-table-column>
                 </el-table>
@@ -45,7 +55,6 @@
                     <el-pagination
                         v-model:currentPage="currentPage"
                         v-model:page-size="pageSize"
-                        :page-sizes="[100, 200, 300, 400]"
                         background
                         layout="prev, pager, next, jumper"
                         :total="total"
@@ -76,59 +85,47 @@ export default {
         }
     },
     mounted() {
-        this.loading = true;
-        this.getData().then(() => this.loading = false);
+        this.getData();
     },
     methods: {
         // 获取数据列表
-        getData (k){
-            k = this.searchKey || '';
-            return new Promise ((resolve, reject) => {
-                this.ajax.post('/api/v1/adam/agricultural/platform-list', {
-                    "pageNum": 0,
-                    "pageSize": 0,
-                    "param": {
-                        "keyWord": k,
-                        "orderStatus": 0
+        getData (){
+            this.loading = true;
+            this.ajax.post('/api/v1/adam/agricultural/platform-list', {
+                "pageNum": this.currentPage,
+                "pageSize": 10,
+                "param": {
+                    "keyWord": this.searchKey,
+                    "orderStatus": -1
+                }
+            }).then(r => {
+                console.log(r)
+                this.list = r.data.map(item => {
+                    let status = '';
+                    let color = '';
+                    switch (item.orderStatus) {
+                        case 0: status = '已提交'; color = '#1890FF'; break;
+                        case 1: status = '已完成'; color = '#0DD71C'; break;
+                        case 2: status = '已关闭'; color = '#A8A8A8'; break;
                     }
-                }).then(r => {
-                    console.log(r)
-                    this.list = r.data.map(item => {
-                        let status = '';
-                        let color = '';
-                        switch (item.orderStatus) {
-                            case 0: status = '已提交'; color = '#1890FF'; break;
-                            case 1: status = '已完成'; color = '#0DD71C'; break;
-                            case 2: status = '已关闭'; color = '#A8A8A8'; break;
-                        }
-                        item.orderStatus = status;
-                        item.orderStatusColor = color;
-                        return item;
-                    })
-                    this.currentPage = r.pageNum;
-                    this.pageSize = r.pageSize;
-                    this.total = r.total;
-                    resolve();
+                    item.orderStatus = status;
+                    item.orderStatusColor = color;
+                    return item;
                 })
+                this.currentPage = r.pageNum;
+                this.pageSize = r.pageSize;
+                this.total = r.total;
+                this.loading = false;
             })
-        },
-        // 去采购
-        gotoPurchase() {
-            this.$message.success("跳转到采购链接。。。");
-        },
-        // 查询
-        search (){
-            this.loading = true;
-            this.getData(this.searchKey).then(() => this.loading = false);
-        },
-        // 按条件筛选
-        selectClick (status){
-            this.loading = true;
-            this.getData().then(() => this.loading = false);
         },
         // 查看详情
         viewDetail (id){
-            this.$router.push(`/erp/purchase/shop/detail`);
+            this.$router.push({
+                path: '/erp/purchase/shop/detail',
+                query: {
+                    id
+                }
+            });
         },
         // 打开购物车
         showCar (id){

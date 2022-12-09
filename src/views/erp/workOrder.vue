@@ -9,7 +9,7 @@
                     <el-badge
                         class="statusItem"
                         :value="item.sup > 0 ? item.sup : ''"
-                        @click="selectClick(item.value)"
+                        @click="changeStatus(item)"
                         v-for="item in status"
                         :key="item.value"
                     >
@@ -24,22 +24,49 @@
                         class="searchInput"
                         placeholder="关键词搜索：农资类型、农资名称..."
                     ></el-input>
-                    <el-button type="primary" class="searchSubmit" :loading="searchLoading">查询</el-button>
+                    <el-button type="primary" class="searchSubmit" @click="getData">查询</el-button>
                 </div>
             </div>
             <div class="tableWrap">
                 <div class="table">
-                    <el-table :data="list" style="width: 100%" size="large" max-height="600px">
-                        <el-table-column prop="id" label="工单号" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
-                        <el-table-column prop="type" label="农资类型"></el-table-column>
-                        <el-table-column prop="num" label="数量"></el-table-column>
-                        <el-table-column prop="status" label="状态"></el-table-column>
-                        <el-table-column prop="user" label="申领人"></el-table-column>
+                    <el-table size="large" :data="list" v-loading="loading" style="width: 100%" max-height="600px">
+                        <el-table-column prop="orderUuid" label="工单号" show-overflow-tooltip></el-table-column>
+                        <el-table-column label="农资名称" show-overflow-tooltip>
+                            <template #default="scope">
+                                <span v-for="(item, index) in scope.row.totalCount" :key="index"
+                                    >{{ item.variety }} <br
+                                /></span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="type" label="农资类型">
+                            <template #default="scope">
+                                <span v-for="(item, index) in scope.row.totalCount" :key="index"
+                                    >{{ item.title }} <br
+                                /></span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="num" label="数量">
+                            <template #default="scope">
+                                <span v-for="(item, index) in scope.row.totalCount" :key="index"
+                                    >{{ item.agriculturalCos }} {{ item.unitweight }} <br
+                                /></span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="状态">
+                            <template #default="scope">
+                                <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="userName" label="申领人"></el-table-column>
                         <el-table-column label="操作" width="260">
                             <template #default="scope">
-                                <el-button link type="primary" @click="showDetail(scope.row.id)">查看详情</el-button>
-                                <el-button link type="primary" @click="out(scope.row.id)">一键出库</el-button>
+                                <el-button
+                                    link
+                                    type="primary"
+                                    @click="showDetail(scope.row.id)"
+                                    v-if="$store.state.power.workOrderDetail"
+                                    >查看详情</el-button
+                                >
                             </template>
                         </el-table-column>
                     </el-table>
@@ -47,9 +74,8 @@
                         <span class="total">共 {{ total }} 条</span>
                         <el-pagination
                             v-model:currentPage="currentPage"
-                            v-model:page-size="pageSize"
-                            :page-sizes="[100, 200, 300, 400]"
                             background
+                            @current-change="getData"
                             layout="prev, pager, next, jumper"
                             :total="total"
                         />
@@ -57,12 +83,11 @@
                 </div>
             </div>
         </div>
-        <WorkOrderDetail v-if="showDetailBox" @onCloseDetail="onCloseDetail"></WorkOrderDetail>
+        <WorkOrderDetail v-if="showDetailBox" :id="currentDetailId" @onCloseDetail="onCloseDetail"></WorkOrderDetail>
     </div>
 </template>
 
 <script>
-import { ElMessage, ElMessageBox } from "element-plus";
 import WorkOrderDetail from "@/components/workOrder/WorkOrderDetail.vue";
 export default {
     name: "workOrder",
@@ -72,8 +97,8 @@ export default {
                 // 状态列表
                 {
                     title: "全部",
-                    value: "",
-                    sup: 10,
+                    value: "-1",
+                    sup: 0,
                 },
                 {
                     title: "待审核",
@@ -81,7 +106,7 @@ export default {
                     sup: 0,
                 },
                 {
-                    title: "已通过",
+                    title: "待出库",
                     value: "1",
                     sup: 0,
                 },
@@ -92,95 +117,114 @@ export default {
                 },
                 {
                     title: "已出库",
-                    value: "2",
+                    value: "3",
                     sup: 0,
                 },
             ],
-            currentStatus: "", // 当前选定的状态
+            currentStatus: "-1", // 当前选定的状态
             searchKey: "", // 搜索关键词
-            searchLoading: false, // 搜索中状态,
-            list: [
-                // 数据列表
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-                {
-                    id: "1477125",
-                    title: "硝酸铵复合肥",
-                    type: "化肥",
-                    num: 100,
-                    status: "已出库",
-                    user: "Mins",
-                },
-            ],
+            loading: false,
+            list: [],
             currentPage: 1,
             pageSize: 100,
-            total: 4,
+            total: 0,
             showDetailBox: false, // 是否显示详情弹窗
+            currentDetailId: "", // 查看详情的ID
         };
     },
     components: {
         WorkOrderDetail,
     },
-    mounted() {},
+    mounted() {
+        const ajax = async () => {
+            await this.getData();
+            await this.getStatus_0();
+        };
+        ajax();
+    },
     methods: {
+        // 获取数据
+        getData() {
+            return new Promise((a, b) => {
+                this.loading = true;
+                this.ajax
+                    .post("/api/v1/adam/workOrder/workOrder-list", {
+                        pageNum: this.currentPage,
+                        pageSize: 10,
+                        param: {
+                            keyWord: this.searchKey,
+                            orderStatus: this.currentStatus,
+                        },
+                    })
+                    .then((r) => {
+                        this.loading = false;
+                        this.list = r.data.map((item) => {
+                            let status = "";
+                            let color = "";
+                            switch (item.orderStatus) {
+                                case 0:
+                                    status = "待审核";
+                                    color = "#EC2626";
+                                    break;
+                                case 1:
+                                    status = "待出库";
+                                    color = "#0DD71C";
+                                    break;
+                                case 2:
+                                    status = "不通过";
+                                    color = "#1890FF";
+                                    break;
+                                case 3:
+                                    status = "已出库";
+                                    color = "#A8A8A8";
+                                    break;
+                            }
+                            item.orderStatus = status;
+                            item.orderStatusColor = color;
+                            return item;
+                        });
+                        this.total = r.total;
+                        a();
+                    });
+            });
+        },
+        // 获取待审核的数量
+        getStatus_0() {
+            return new Promise((a, b) => {
+                this.ajax
+                    .post("/api/v1/adam/workOrder/workOrder-list", {
+                        pageNum: this.currentPage,
+                        pageSize: 10,
+                        param: {
+                            keyWord: this.searchKey,
+                            orderStatus: 0,
+                        },
+                    })
+                    .then((r) => {
+                        this.status[1].sup = r.total;
+                        a();
+                    });
+            });
+        },
+        changeStatus(item) {
+            this.currentStatus = item.value;
+            this.getData();
+        },
         // 打开详情
         showDetail(id) {
             console.log(this.showDetailBox);
+            this.currentDetailId = id;
             this.showDetailBox = true;
         },
         // 关闭详情
-        onCloseDetail() {
+        onCloseDetail(v) {
+            if (v == 1) {
+                this.getData();
+            }
             let timer = setTimeout(() => {
                 this.showDetailBox = false;
                 clearTimeout(timer);
             }, 500);
-        },
-        // 出库
-        out(id) {
-            ElMessageBox.confirm(
-                "农资名称：史丹利复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、金克拉复合肥、百草枯2号 <br> 确定要出库吗？",
-                "一键出库",
-                {
-                    confirmButtonText: "确定",
-                    cancelButtonText: "取消",
-                    type: "warning",
-                    dangerouslyUseHTMLString: true,
-                }
-            )
-                .then(() => {
-                    ElMessage({
-                        type: "success",
-                        message: "Delete completed",
-                    });
-                })
-                .catch(() => {
-                    ElMessage({
-                        type: "info",
-                        message: "Delete canceled",
-                    });
-                });
         },
     },
 };

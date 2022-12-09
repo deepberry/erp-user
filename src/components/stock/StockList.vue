@@ -7,7 +7,7 @@
                     class="searchInput"
                     placeholder="关键词搜索：农资类型、农资名称、厂家名称"
                 ></el-input>
-                <el-button type="primary" class="searchSubmit">查询</el-button>
+                <el-button type="primary" class="searchSubmit" @click="getData">查询</el-button>
                 <el-select
                     v-model="defaultClassify"
                     class="searchSelect"
@@ -15,9 +15,12 @@
                     placeholder="全部分类"
                 >
                     <el-option label="全部分类" value="0" />
-                    <el-option label="分类一" value="1" />
-                    <el-option label="分类二" value="2" />
-                    <el-option label="分类三" value="3" />
+                    <el-option
+                        v-for="(item, classifyIndex) in classifyList"
+                        :key="classifyIndex"
+                        :label="item.title"
+                        :value="item.id"
+                    />
                 </el-select>
                 <el-select v-model="defaultStatus" class="searchSelect" @change="selectByStatus" placeholder="全部显示">
                     <el-option label="全部显示" value="-1" />
@@ -26,29 +29,70 @@
                 </el-select>
             </div>
             <div class="buttons">
-                <el-button type="primary" @click="showBatch = true">批量入库</el-button>
-                <el-button type="success" @click="showReg = true">登记新农资</el-button>
-                <el-button type="warning" @click="gotoRecord">出入库记录</el-button>
+                <el-button type="primary" @click="showBatch = true" v-if="$store.state.power.batchMaterialsIntoBtn"
+                    >批量入库</el-button
+                >
+                <el-button type="success" @click="showReg = true" v-if="$store.state.power.addMaterialsInfoBtn"
+                    >登记新农资</el-button
+                >
+                <el-button type="warning" @click="gotoRecord" v-if="$store.state.power.stockRecordBtn"
+                    >出入库记录</el-button
+                >
             </div>
         </div>
         <div class="tableWrap">
             <div class="table">
-                <el-table :data="list" style="width: 100%" size="large" max-height="600px">
-                    <el-table-column prop="title" label="农资名称" show-overflow-tooltip></el-table-column>
-                    <el-table-column prop="type" label="类型"></el-table-column>
-                    <el-table-column prop="company" label="生产厂家" show-overflow-tooltip></el-table-column>
+                <el-table size="large" :data="list" style="width: 100%" max-height="600px">
+                    <el-table-column
+                        prop="agriculturalBo.title"
+                        label="农资名称"
+                        show-overflow-tooltip
+                    ></el-table-column>
+                    <el-table-column prop="agriculturalBo.agriculturalCategory" label="类型"></el-table-column>
+                    <el-table-column
+                        prop="agriculturalBo.manufacturers"
+                        label="生产厂家"
+                        show-overflow-tooltip
+                    ></el-table-column>
                     <el-table-column prop="orderStatus" label="规格">
                         <template #default="scope">
-                            <!-- <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span> -->
-                            <span>{{ scope.row.unit }}</span>
+                            {{ scope.row.agriculturalBo.agriculturalCount }}{{ scope.row.agriculturalBo.unitweight }}/{{
+                                scope.row.agriculturalBo.unitmeasurement
+                            }}
                         </template>
                     </el-table-column>
-                    <el-table-column prop="num" label="库存"></el-table-column>
+                    <el-table-column label="库存">
+                        <template #default="scope">
+                            <span :style="{ color: scope.row.agriculturalCount > 0 ? '#606266' : 'red' }">
+                                {{ scope.row.agriculturalUnit }}{{ scope.row.agriculturalBo.unitmeasurement }}（共{{
+                                    scope.row.agriculturalCount
+                                }}{{ scope.row.agriculturalBo.unitweight }}）
+                            </span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" width="260">
                         <template #default="scope">
-                            <el-button link type="primary" @click="viewDetail(scope.row.id)">明细</el-button>
-                            <el-button link type="primary" @click="stock(true, scope.row.id)">入库</el-button>
-                            <el-button link type="primary" @click="stock(false, scope.row.id)">出库</el-button>
+                            <el-button
+                                link
+                                type="primary"
+                                @click="viewDetail(scope.row.id)"
+                                v-if="$store.state.power.materialsStockDetail"
+                                >明细</el-button
+                            >
+                            <el-button
+                                link
+                                type="primary"
+                                @click="stock(true, scope.row.id)"
+                                v-if="$store.state.power.materialsInto"
+                                >入库</el-button
+                            >
+                            <el-button
+                                link
+                                type="primary"
+                                @click="stock(false, scope.row.id)"
+                                v-if="$store.state.power.materialsOut"
+                                >出库</el-button
+                            >
                         </template>
                     </el-table-column>
                 </el-table>
@@ -57,17 +101,17 @@
                     <el-pagination
                         v-model:currentPage="currentPage"
                         v-model:page-size="pageSize"
-                        :page-sizes="[100, 200, 300, 400]"
                         background
+                        @current-change="getData"
                         layout="prev, pager, next, jumper"
                         :total="total"
                     />
                 </div>
             </div>
         </div>
-        <StockDetail v-if="showDetailBox" @closeDetailBox="closeDetailBox"></StockDetail>
-        <StockReg v-if="showReg" @closeReg="closeReg"></StockReg>
-        <StockPutBatch v-if="showBatch" @closeBatch="closeBatch"> </StockPutBatch>
+        <StockDetail v-if="showDetailBox" :id="currentDetailId" @closeDetailBox="closeDetailBox"></StockDetail>
+        <StockReg v-if="showReg" needSubmit @onSave="onRegSave" @closeReg="closeReg"></StockReg>
+        <StockPutBatch v-if="showBatch" @load="getData" @closeBathBox="closeBathBox"> </StockPutBatch>
     </div>
 </template>
 
@@ -86,83 +130,71 @@ export default {
             searchKey: "", // 搜索关键词
             searchLoading: false, // 搜索中状态,
             list: [], // 数据列表
+            classifyList: [], // 分类列表
             defaultClassify: "0",
             defaultStatus: "-1",
             currentPage: 1,
             pageSize: 10,
             total: 2,
+            currentDetailId: '', // 查看详情的ID
             showDetailBox: false, // 是否显示库存明细弹窗
             showReg: false, // 是否显示登记新农资的弹窗
             showBatch: false, // 是否显示批量入库的弹窗
         }
     },
     mounted() {
-        this.loading = true;
-        this.getData().then(() => this.loading = false);
+        // 获取详情数据
+        let t = this;
+        const ajax = async function (){
+            await t.getData();
+            await t.getClassify();
+        }
+        ajax();
     },
     methods: {
         // 获取数据列表
-        getData (k){
-            k = this.searchKey || '';
-            return new Promise ((resolve, reject) => {
+        getData (){
+            return new Promise ((a,b) => {
+                this.loading = true;
                 this.ajax.post('/api/v1/adam/farmLand/agriculturalSearch-list', {
-                    "pageNum": 0,
-                    "pageSize": 0,
+                    "pageNum": this.currentPage,
+                    "pageSize": this.pageSize,
                     "param": {
-                        "categoryId": 0,
+                        "categoryId": this.defaultClassify,
                         "inventory": this.defaultStatus,
-                        "keyWord": ""
+                        "keyWord": this.searchKey
                     }
                 }).then(r => {
-                    console.log(r)
-                    // this.list = r.data;
-                    // mock 数据
-                    this.list = [
-                        {
-                            title: '哈哈哈复合肥',
-                            type: '化肥',
-                            company: '上海xxxxx化肥厂',
-                            unit: '50kg/袋',
-                            num: 100
-                        },
-                        {
-                            title: '哈哈哈复合肥',
-                            type: '化肥',
-                            company: '上海xxxxx化肥厂',
-                            unit: '50kg/袋',
-                            num: 100
-                        },
-                        {
-                            title: '哈哈哈复合肥',
-                            type: '化肥',
-                            company: '上海xxxxx化肥厂',
-                            unit: '50kg/袋',
-                            num: 100
-                        },
-                    ]
+                    this.list = r.data.map(item => {
+                        item.agriculturalBo = item.agriculturalBo || {};
+                        return item;
+                    })
                     this.currentPage = r.pageNum;
                     this.pageSize = r.pageSize;
                     this.total = r.total;
-                    resolve();
+                    this.loading = false;
+                    a();
                 })
             })
         },
-        // 查询
-        search (){
-            this.loading = true;
-            this.getData(this.searchKey).then(() => this.loading = false);
+        // 获取分类列表
+        getClassify (){
+            return new Promise ((a,b) => {
+                this.ajax.post('/api/v1/adam/farmLand/getAgriculturalCategory').then(r => {
+                    this.classifyList = r.data;
+                    a();
+                })
+            })
         },
         // 按库存状态筛选
         selectByStatus (data){
             this.defaultStatus = data;
-            this.loading = true;
-            this.getData().then(() => this.loading = false);
+            this.getData();
         },
         // 按分类筛选
         selectByClassify (data){
             this.defaultClassify = data;
-            this.loading = true;
-            this.getData().then(() => this.loading = false);
+            this.getData();
         },
         // 查看详情
         viewDetail (id){
@@ -171,7 +203,12 @@ export default {
         },
         // 出入库
         stock (put, id){
-            this.$router.push(`/erp/stock/${put ? 'put' : 'out'}`);
+            this.$router.push({
+                path: `/erp/stock/${put ? 'put' : 'out'}`,
+                query: {
+                    id
+                }
+            });
         },
         // 关闭详情
         closeDetailBox (){
@@ -188,6 +225,10 @@ export default {
                 clearTimeout(timer);
             }, 500);
         },
+        // 保存农资触发
+        onRegSave (){
+            this.getData();
+        },
         // 打开购物车
         showCar (id){
             this.showCarBox = true;
@@ -200,7 +241,7 @@ export default {
             }, 500);
         },
         // 关闭批量入库
-        closeBatch (){
+        closeBathBox (){
             let timer = setTimeout(() => {
                 this.showBatch = false;
                 clearTimeout(timer);

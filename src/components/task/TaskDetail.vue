@@ -5,58 +5,99 @@
             :before-close="onClose"
             append-to-body
             v-model="showDetailBox"
-            title="工单详情"
+            title="任务详情"
             width="700px"
         >
             <div v-loading="detailLoading" class="taskDetailInner purchaseDetailBoxInner">
-                <div class="id wrap">任务单号：22222222</div>
+                <!-- 此处状态图标临时引用，后期修改为动态图片 -->
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 0"
+                    src="../../assets/img/task-detail-status/0.png"
+                    alt=""
+                />
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 1"
+                    src="../../assets/img/task-detail-status/1.png"
+                    alt=""
+                />
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 2"
+                    src="../../assets/img/task-detail-status/2.png"
+                    alt=""
+                />
+                <img
+                    class="statusImg"
+                    v-if="detail.status == 3"
+                    src="../../assets/img/task-detail-status/3.png"
+                    alt=""
+                />
+                <div class="id wrap">任务单号：RW{{ detail.id }}</div>
                 <div class="create wrap">
                     <div>任务创建</div>
                     <div>
-                        <p>创建人：Mins</p>
-                        <p>创建时间：2022.10.19 14:33:01</p>
+                        <p>创建人：{{ detail.createUserName }}</p>
+                        <p>创建时间：{{ detail.createTime }}</p>
                     </div>
                     <div>任务内容</div>
                     <div class="taskContent">
                         <div>
-                            <p>园区：A区B棚</p>
-                            <p>作物：蓝莓</p>
+                            <p>园区：{{ detail.gardenTitle }}</p>
+                            <p>作物：{{ detail.growPlantTitle }}-{{ detail.address }}</p>
                         </div>
                         <div>
-                            <p>内容：修枝</p>
+                            <p>内容：{{ detail.taskContent }}</p>
                             <div>
                                 <p>操作视频：</p>
-                                <img src="../../assets/img/ds.png" alt="" />
+                                <video controls @click="view(detail.reWire)" :src="detail.reWire" alt="" />
                             </div>
                         </div>
                     </div>
-                    <div>指定执行人：张三</div>
-                    <div>开始时间：2022.10.19 14:35:01</div>
-                    <div>截止时间：2022.10.19 14:35:01</div>
+                    <div>
+                        <p>
+                            指定执行人：<span style="margin: 0 5px" v-for="item in detail.executors" :key="item.id">{{
+                                item.name
+                            }}</span>
+                        </p>
+                    </div>
+                    <div>开始时间：{{ detail.startTime }}</div>
+                    <div>截止时间：{{ detail.endTime }}</div>
                 </div>
-                <div class="todo wrap">
+                <div class="todo wrap" v-if="detail.status != 0">
                     <div>任务执行</div>
-                    <div>执行提交时间：2022.10.19 14:35:01</div>
-                    <div>执行提交人：张三</div>
+                    <div>执行提交时间：{{ detail.farmRecordBo.workTime }}</div>
+                    <div>执行提交人：{{ detail.farmRecordBo.userName }}</div>
                     <div class="todoContent">
                         <div>
-                            <p class="a">施肥</p>
-                            <p>2022.10.19</p>
-                        </div>
-                        <div style="display: block">
-                            <p>这次是施肥</p>
-                            <p>这次是施肥</p>
-                            <p>这次是施肥</p>
+                            <p class="a">{{ detail.farmRecordBo.title }}</p>
+                            <p>{{ detail.farmRecordBo.workTime }}</p>
                         </div>
                         <div>
-                            <p class="b">复合肥-5号 500公斤</p>
-                            <p>张三</p>
+                            <p class="u" v-for="item in detail.farmRecordBo.farmUseBos" :key="item.id">
+                                {{ item.agricultural }} &nbsp;&nbsp;&nbsp;&nbsp;
+                                {{ item.agriculturalCount }}
+                                {{ item.agriculturalUnit }}
+                            </p>
                         </div>
+                        <div>
+                            <p>{{ detail.farmRecordBo.workText || "无备注" }}</p>
+                            <p>{{ detail.farmRecordBo.userName }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="todo wrap" v-if="detail.status > 1 && $store.state.power.checkTaskBtn">
+                    <div>任务检查</div>
+                    <div>检查结果：{{ detail.status == 2 ? "合格" : "不合格" }}</div>
+                    <div>检查意见：</div>
+                    <div class="todoContent">
+                        <div style="display: block">{{ detail.opinion }}</div>
                     </div>
                 </div>
                 <el-button
                     @click="showTextArea = true"
-                    v-if="!showTextArea"
+                    v-if="!showTextArea && detail.status == 1"
                     type="primary"
                     link
                     style="margin-top: 20px"
@@ -69,8 +110,8 @@
                         <div>
                             是否合格：
                             <el-radio-group v-model="isPass" class="ml-4">
-                                <el-radio label="1">合格</el-radio>
-                                <el-radio label="0">不合格</el-radio>
+                                <el-radio label="2">合格</el-radio>
+                                <el-radio label="3">不合格</el-radio>
                             </el-radio-group>
                         </div>
                     </div>
@@ -81,7 +122,7 @@
                 </div>
                 <div class="btns" v-if="showTextArea">
                     <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
-                    <el-button type="primary">确定</el-button>
+                    <el-button type="primary" @click="submitCheck" :loading="submitting">确定</el-button>
                 </div>
             </div>
         </el-dialog>
@@ -89,6 +130,7 @@
 </template>
 
 <script>
+import timer from "@/utils/timer";
 export default {
     name: "taskDetail",
     props: ["id"],
@@ -96,17 +138,62 @@ export default {
         return {
             detailLoading: false,
             showDetailBox: true, // 是否显示详情弹窗
-            detail: "",
+            detail: {
+                farmRecordBo: {
+                    farmUseBos: [],
+                },
+            },
             showTextArea: false,
             textarea: "",
-            isPass: "1",
+            isPass: "2",
+            submitting: false,
         };
     },
-    mounted() {},
+    mounted() {
+        this.getData();
+    },
     methods: {
-        onClose() {
-            this.$emit("onCloseDetail", 0);
+        // 图片预览
+        view(src) {
+            window.open(src);
+        },
+        getData() {
+            this.detailLoading = true;
+            this.ajax
+                .post("/api/v1/adam/task/taskDetail", {
+                    taskId: this.id,
+                })
+                .then((r) => {
+                    this.detailLoading = false;
+                    r.data.startTime = timer.time("y-m-d h:i:s", r.data.startTime);
+                    r.data.endTime = timer.time("y-m-d h:i:s", r.data.endTime);
+                    r.data.createTime = timer.time("y-m-d h:i:s", r.data.createTime);
+                    r.data.executors = JSON.parse(r.data.executors);
+                    r.data.farmRecordBo = r.data.farmRecordBo || { farmUseBos: {} };
+                    r.data.farmRecordBo.farmUseBos = r.data.farmRecordBo.farmUseBos || {};
+                    this.detail = r.data;
+                });
+        },
+        onClose(params = null) {
+            if (typeof params == "function") {
+                params = null;
+            }
+            this.$emit("onCloseDetail", params);
             this.showDetailBox = false;
+        },
+        submitCheck() {
+            this.submitting = true;
+            this.ajax
+                .post("/api/v1/adam/task/taskCheck", {
+                    checkStatus: this.isPass,
+                    taskId: this.id,
+                    taskOpinion: this.textarea,
+                })
+                .then((r) => {
+                    this.submitting = false;
+                    this.$message.success("提交成功");
+                    this.onClose(1);
+                });
         },
     },
 };
@@ -120,6 +207,11 @@ export default {
     top: -10px;
     padding: 20px 0;
     border-top: 1px solid rgba(0, 0, 0, 0.09);
+    .statusImg {
+        position: absolute;
+        top: 0px;
+        right: 50px;
+    }
     .wrap {
         padding: 20px 0;
         border-bottom: 1px solid rgba(0, 0, 0, 0.09);
@@ -152,8 +244,9 @@ export default {
                     p {
                         width: auto;
                     }
-                    img {
+                    video {
                         width: 200px;
+                        height: 130px;
                         margin-left: 10px;
                         border-radius: 10px;
                     }
@@ -173,6 +266,7 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-start;
+                flex-wrap: wrap;
                 padding: 5px 0;
                 p {
                     width: auto;
@@ -182,6 +276,10 @@ export default {
                     color: rgba(80, 80, 80, 1);
                 }
                 p.b {
+                    color: rgba(232, 161, 69, 1);
+                }
+                p.u {
+                    width: 100%;
                     color: rgba(232, 161, 69, 1);
                 }
             }

@@ -6,59 +6,89 @@
             append-to-body
             v-model="showDetailBox"
             title="工单详情"
-            width="700px"
+            width="1000px"
         >
             <div v-loading="detailLoading" class="workOrderDetailInner purchaseDetailBoxInner">
                 <div class="item">
-                    <p>订单号：1544555554</p>
-                    <p>订单状态</p>
+                    <p>工单号：{{ detail.orderNo }}</p>
+                    <p :style="{ color: detail.color }">{{ detail.status }}</p>
                 </div>
                 <div class="item">
-                    <p>提交人：mins</p>
-                    <p>提交时间：2022-10-17 12:00:00</p>
+                    <p>提交人：{{ detail.userName }}</p>
+                    <p>提交时间：{{ detail.orderTime }}</p>
                 </div>
-                <el-table :data="detail" style="width: 100%; margin-top: 20px">
-                    <el-table-column prop="agriculturalBo" label="农资名称" show-overflow-tooltip />
-                    <el-table-column prop="agriculturalBo" label="类型" show-overflow-tooltip />
-                    <el-table-column prop="id" label="规格" show-overflow-tooltip>
-                        <template #default="scope"> 50gk/袋 {{ scope.row }} </template>
+                <el-table size="large" :data="detail.agriculturalCartBos" style="width: 100%; margin-top: 20px">
+                    <el-table-column
+                        label="农资名称"
+                        prop="agriculturalBo.title"
+                        show-overflow-tooltip
+                    ></el-table-column>
+                    <el-table-column
+                        label="类型"
+                        width="140"
+                        prop="agriculturalBo.agriculturalCategory"
+                        show-overflow-tooltip
+                    ></el-table-column>
+                    <el-table-column label="规格" width="140" show-overflow-tooltip>
+                        <template #default="scope">
+                            {{ scope.row.agriculturalBo.agriculturalCount }}
+                            {{ scope.row.agriculturalBo.unitweight }}/{{ scope.row.agriculturalBo.unitmeasurement }}
+                        </template>
                     </el-table-column>
-                    <el-table-column prop="agriculturalBo" label="厂家" show-overflow-tooltip />
-                    <el-table-column prop="agriculturalBo" label="申领数量" show-overflow-tooltip />
-                    <el-table-column prop="agriculturalBo" label="参考单价" show-overflow-tooltip />
+                    <el-table-column
+                        label="厂家"
+                        prop="agriculturalBo.manufacturers"
+                        show-overflow-tooltip
+                    ></el-table-column>
+                    <el-table-column label="申领数量" show-overflow-tooltip>
+                        <template #default="scope">
+                            {{ scope.row.agriculturalCos }} {{ scope.row.agriculturalBo.unitweight }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="当前库存" show-overflow-tooltip>
+                        <template #default="scope">
+                            {{ scope.row.unit }} {{ scope.row.agriculturalBo.unitweight }}
+                        </template>
+                    </el-table-column>
                 </el-table>
                 <div class="bottom">
                     <div>合计：</div>
                     <div>
-                        <p>
-                            <span>化肥</span>
-                            <span>5000公斤</span>
+                        <p v-for="(item, index) in detail.totalCount" :key="index">
+                            <span>{{ item.title }}</span>
+                            <span>{{ item.agriculturalCos }}{{ item.unitweight }}</span>
                         </p>
-                        <p>
-                            <span>化肥</span>
-                            <span>5000公斤</span>
-                        </p>
+                        <p style="height: 0px"></p>
                     </div>
                 </div>
                 <div class="form">
                     <p class="formTitle">审核流程</p>
-                    <p>
-                        <span>张三</span>
-                        <span class="ed">发起人</span>
-                        <span>2022.10.17 22:16:01</span>
-                    </p>
-                    <p>
-                        <span>李四</span>
-                        <span>待审核</span>
-                    </p>
-                    <p>
-                        <span>李四</span>
-                        <span>待审核</span>
+                    <p v-for="(item, index) in detail.orderManagerBoList" :key="index">
+                        <span>{{ item.username }}</span>
+                        <span :style="{ color: item.color }">{{ item.check }}</span>
+                        <span>{{ item.checkTime }}</span>
                     </p>
                 </div>
                 <div class="formButton">
-                    <el-button type="primary" plain>不通过</el-button>
-                    <el-button type="primary">通过</el-button>
+                    <el-button
+                        type="primary"
+                        @click="check(2)"
+                        plain
+                        v-if="$store.state.power.reviewOrderBtn && detail.isCheckBth == 1"
+                        >不通过</el-button
+                    >
+                    <el-button
+                        type="primary"
+                        @click="check(1)"
+                        v-if="$store.state.power.reviewOrderBtn && detail.isCheckBth == 1"
+                        >通过</el-button
+                    >
+                    <el-button
+                        type="primary"
+                        @click="out(detail.id)"
+                        v-if="$store.state.power.simpleMaterialsOut && detail.isOutBth == 1"
+                        >一键出库</el-button
+                    >
                 </div>
             </div>
         </el-dialog>
@@ -66,6 +96,7 @@
 </template>
 
 <script>
+import { ElMessage, ElMessageBox } from "element-plus";
 export default {
     name: "workOrderDetail",
     props: ["id"],
@@ -73,13 +104,114 @@ export default {
         return {
             detailLoading: false,
             showDetailBox: true, // 是否显示详情弹窗
-            detail: "",
+            detail: {},
         };
     },
-    mounted() {},
+    mounted() {
+        this.getData();
+    },
     methods: {
-        onClose() {
-            this.$emit("onCloseDetail", 0);
+        // 出库
+        out(id) {
+            let data = this.detail.agriculturalCartBos.map((item) => {
+                return item.agriculturalBo.title;
+            });
+            ElMessageBox.confirm("农资名称：" + data.join(",") + " <br> 确定要出库吗？", "一键出库", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+                dangerouslyUseHTMLString: true,
+            })
+                .then(() => {
+                    this.ajax
+                        .post("/api/v1/adam/farmLand/saveAgriculturalOutIn", {
+                            checkStatus: 0,
+                            id: this.detail.id,
+                            orderNo: this.detail.orderNo,
+                        })
+                        .then((r) => {
+                            if (r.code == 200) {
+                                this.$message.success("出库成功");
+                                this.onClose(1);
+                            } else {
+                                this.$message.error(r.message);
+                            }
+                        });
+                })
+                .catch(() => {});
+        },
+        // 审核工单
+        check(v) {
+            this.ajax
+                .post("/api/v1/adam/workOrder/checkOrder", {
+                    checkStatus: v,
+                    id: this.detail.id,
+                    orderNo: this.detail.orderNo,
+                })
+                .then((r) => {
+                    this.onClose(1);
+                });
+        },
+        // 获取详情
+        getData() {
+            this.detailLoading = true;
+            this.ajax
+                .post("/api/v1/adam/workOrder/workOrderDetail", {
+                    id: this.id,
+                })
+                .then((r) => {
+                    // 是否显示审核按钮
+                    let user = JSON.parse(localStorage.getItem("erp_user")).id;
+
+                    switch (r.data.orderStatus) {
+                        case 0:
+                            r.data.status = "待审核";
+                            r.data.color = "#EC2626";
+                            break;
+                        case 1:
+                            r.data.status = "待出库";
+                            r.data.color = "#0DD71C";
+                            break;
+                        case 2:
+                            r.data.status = "不通过";
+                            r.data.color = "#1890FF";
+                            break;
+                        case 3:
+                            r.data.status = "已出库";
+                            r.data.color = "#A8A8A8";
+                            break;
+                    }
+                    r.data.orderManagerBoList = r.data.orderManagerBoList.map((item) => {
+                        switch (item.isCheck) {
+                            case -1:
+                                item.check = "发起人";
+                                item.color = "#979797";
+                                break;
+                            case 0:
+                                item.check = "待审核";
+                                item.color = "#538DFF";
+                                break;
+                            case 1:
+                                item.check = "通过";
+                                item.color = "#3DC947";
+                                break;
+                            case 2:
+                                item.check = "拒绝";
+                                item.color = "#EC2D2D";
+                                break;
+                        }
+                        return item;
+                    });
+                    this.detail = r.data;
+                    console.log(this.detail);
+                    this.detailLoading = false;
+                });
+        },
+        onClose(v) {
+            if (typeof v == "function") {
+                v = null;
+            }
+            this.$emit("onCloseDetail", v);
             this.showDetailBox = false;
         },
     },
