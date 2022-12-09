@@ -27,7 +27,9 @@
                         </p>
                     </template>
                 </el-table-column>
-                <el-table-column prop="gardenName" label="实施棚区" />
+                <el-table-column label="实施棚区">
+                    <template #default="scope"> {{ scope.row.gardenName }}-{{ scope.row.address }} </template>
+                </el-table-column>
                 <el-table-column prop="userName" label="实施人" />
                 <el-table-column prop="workHour" label="工时数" />
             </el-table>

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import index from "@/views/index.vue";
+import index from "@/views/Index.vue";
 import indexRoutes from "@/data/indexRoutes.js";
 
 const routes = [
@@ -12,7 +12,7 @@ const routes = [
     {
         name: "login",
         path: "/login",
-        component: () => import("@/views/login.vue"),
+        component: () => import("@/views/Login.vue"),
     },
 ];
 
