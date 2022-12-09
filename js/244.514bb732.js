@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunktitan2"]=self["webpackChunktitan2"]||[]).push([[244],{244:function(n,t,e){e.r(t),e.d(t,{default:function(){return f}});var r=e(252);const u={class:"p-index"};function a(n,t){return(0,r.wg)(),(0,r.iD)("div",u,"首屏")}var c=e(118);const i={},s=(0,c.Z)(i,[["render",a]]);var f=s}}]);
-//# sourceMappingURL=244.514bb732.js.map
