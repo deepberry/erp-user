@@ -69,7 +69,7 @@ export default {
                     this.loading = false;
                     if (r.code == 200) {
                         this.list = r.data.map((item) => {
-                            item.workTime = timer.time("y-m-d h:i:s", item.workTime);
+                            item.workTime = timer.time("y-m-d", item.workTime);
                             return item;
                         });
                         this.total = this.list.length;

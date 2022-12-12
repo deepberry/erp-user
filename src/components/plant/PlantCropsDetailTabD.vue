@@ -119,7 +119,7 @@ export default {
                     id: 2,
                     title: "今天",
                     value: 0,
-                    diff: 2,
+                    diff: 4,
                 },
                 {
                     id: 3,
@@ -220,6 +220,7 @@ export default {
                             name: item.propertyName,
                             data: data.map((d) => d[1]),
                             type: "line",
+                            showSymbol: false,
                             // smooth: true,
                             // areaStyle: {},
                         };
