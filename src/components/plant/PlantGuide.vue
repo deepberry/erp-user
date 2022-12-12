@@ -170,7 +170,7 @@ export default {
             let t = this;
             return new Promise((a, b) => {
                 if (t.plantDetail.smartDeviceBoList.length > 0) {
-                    const token = localStorage.getItem("erp_token");
+                    const token = localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN");
                     let connection = new signalR.HubConnectionBuilder()
                         .withUrl(`${iourl}/hub/node`, {
                             accessTokenFactory: () => token,

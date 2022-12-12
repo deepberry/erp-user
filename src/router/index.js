@@ -23,11 +23,11 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     // 判断是否在登陆状态
-    if (to.path != "/login" && !localStorage.getItem("erp_token")) {
-        next({
-            path: "/login",
-        });
-    }
+    // if (to.path != "/login" && !localStorage.getItem("erp_token")) {
+    //     next({
+    //         path: "/login",
+    //     });
+    // }
 
     next();
 });

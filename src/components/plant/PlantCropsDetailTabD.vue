@@ -79,13 +79,13 @@
             </div>
             <div class="wrap">
                 <div class="left">
-                    <div class="title">农事照片</div>
+                    <div class="title">作物相册</div>
                     <div class="imgs">
                         <div class="pic" v-for="(item, index) in imgs" :key="index">
                             <img :src="item" alt="" />
                         </div>
                         <div class="space" v-for="(item, index) in imgSpace" :key="index"></div>
-                        <el-empty description="暂无农事照片" style="margin: 0 auto" v-if="imgs.length == 0" />
+                        <el-empty description="暂无作物相册" style="margin: 0 auto" v-if="imgs.length == 0" />
                     </div>
                 </div>
             </div>
@@ -197,7 +197,7 @@ export default {
         // 处理图表数据
         chartsData(index) {
             return new Promise((a, b) => {
-                let token = localStorage.getItem("erp_token");
+                let token = localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN");
                 let list = [];
                 let legend = [];
                 let xAxis = [];
@@ -311,7 +311,7 @@ export default {
             let t = this;
             return new Promise((a, b) => {
                 if (t.plantDetail.smartDeviceBoList.length > 0) {
-                    const token = localStorage.getItem("erp_token");
+                    const token = localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN");
                     let connection = new signalR.HubConnectionBuilder()
                         .withUrl(`${iourl}/hub/node`, {
                             accessTokenFactory: () => token,

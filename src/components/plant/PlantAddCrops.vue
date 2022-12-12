@@ -169,7 +169,7 @@ export default {
         // 获取关联设备列表
         getDevice (){
             return new Promise((a,b) => {
-                const token = localStorage.getItem('erp_token');
+                const token = localStorage.getItem('erp_token') || localStorage.getItem('TOKEN_TITAN');
                 let connection = new signalR.HubConnectionBuilder().withUrl(iourl + '/hub/overview', {
                     accessTokenFactory: () => token
                 }).withAutomaticReconnect({
