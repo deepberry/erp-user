@@ -1,13 +1,14 @@
 export default [
-    {
-        title: "智能设备",
-        icon: "erpjiekouyunwei",
-        son: [],
-        path: "/ied",
-    },
+    // {
+    //     title: "智能设备",
+    //     icon: "erpjiekouyunwei",
+    //     son: [],
+    //     path: "/ied",
+    // },
     {
         title: "ERP",
         icon: "erpxitongshezhi",
+        show: true,
         son: [
             {
                 title: "作物种植",
@@ -46,20 +47,20 @@ export default [
             },
         ],
     },
-    {
-        title: "账号权限",
-        icon: "erpgongnengquanxian",
-        son: [
-            {
-                title: "子账号",
-                path: "/account/subAccount",
-                show: true,
-            },
-            {
-                title: "角色权限",
-                path: "/account/role",
-                show: false,
-            },
-        ],
-    },
+    // {
+    //     title: "账号权限",
+    //     icon: "erpgongnengquanxian",
+    //     son: [
+    //         {
+    //             title: "子账号",
+    //             path: "/account/subAccount",
+    //             show: true,
+    //         },
+    //         {
+    //             title: "角色权限",
+    //             path: "/account/role",
+    //             show: false,
+    //         },
+    //     ],
+    // },
 ];

@@ -1,9 +1,9 @@
 export default [
-    {
-        name: "ied",
-        path: "/ied",
-        component: () => import("../views/Ied.vue"),
-    },
+    // {
+    //     name: "ied",
+    //     path: "/ied",
+    //     component: () => import("../views/Ied.vue"),
+    // },
     {
         name: "erpPlant",
         path: "/erp/plant",
@@ -144,14 +144,14 @@ export default [
         path: "/erp/my/workTime",
         component: () => import("../components/my/MyWorkTime.vue"),
     },
-    {
-        name: "accountSubAccount",
-        path: "/account/subAccount",
-        component: () => import("../views/account/SubAccount.vue"),
-    },
-    {
-        name: "accountRole",
-        path: "/account/role",
-        component: () => import("../views/account/Role.vue"),
-    },
+    // {
+    //     name: "accountSubAccount",
+    //     path: "/account/subAccount",
+    //     component: () => import("../views/account/SubAccount.vue"),
+    // },
+    // {
+    //     name: "accountRole",
+    //     path: "/account/role",
+    //     component: () => import("../views/account/Role.vue"),
+    // },
 ];
