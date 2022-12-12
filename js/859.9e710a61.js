@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunktitan2"]=self["webpackChunktitan2"]||[]).push([[859],{5859:function(n,t,u){u.r(t),u.d(t,{default:function(){return o}});var c=u(6252);const e={class:"subAccount"};function r(n,t){return(0,c.wg)(),(0,c.iD)("div",e,"子账号")}var s={name:"subAccount"},a=u(8118);const i=(0,a.Z)(s,[["render",r]]);var o=i}}]);
-//# sourceMappingURL=859.9e710a61.js.map
