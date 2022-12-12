@@ -25,7 +25,7 @@ export default {
     mounted (){
         // 默认进入 智能设备 ied
         if(this.$route.path == '/'){
-            this.$router.push('/ied');
+            this.$router.push('/erp/plant');
         }
     }
 }
