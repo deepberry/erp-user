@@ -20,7 +20,7 @@
                     </el-dropdown-menu>
                 </template>
             </el-dropdown> -->
-            <p class="logout" @click="logout">退出</p>
+            <!-- <p class="logout" @click="logout">退出</p> -->
         </div>
     </div>
 </template>

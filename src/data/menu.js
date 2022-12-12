@@ -36,7 +36,7 @@ export default [
             },
             {
                 title: "数据统计",
-                path: "/erp/statisti",
+                path: "/erp/statistics",
                 show: false,
             },
             {

@@ -1,5 +1,5 @@
 <template>
-    <div class="StatistiProduct">
+    <div class="StatisticsProduct">
         <div class="head">
             <div>
                 <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农资类型、农资名称" />
@@ -27,7 +27,9 @@
                         </p>
                     </template>
                 </el-table-column>
-                <el-table-column prop="gardenName" label="实施棚区" />
+                <el-table-column label="实施棚区">
+                    <template #default="scope"> {{ scope.row.gardenName }}-{{ scope.row.address }} </template>
+                </el-table-column>
                 <el-table-column prop="userName" label="实施人" />
                 <el-table-column prop="workHour" label="工时数" />
             </el-table>
@@ -38,7 +40,7 @@
 <script>
 import timer from "@/utils/timer";
 export default {
-    name: "StatistiProduct",
+    name: "StatisticsProduct",
     data() {
         return {
             list: [],
@@ -67,7 +69,7 @@ export default {
                     this.loading = false;
                     if (r.code == 200) {
                         this.list = r.data.map((item) => {
-                            item.workTime = timer.time("y-m-d h:i:s", item.workTime);
+                            item.workTime = timer.time("y-m-d", item.workTime);
                             return item;
                         });
                         this.total = this.list.length;
@@ -79,7 +81,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StatistiProduct {
+.StatisticsProduct {
     .head {
         display: flex;
         justify-content: space-between;

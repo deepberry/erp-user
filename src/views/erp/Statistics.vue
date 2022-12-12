@@ -33,19 +33,19 @@ export default {
                 if (this.$store.state.power.outputStatistics) {
                     this.headTab.push({
                         title: "产量统计",
-                        path: "/erp/statisti/product",
+                        path: "/erp/statistics/product",
                     });
                 }
                 if (this.$store.state.power.materialsStatistics) {
                     this.headTab.push({
                         title: "出入库统计",
-                        path: "/erp/statisti/stock",
+                        path: "/erp/statistics/stock",
                     });
                 }
                 if (this.$store.state.power.workingHoursStatistics) {
                     this.headTab.push({
                         title: "工时统计",
-                        path: "/erp/statisti/work",
+                        path: "/erp/statistics/work",
                     });
                 }
                 if (this.headTab.length > 0) this.$router.push(this.headTab[0].path);

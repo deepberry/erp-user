@@ -236,19 +236,36 @@ export default {
         },
         // 操作作物
         selectChange (){
+            let t = this;
             // 结束种植
-            if(this.selectValue == '结束种植'){
-                this.ajax.post('/api/v1/adam/plants/end', {
-                    id: this.$route.query.id
-                }).then(r => {
-                    this.$message.success('操作成功');
-                    this.$router.push({
-                        path: '/erp/plant',
-                        query: {
-                            gardenId: this.$route.query.gardenId
-                        }
-                    })
-                })
+            if(t.selectValue == '结束种植'){
+                t.$confirm(
+                    `确定要结束种植该作物？ `,
+                    "结束种植",
+                    {
+                        dangerouslyUseHTMLString: true,
+                        type: "warning",
+                        beforeClose(action, instance, done) {
+                            if (action == "confirm") {
+                                t.ajax.post('/api/v1/adam/plants/end', {
+                                    id: t.$route.query.id
+                                }).then(r => {
+                                    t.$message.success('操作成功');
+                                    done();
+                                    t.$router.push({
+                                        path: '/erp/plant',
+                                        query: {
+                                            gardenId: t.$route.query.gardenId
+                                        }
+                                    })
+                                })
+                            } else {
+                                done();
+                                t.selectValue = '';
+                            }
+                        },
+                    }
+                ).catch(() => {});
             }
 
             // 编辑作物
@@ -258,17 +275,34 @@ export default {
             }
             // 删除作物
             if(this.selectValue == '删除作物'){
-                this.ajax.post('/api/v1/adam/plants/deletePlants', {
-                    id: this.$route.query.id
-                }).then(r => {
-                    this.$message.success('删除成功');
-                    this.$router.push({
-                        path: '/erp/plant',
-                        query: {
-                            gardenId: this.$route.query.gardenId
-                        }
-                    })
-                })
+
+                t.$confirm(
+                    `确定要删除该作物？ `,
+                    "删除作物",
+                    {
+                        dangerouslyUseHTMLString: true,
+                        type: "warning",
+                        beforeClose(action, instance, done) {
+                            if (action == "confirm") {
+                                t.ajax.post('/api/v1/adam/plants/deletePlants', {
+                                    id: t.$route.query.id
+                                }).then(r => {
+                                    t.$message.success('删除成功');
+                                    done();
+                                    t.$router.push({
+                                        path: '/erp/plant',
+                                        query: {
+                                            gardenId: t.$route.query.gardenId
+                                        }
+                                    })
+                                })
+                            } else {
+                                done();
+                                t.selectValue = '';
+                            }
+                        },
+                    }
+                ).catch(() => {});
             }
         },
         // 返回列表

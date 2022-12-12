@@ -2,7 +2,7 @@ import { $cms } from "@deepberry/common/js/https";
 import OSS from "ali-oss";
 import ajax from "./ajax.js";
 
-const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
+const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://cms.deepberry.cn";
 const getToken = () => {
     return new Promise((a) => {
         ajax.ajax.getUrlBearer(iourl + "/api/cms/system/upload/sts-token").then((token) => {

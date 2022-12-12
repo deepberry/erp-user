@@ -1,13 +1,15 @@
 <template>
-    <div class="StatistiProduct">
+    <div class="StatisticsProduct">
         <div class="head">
-            <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：农户姓名" />
+            <el-input style="width: 300px" v-model="searchKey" placeholder="关键字搜索：作物名称" />
             <el-button type="primary" style="margin-left: 10px" @click="getData">查询</el-button>
         </div>
         <div class="table" v-loading="loading">
             <el-table size="large" :data="list" style="width: 100%" max-height="600">
-                <el-table-column prop="userName" label="姓名" width="280" />
-                <el-table-column prop="workHours" label="工时" />
+                <el-table-column prop="cateGoryTitle" label="种类" width="280" />
+                <el-table-column label="重量">
+                    <template #default="scope"> {{ scope.row.weight }}公斤 </template>
+                </el-table-column>
             </el-table>
         </div>
     </div>
@@ -15,7 +17,7 @@
 
 <script>
 export default {
-    name: "StatistiProduct",
+    name: "StatisticsProduct",
     data() {
         return {
             loading: false,
@@ -33,16 +35,17 @@ export default {
         getData() {
             this.loading = true;
             this.ajax
-                .post("/api/v1/adam/task/workHoursSta", {
+                .post("/api/v1/adam/task/outputDetailSta", {
                     endTime: "",
                     keyWord: this.searchKey,
                     startTime: "",
                 })
                 .then((r) => {
                     this.loading = false;
+                    console.log(r);
                     if (r.code == 200) {
-                        this.list = r.data.workDetailHoursList;
-                        // this.total = r.total;
+                        this.list = r.data.list || [];
+                        this.total = r.data.list.length;
                     }
                 });
         },
@@ -51,7 +54,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StatistiProduct {
+.StatisticsProduct {
     .head {
         display: flex;
         justify-content: flex-start;

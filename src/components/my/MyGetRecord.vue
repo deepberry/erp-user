@@ -159,7 +159,7 @@ export default {
     overflow-y: auto;
     padding: 0 20px;
 
-    .StatistiProduct {
+    .StatisticsProduct {
         .head {
             display: flex;
             justify-content: flex-start;

@@ -2,12 +2,12 @@ export default [
     {
         name: "ied",
         path: "/ied",
-        component: () => import("../views/ied.vue"),
+        component: () => import("../views/Ied.vue"),
     },
     {
         name: "erpPlant",
         path: "/erp/plant",
-        component: () => import("../views/erp/plant.vue"),
+        component: () => import("../views/erp/Plant.vue"),
         children: [
             {
                 name: "erpPlantDetail",
@@ -34,12 +34,12 @@ export default [
     {
         name: "erpTask",
         path: "/erp/task",
-        component: () => import("../views/erp/task.vue"),
+        component: () => import("../views/erp/Task.vue"),
     },
     {
         name: "erpPurchase",
         path: "/erp/purchase",
-        component: () => import("../views/erp/purchase.vue"),
+        component: () => import("../views/erp/Purchase.vue"),
         children: [
             {
                 name: "erpPurchaseOrder",
@@ -61,7 +61,7 @@ export default [
     {
         name: "erpStock",
         path: "/erp/stock",
-        component: () => import("../views/erp/stock.vue"),
+        component: () => import("../views/erp/Stock.vue"),
         children: [
             {
                 name: "erpStockList",
@@ -88,34 +88,34 @@ export default [
     {
         name: "erpWorkOrder",
         path: "/erp/workOrder",
-        component: () => import("../views/erp/workOrder.vue"),
+        component: () => import("../views/erp/WorkOrder.vue"),
     },
     {
-        name: "erpStatisti",
-        path: "/erp/statisti",
-        component: () => import("../views/erp/statisti.vue"),
+        name: "erpStatistics",
+        path: "/erp/statistics",
+        component: () => import("../views/erp/Statistics.vue"),
         children: [
             {
-                name: "erpStatistiProduct",
-                path: "/erp/statisti/product",
-                component: () => import("../components/statisti/StatistiProduct.vue"),
+                name: "erpStatisticsProduct",
+                path: "/erp/statistics/product",
+                component: () => import("../components/statistics/StatisticsProduct.vue"),
             },
             {
-                name: "erpStatistiStock",
-                path: "/erp/statisti/stock",
-                component: () => import("../components/statisti/StatistiStock.vue"),
+                name: "erpStatisticsStock",
+                path: "/erp/statistics/stock",
+                component: () => import("../components/statistics/StatisticsStock.vue"),
             },
             {
-                name: "erpStatistiWork",
-                path: "/erp/statisti/work",
-                component: () => import("../components/statisti/StatistiWork.vue"),
+                name: "erpStatisticsWork",
+                path: "/erp/statistics/work",
+                component: () => import("../components/statistics/StatisticsWork.vue"),
             },
         ],
     },
     {
         name: "erpMy",
         path: "/erp/my",
-        component: () => import("../views/erp/my.vue"),
+        component: () => import("../views/erp/My.vue"),
         children: [
             {
                 name: "erpMyProduct",
@@ -147,11 +147,11 @@ export default [
     {
         name: "accountSubAccount",
         path: "/account/subAccount",
-        component: () => import("../views/account/subAccount.vue"),
+        component: () => import("../views/account/SubAccount.vue"),
     },
     {
         name: "accountRole",
         path: "/account/role",
-        component: () => import("../views/account/role.vue"),
+        component: () => import("../views/account/Role.vue"),
     },
 ];

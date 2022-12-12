@@ -223,6 +223,7 @@ export default {
                         arr[list.indexOf(v[i].agricultural)].agriculturalCount += v[i].agriculturalCount;
                     } else {
                         list.push(v[i].agricultural);
+                        v[i].isUse = 1;
                         arr.push(v[i]);
                     }
                 }
@@ -282,7 +283,7 @@ export default {
                 image: this.imgs.join(","),
                 workText: this.workText,
                 workType: this.workType,
-                workTime: this.workTime,
+                workTime: this.workTime + " 08:00:00",
                 taskId: this.taskId || "",
                 workAid: this.workAid,
                 plantsId: this.$route.query.id,

@@ -1,5 +1,5 @@
 <template>
-    <div class="StatistiProduct">
+    <div class="StatisticsProduct">
         <div class="head">
             <div>
                 <!-- <el-input style="width: 300px" v-model="input" placeholder="关键字搜索：作物名称、日期" />
@@ -46,7 +46,7 @@
 
 <script>
 export default {
-    name: "StatistiProduct",
+    name: "StatisticsProduct",
     data() {
         return {
             loading: false,
@@ -90,7 +90,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.StatistiProduct {
+.StatisticsProduct {
     .head {
         display: flex;
         justify-content: space-between;
