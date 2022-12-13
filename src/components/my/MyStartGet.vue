@@ -122,6 +122,7 @@ export default {
             this.ajax.post('/api/v1/adam/workOrder/getManager-list').then(r => {
                 this.userChosed = r.data.map(item => {
                     item.name = item.username;
+                    item.id = item.aid;
                     return item;
                 })
             })
