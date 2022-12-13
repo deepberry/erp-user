@@ -47,20 +47,21 @@ export default [
             },
         ],
     },
-    // {
-    //     title: "账号权限",
-    //     icon: "erpgongnengquanxian",
-    //     son: [
-    //         {
-    //             title: "子账号",
-    //             path: "/account/subAccount",
-    //             show: true,
-    //         },
-    //         {
-    //             title: "角色权限",
-    //             path: "/account/role",
-    //             show: false,
-    //         },
-    //     ],
-    // },
+    {
+        title: "账号权限",
+        icon: "erpgongnengquanxian",
+        show: false,
+        son: [
+            // {
+            //     title: "子账号",
+            //     path: "/account/subAccount",
+            //     show: true,
+            // },
+            {
+                title: "角色权限",
+                path: "/account/role",
+                show: false,
+            },
+        ],
+    },
 ];

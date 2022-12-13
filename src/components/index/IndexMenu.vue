@@ -66,7 +66,7 @@ export default {
                 this.menu[0].son[5].show = true;
             }
             if (this.$store.state.power.accountRole) {
-                this.menu[1].son[1].show = true;
+                this.menu[1].son[0].show = true;
             }
 
             // 刷新时菜单高亮
