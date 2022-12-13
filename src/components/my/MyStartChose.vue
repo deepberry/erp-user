@@ -23,6 +23,11 @@
                             <p>
                                 <span class="tag">{{ item.agriculturalBo.agriculturalCategory }}</span>
                             </p>
+                            <p style="color: #409eff">
+                                库存量：{{ item.agriculturalUnit }}{{ item.agriculturalBo.unitmeasurement }}共{{
+                                    item.agriculturalCount
+                                }}{{ item.agriculturalBo.unitweight }}
+                            </p>
                         </div>
                         <div>
                             <p>{{ item.agriculturalBo.manufacturers }}</p>

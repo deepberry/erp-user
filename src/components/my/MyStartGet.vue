@@ -17,9 +17,16 @@
                 </el-button>
                 <div class="item" v-for="(item, index) in list" :key="index">
                     <p class="title">{{ item.agriculturalBo.title }}</p>
-                    <p class="tagBox">
-                        <span class="tag">{{ item.agriculturalBo.agriculturalCategory }}</span>
-                    </p>
+                    <div class="unit" style="padding: 20px 0">
+                        <p>
+                            <span class="tag">{{ item.agriculturalBo.agriculturalCategory }}</span>
+                        </p>
+                        <p style="color: #409eff">
+                            库存量：{{ item.agriculturalUnit }}{{ item.agriculturalBo.unitmeasurement }}共{{
+                                item.agriculturalCount
+                            }}{{ item.agriculturalBo.unitweight }}
+                        </p>
+                    </div>
                     <div class="unit">
                         <p>{{ item.agriculturalBo.manufacturers }}</p>
                         <p>
@@ -216,7 +223,6 @@ export default {
         padding: 2px 10px;
         font-size: 12px;
         border-radius: 3px;
-        margin-left: 10px;
     }
     .item {
         width: 400px;

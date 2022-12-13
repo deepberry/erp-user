@@ -69,7 +69,7 @@
                     <div>任务执行</div>
                     <div>执行提交时间：{{ detail.farmRecordBo.workTime }}</div>
                     <div>执行提交人：{{ detail.farmRecordBo.userName }}</div>
-                    <div class="todoContent">
+                    <div class="todoContent" @click="showDetailClick">
                         <div>
                             <p class="a">{{ detail.farmRecordBo.title }}</p>
                             <p>{{ detail.farmRecordBo.workTime }}</p>
@@ -126,10 +126,18 @@
                 </div>
             </div>
         </el-dialog>
+        <PlantCropsDetailCDialogDetail
+            v-if="showDetail"
+            :title="detailTitle"
+            :id="detailId"
+            @close="closeDetail"
+            @load="getData"
+        ></PlantCropsDetailCDialogDetail>
     </div>
 </template>
 
 <script>
+import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
 import timer from "@/utils/timer";
 export default {
     name: "taskDetail",
@@ -147,15 +155,31 @@ export default {
             textarea: "",
             isPass: "2",
             submitting: false,
+            showDetail: false,
+            detailTitle: "",
+            detailId: "",
         };
+    },
+    components: {
+        PlantCropsDetailCDialogDetail,
     },
     mounted() {
         this.getData();
     },
     methods: {
+        showDetailClick(id) {
+            this.detailTitle = "农事记录详情";
+            this.detailId = this.detail.farmRecordBo.id;
+            this.showDetail = true;
+        },
         // 图片预览
         view(src) {
             window.open(src);
+        },
+        closeDetail() {
+            setTimeout(() => {
+                this.showDetail = false;
+            }, 300);
         },
         getData() {
             this.detailLoading = true;
@@ -259,6 +283,7 @@ export default {
     }
     .todo {
         .todoContent {
+            cursor: pointer;
             display: block;
             padding: 8px;
             background: rgba(244, 248, 251, 1);

@@ -104,14 +104,12 @@
                     v-loading="loading"
                 >
                     <el-table-column type="selection" width="55" />
-                    <el-table-column prop="agriculturalBo.title" label="农资名称" />
-                    <el-table-column prop="agriculturalBo.agriculturalCategory" label="农资类型" width="150" />
-                    <el-table-column prop="agriculturalBo.manufacturers" label="生产厂家" />
+                    <el-table-column prop="title" label="农资名称" />
+                    <el-table-column prop="agriculturalCategory" label="农资类型" width="150" />
+                    <el-table-column prop="manufacturers" label="生产厂家" />
                     <el-table-column label="规格" width="150">
                         <template #default="scope">
-                            {{ scope.row.agriculturalBo.agriculturalCount }}{{ scope.row.agriculturalBo.unitweight }}/{{
-                                scope.row.agriculturalBo.unitmeasurement
-                            }}
+                            {{ scope.row.agriculturalCount }}{{ scope.row.unitweight }}/{{ scope.row.unitmeasurement }}
                         </template>
                     </el-table-column>
                 </el-table>
@@ -183,7 +181,7 @@ export default {
         // 获取农资数据列表
         getData (){
             this.loading = true;
-            this.ajax.post('/api/v1/adam/farmLand/agriculturalSearch-list', {
+            this.ajax.post('/api/v1/adam/agricultural/platform-list', {
                 "pageNum": 1,
                 "pageSize": 100,
                 "param": {
