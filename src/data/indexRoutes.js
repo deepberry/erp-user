@@ -149,9 +149,9 @@ export default [
     //     path: "/account/subAccount",
     //     component: () => import("../views/account/SubAccount.vue"),
     // },
-    // {
-    //     name: "accountRole",
-    //     path: "/account/role",
-    //     component: () => import("../views/account/Role.vue"),
-    // },
+    {
+        name: "accountRole",
+        path: "/account/role",
+        component: () => import("../views/account/Role.vue"),
+    },
 ];
