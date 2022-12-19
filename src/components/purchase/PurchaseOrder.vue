@@ -32,7 +32,7 @@
                         prop="orderUuid"
                         label="订单号"
                         show-overflow-tooltip
-                        width="400"
+                        width="200"
                     ></el-table-column>
                     <el-table-column label="农资名称" show-overflow-tooltip>
                         <template #default="scope">
@@ -55,6 +55,7 @@
                             </span>
                         </template>
                     </el-table-column>
+                    <el-table-column prop="userName" label="提交人" show-overflow-tooltip width="200"></el-table-column>
                     <el-table-column prop="orderStatus" label="状态">
                         <template #default="scope">
                             <span :style="{ color: scope.row.orderStatusColor }">{{ scope.row.orderStatus }}</span>
