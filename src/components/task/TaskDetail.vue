@@ -124,6 +124,9 @@
                     <el-button type="primary" plain @click="showTextArea = false">取消</el-button>
                     <el-button type="primary" @click="submitCheck" :loading="submitting">确定</el-button>
                 </div>
+                <div class="btns">
+                    <el-button type="primary" plain @click="delTask">删除任务</el-button>
+                </div>
             </div>
         </el-dialog>
         <PlantCropsDetailCDialogDetail
@@ -167,6 +170,17 @@ export default {
         this.getData();
     },
     methods: {
+        // 删除任务
+        delTask() {
+            this.ajax
+                .post("/api/v1/adam/task/deleteTask", {
+                    taskId: this.detail.id,
+                })
+                .then((r) => {
+                    this.$message.success("删除成功");
+                    this.onClose(1);
+                });
+        },
         showDetailClick(id) {
             this.detailTitle = "农事记录详情";
             this.detailId = this.detail.farmRecordBo.id;

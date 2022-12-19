@@ -38,22 +38,17 @@ export default {
     },
     mounted() {
         // 获取个人信息
-        let user = localStorage.getItem("erp_user");
-        if (user) {
-            this.user = JSON.parse(user);
-        } else {
-            this.ajax.post("/api/v1/adam/member/user-info").then((r) => {
-                if (r.data.orgzs.length == 0) {
-                    r.data.orgzs = [
-                        {
-                            name: "苏州xxx化肥厂",
-                        },
-                    ];
-                }
-                this.user = r.data;
-                localStorage.setItem("erp_user", JSON.stringify(r.data));
-            });
-        }
+        this.ajax.post("/api/v1/adam/member/user-info").then((r) => {
+            if (r.data.orgzs.length == 0) {
+                r.data.orgzs = [
+                    {
+                        name: "苏州xxx化肥厂",
+                    },
+                ];
+            }
+            this.user = r.data;
+            localStorage.setItem("erp_user", JSON.stringify(r.data));
+        });
     },
     methods: {
         // 退出登录
