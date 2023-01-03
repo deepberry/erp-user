@@ -7,19 +7,23 @@
         </div>
         <el-empty v-if="list.length == 0" description="暂无数据" />
         <div class="items">
-            <div
-                class="item"
-                v-for="item in list"
-                :key="item.id"
-                @click="$store.state.power.farmRecordDetail ? itemClick(item.id) : () => {}"
-            >
-                <div class="itemBox">{{ item.title }}</div>
-                <div class="itemBox">农事时间：{{ item.workTime }}</div>
-                <div :class="item.workText ? 'itemBox h' : 'itemBox'">备注：{{ item.workText || "无" }}</div>
-                <div class="itemBox s_3">
-                    <i class="erp erpxiangyou1"></i>
-                </div>
-            </div>
+            <el-timeline>
+                <el-timeline-item
+                    type="primary"
+                    v-for="item in list"
+                    :key="item.id"
+                    @click="$store.state.power.farmRecordDetail ? itemClick(item.id) : () => {}"
+                >
+                    <div class="item">
+                        <div class="itemBox">农事时间：{{ item.workTime }}</div>
+                        <div class="itemBox">{{ item.title }}</div>
+                        <div :class="item.workText ? 'itemBox h' : 'itemBox'">备注：{{ item.workText || "无" }}</div>
+                        <div class="itemBox s_3">
+                            <i class="erp erpxiangyou1"></i>
+                        </div>
+                    </div>
+                </el-timeline-item>
+            </el-timeline>
         </div>
         <PlantCropsDetailCDialogDetail
             v-if="showDetail"
@@ -105,8 +109,12 @@ export default {
         align-items: center;
     }
     .items {
+        width: calc(100% - 20px);
         height: 500px;
         overflow-y: auto;
+        margin-top: 20px;
+        margin-left: 10px;
+        padding-left: 10px;
     }
     .item {
         width: calc(100% - 80px);
@@ -114,6 +122,8 @@ export default {
         box-shadow: 0px 0px 14px 0px #e5ecf2;
         border-radius: 8px;
         margin-top: 20px;
+        position: relative;
+        top: -25px;
         padding: 20px;
         display: flex;
         justify-content: space-between;

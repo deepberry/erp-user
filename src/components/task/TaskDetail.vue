@@ -51,7 +51,13 @@
                             <p>内容：{{ detail.taskContent }}</p>
                             <div>
                                 <p>操作视频：</p>
-                                <video controls @click="view(detail.reWire)" :src="detail.reWire" alt="" />
+                                <video
+                                    v-if="detail.reWire"
+                                    controls
+                                    @click="view(detail.reWire)"
+                                    :src="detail.reWire"
+                                    alt=""
+                                />
                             </div>
                         </div>
                     </div>

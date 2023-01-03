@@ -33,7 +33,13 @@ ajax.get = (url) => {
     return new Promise((reslove, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open("GET", `${HOST}${url}`, true);
-        xhr.setRequestHeader("token", localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN") || "1");
+        xhr.setRequestHeader(
+            "token",
+            localStorage.getItem("erp_token") ||
+                localStorage.getItem("TOKEN_TITAN") ||
+                sessionStorage.getItem("TOKEN_TITAN") ||
+                "1"
+        );
         xhr.send();
         callback(xhr, reslove, reject);
     });
@@ -43,7 +49,13 @@ ajax.getUrl = (url) => {
     return new Promise((reslove, reject) => {
         let xhr = new XMLHttpRequest();
         xhr.open("GET", url, true);
-        xhr.setRequestHeader("token", localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN") || "1");
+        xhr.setRequestHeader(
+            "token",
+            localStorage.getItem("erp_token") ||
+                localStorage.getItem("TOKEN_TITAN") ||
+                sessionStorage.getItem("TOKEN_TITAN") ||
+                "1"
+        );
         xhr.send();
         callback(xhr, reslove, reject);
     });
@@ -55,7 +67,11 @@ ajax.getUrlBearer = (url) => {
         xhr.open("GET", url, true);
         xhr.setRequestHeader(
             "Authorization",
-            "Bearer " + (localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN") || "1")
+            "Bearer " +
+                (localStorage.getItem("erp_token") ||
+                    localStorage.getItem("TOKEN_TITAN") ||
+                    sessionStorage.getItem("TOKEN_TITAN") ||
+                    "1")
         );
         xhr.send();
         callback(xhr, reslove, reject);
@@ -72,7 +88,13 @@ ajax.post = (url, data) => {
 
         xhr.open("POST", `${HOST}${url}`, true);
         xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.setRequestHeader("token", localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN") || "1");
+        xhr.setRequestHeader(
+            "token",
+            localStorage.getItem("erp_token") ||
+                localStorage.getItem("TOKEN_TITAN") ||
+                sessionStorage.getItem("TOKEN_TITAN") ||
+                "1"
+        );
         xhr.send(form);
         callback(xhr, reslove, reject);
     });
