@@ -105,7 +105,14 @@
             <div class="item">
                 <p class="title">农事照片：</p>
                 <div class="content" v-if="!isEdit">
-                    <img class="picsimg" v-for="(item, index) in form.image" :key="index" :src="item" alt="" />
+                    <img
+                        class="picsimg"
+                        @click="viewImg(item)"
+                        v-for="(item, index) in form.image"
+                        :key="index"
+                        :src="item"
+                        alt=""
+                    />
                     <p class="text" v-if="form.image.length == 0">暂无数据</p>
                 </div>
                 <div class="content" v-if="isEdit">
@@ -208,6 +215,12 @@ export default {
         },
     },
     methods: {
+        // 查看大图
+        viewImg(img) {
+            this.$nextTick(() => {
+                window.open(img);
+            });
+        },
         // 获取农事记录照片
         getFarmRecordImg() {
             this.ajax

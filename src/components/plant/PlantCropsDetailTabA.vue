@@ -176,11 +176,14 @@ export default {
             background: linear-gradient(to right, rgb(226, 236, 248), rgba(226, 236, 248, 0));
         }
         .itemBox:nth-child(2) {
-            width: 20%;
+            width: 23%;
         }
         .itemBox:nth-child(3) {
-            width: 20%;
+            width: 23%;
             color: #8f8f8f;
+        }
+        .itemBox:nth-child(4) {
+            width: 100%;
         }
         .itemBox:nth-child(5) {
             width: 100px;

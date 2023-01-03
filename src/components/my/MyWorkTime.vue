@@ -20,7 +20,9 @@
                     <div class="table">
                         <el-table size="large" :data="list" style="width: 100%" max-height="600" v-loading="loading">
                             <el-table-column prop="agricultural" label="农资类型" width="250" />
-                            <el-table-column prop="agriculturalCount" label="工时" />
+                            <el-table-column label="工时">
+                                <template #default="scope"> {{ scope.row.agriculturalCount || 0 }}</template>
+                            </el-table-column>
                         </el-table>
                     </div>
                 </div>

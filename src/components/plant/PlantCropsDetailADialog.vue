@@ -51,7 +51,13 @@
                             <p>内容：{{ detail.taskContent }}</p>
                             <div>
                                 <p>操作视频：</p>
-                                <video controls @click="view(detail.reWire)" :src="detail.reWire" alt="" />
+                                <video
+                                    v-if="detail.reWire"
+                                    controls
+                                    @click="view(detail.reWire)"
+                                    :src="detail.reWire"
+                                    alt=""
+                                />
                             </div>
                         </div>
                     </div>
@@ -69,7 +75,7 @@
                     <div>任务执行</div>
                     <div>执行提交时间：{{ detail.farmRecordBo.workTime }}</div>
                     <div>执行提交人：{{ detail.farmRecordBo.userName }}</div>
-                    <div class="todoContent">
+                    <div class="todoContent" @click="showDetailClick" style="cursor: pointer">
                         <div>
                             <p class="a">{{ detail.farmRecordBo.title }}</p>
                             <p>{{ detail.farmRecordBo.workTime }}</p>
@@ -113,11 +119,19 @@
             v-if="showAdd"
             @close="closeAdd"
         ></PlantCropsDetailBDialog>
+        <PlantCropsDetailCDialogDetail
+            v-if="showDetail"
+            :title="detailTitle"
+            :id="detailId"
+            @close="closeDetail"
+            @load="getData"
+        ></PlantCropsDetailCDialogDetail>
     </div>
 </template>
 
 <script>
 import PlantCropsDetailBDialog from "@/components/plant/PlantCropsDetailBDialog";
+import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
 import timer from "@/utils/timer";
 export default {
     name: "taskDetail",
@@ -136,6 +150,9 @@ export default {
             isPass: "2",
             submitting: false,
             showAdd: false,
+            showDetail: false,
+            detailTitle: "",
+            detailId: "",
         };
     },
     mounted() {
@@ -143,8 +160,19 @@ export default {
     },
     components: {
         PlantCropsDetailBDialog,
+        PlantCropsDetailCDialogDetail,
     },
     methods: {
+        showDetailClick(id) {
+            this.detailTitle = "农事记录详情";
+            this.detailId = this.detail.farmRecordBo.id;
+            this.showDetail = true;
+        },
+        closeDetail() {
+            setTimeout(() => {
+                this.showDetail = false;
+            }, 300);
+        },
         closeAdd(v = null) {
             if (v == 1) {
                 this.getData();
