@@ -10,7 +10,7 @@
                 <div class="item" v-for="(item, index) in list" :key="item.id">
                     <i
                         @click="item.use = !item.use"
-                        :class="item.use ? 'erp erpduoxuankuangxuanzhong' : 'erp erpduoxuan-01'"
+                        :class="item.use || item.selected ? 'erp erpduoxuankuangxuanzhong' : 'erp erpduoxuan-01'"
                     ></i>
                     <div class="itemBox">
                         <div>
@@ -119,7 +119,7 @@
 
 <script>
 export default {
-    props: ["id"],
+    props: ["id", "selected"],
     emits: ["close", "save", "chose"],
     data() {
         return {
@@ -156,13 +156,8 @@ export default {
                     else err = item;
                 }
             });
-            console.log(arr);
             if (err) {
                 this.$message.warning(`请输入[${err.agriculturalBo.title}]的使用数量`);
-                return;
-            }
-            if (arr.length == 0) {
-                this.$message.warning(`请选择农资`);
                 return;
             }
             arr = arr.map((item) => {
@@ -273,7 +268,18 @@ export default {
                     },
                 })
                 .then((r) => {
-                    this.list = r.data;
+                    this.list = r.data.map((data) => {
+                        this.selected &&
+                            this.selected.map((item) => {
+                                console.log(item);
+                                if (data.agriculturalBo.id == item.agriculturalId) {
+                                    data.selected = true;
+                                    data.useNum = item.agriculturalCount;
+                                    data.use = true;
+                                }
+                            });
+                        return data;
+                    });
                 });
         },
     },

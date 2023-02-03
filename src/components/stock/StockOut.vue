@@ -37,7 +37,7 @@
                             <span>{{ item.agriculturalBo.unitweight }}</span>
                         </p>
                         <p v-if="index == 0">
-                            <el-button size="small" type="primary" @click="showReg = true">
+                            <el-button size="small" type="primary" @click="add">
                                 <i style="font-size: 12px; margin-right: 5px" class="erp erpicon_tianjia"></i> 添加
                             </el-button>
                         </p>
@@ -93,6 +93,7 @@
         <StockReg
             title="请选择要操作的农资"
             v-if="showReg"
+            :selected="selected"
             default="1"
             @onSubmit="onRegSubmit"
             @closeReg="closeReg"
@@ -122,7 +123,8 @@ export default {
             uploading: false,
             imgs: [],
             percentage: 0, // 上传进度
-            submitting: false
+            submitting: false,
+            selected: [], // 已选的农资
         }
     },
     components: {
@@ -141,6 +143,13 @@ export default {
         ajax();
     },
     methods: {
+        // 添加
+        add (){
+            this.selected = this.list.map(item => {
+                return item.agriculturalBo.id;
+            })
+            this.showReg = true;
+        },
         // 获取详情
         getDetail (){
             return new Promise ((a,b) => {
@@ -188,7 +197,20 @@ export default {
             }, 500);
         },
         onRegSubmit (v){
-            this.list = [...this.list, ...v];
+            let r = [];
+            v.map(item => {
+                let isset = false;
+                this.list.map(l => {
+                    if(item.id == l.id){
+                        isset = true;
+                    }
+                })
+                if(!isset){
+                    item.agriculturalBo = JSON.parse(JSON.stringify(item));
+                    r.push(item);
+                }
+            })
+            this.list = [...this.list, ...r];
         },
         // 上传图片
         uploadFile (){

@@ -41,7 +41,7 @@
                         </div>
                         <i class="erp erpshanchu" @click="removeNz(index)"></i>
                     </div>
-                    <div class="nzAdd" @click="showChose = true"><i class="erp erpicon_tianjia"></i> 添加农资</div>
+                    <div class="nzAdd" @click="addNz"><i class="erp erpicon_tianjia"></i> 添加农资</div>
                 </div>
             </div>
             <div class="item">
@@ -124,6 +124,7 @@
             @save="save"
             @chose="chose"
             v-if="showChose"
+            :selected="farmUseBos"
             @close="closeChose"
         ></PlantCropsDetailBDialogChose>
     </el-dialog>
@@ -165,7 +166,6 @@ export default {
         };
     },
     mounted() {
-        console.log(this.plantName);
         this.getFarmType();
         this.getOperatingType();
         let user = JSON.parse(localStorage.getItem("erp_user"));
@@ -179,6 +179,9 @@ export default {
         PlantCropsDetailBDialogChose,
     },
     methods: {
+        addNz() {
+            this.showChose = true;
+        },
         selectType(a) {
             let title = false;
             this.farmType.map((item) => {
@@ -220,7 +223,7 @@ export default {
                 var list = [];
                 for (var i = 0; i < v.length; i++) {
                     if (list.indexOf(v[i].agricultural) > -1) {
-                        arr[list.indexOf(v[i].agricultural)].agriculturalCount += v[i].agriculturalCount;
+                        arr[list.indexOf(v[i].agricultural)].agriculturalCount = v[i].agriculturalCount;
                     } else {
                         list.push(v[i].agricultural);
                         v[i].isUse = 1;

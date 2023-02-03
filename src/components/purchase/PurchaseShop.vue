@@ -11,14 +11,11 @@
                     <el-button type="primary" class="searchSubmit" @click="getData">查询</el-button>
                 </div>
                 <div>
-                    <el-button
-                        v-if="$store.state.power.shoppingCartBtn"
-                        @click="showCar"
-                        type="primary"
-                        class="searchCreateNewTask"
-                        plain
-                        ><i class="erp erpgouwuche"></i> 购物车</el-button
-                    >
+                    <el-badge :value="carCount" class="item" v-if="$store.state.power.shoppingCartBtn" @click="showCar">
+                        <el-button type="primary" class="searchCreateNewTask" plain
+                            ><i class="erp erpgouwuche"></i> 购物车</el-button
+                        >
+                    </el-badge>
                 </div>
             </div>
         </div>
@@ -77,6 +74,7 @@ export default {
         return {
             loading: false,
             searchKey: "", // 搜索关键词
+            carCount: 0,
             list: [], // 数据列表
             currentPage: 0,
             pageSize: 0,
@@ -86,8 +84,18 @@ export default {
     },
     mounted() {
         this.getData();
+        this.getCarCount();
     },
     methods: {
+        // 获取购物车数量
+        getCarCount() {
+            return new Promise((a, b) => {
+                this.ajax.post("/api/v1/adam/agricultural/cart-count").then((r) => {
+                    this.carCount = r.data || "";
+                    a();
+                });
+            });
+        },
         // 获取数据列表
         getData (){
             this.loading = true;
