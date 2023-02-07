@@ -111,6 +111,10 @@ export default {
 
 <style lang="less" scoped>
 .plantDetail {
+    width: 100%;
+    height: 780px;
+    overflow-x: hidden;
+    overflow-y: auto;
     .list {
         width: calc(100% - 360px);
         padding: 40px 0;

@@ -54,7 +54,8 @@
                     <el-table-column label="数量">
                         <template #default="scope">
                             <span v-for="(item, index) in scope.row.totalCount" :key="index">
-                                {{ item.agriculturalCos }}{{ item.unitweight }}<br />
+                                {{ item.unitCount }} {{ item.unitdict }}（共{{ item.weightCount
+                                }}{{ item.unitweight }}）<br />
                             </span>
                         </template>
                     </el-table-column>

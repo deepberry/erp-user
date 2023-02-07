@@ -45,7 +45,7 @@
                     <el-table-column prop="agriculturalBo.agriculturalPrice" label="参考单价" show-overflow-tooltip>
                         <template #default="scope"
                             ><span style="color: red"
-                                >￥{{ scope.row.agriculturalBo.agriculturalPrice }}.00元
+                                >￥{{ scope.row.agriculturalBo.agriculturalPrice }}元
                             </span></template
                         >
                     </el-table-column>
@@ -55,11 +55,14 @@
                     <div>
                         <p v-for="(item, index) in detail.totalCount" :key="index">
                             <span>{{ item.title }}</span>
-                            <span>{{ item.agriculturalCos }}{{ item.unitweight }}</span>
+                            <span>
+                                {{ item.unitCount }}{{ item.unitdict }} 共（{{ item.unitCount * item.weightCount
+                                }}{{ item.unitweight }}）
+                            </span>
                         </p>
                         <p>
                             <span>总价</span>
-                            <span>￥{{ detail.orderCos }}.00元</span>
+                            <span>￥{{ detail.orderCos }}元</span>
                         </p>
                     </div>
                 </div>

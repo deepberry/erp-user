@@ -51,6 +51,11 @@
                             {{ scope.row.agriculturalBo.unitmeasurement }}
                         </template>
                     </el-table-column>
+                    <el-table-column width="120" label="操作" show-overflow-tooltip>
+                        <template #default="scope">
+                            <el-button size="small" type="primary" @click="remove(scope)">删除</el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
                 <div class="bottom">
                     <div>合计：</div>
@@ -122,6 +127,18 @@ export default {
         this.getCar();
     },
     methods: {
+        // 移除商品
+        remove(scope) {
+            let index = scope.$index;
+            let id = scope.row.id;
+            this.ajax
+                .post("/api/v1/adam/agricultural/cart-del", {
+                    id,
+                })
+                .then((r) => {
+                    this.list.splice(index, 1);
+                });
+        },
         // 选择行
         select(row) {
             console.log(row);
