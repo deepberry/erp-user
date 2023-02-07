@@ -20,9 +20,12 @@
                 ></el-input>
                 <el-button type="primary" class="searchSubmit" @click="getData">查询</el-button>
                 <el-button type="primary" class="searchSubmit" @click="gotoPurchase">去采购</el-button>
-                <el-button type="primary" class="searchCreateNewTask" plain @click="showCar"
-                    ><i class="erp erpgouwuche"></i> 购物车</el-button
-                >
+
+                <el-badge :value="carCount" class="item" @click="showCar">
+                    <el-button type="primary" class="searchCreateNewTask" plain
+                        ><i class="erp erpgouwuche"></i> 购物车</el-button
+                    >
+                </el-badge>
             </div>
         </div>
         <div class="tableWrap">
@@ -51,7 +54,8 @@
                     <el-table-column label="数量">
                         <template #default="scope">
                             <span v-for="(item, index) in scope.row.totalCount" :key="index">
-                                {{ item.agriculturalCos }}{{ item.unitweight }}<br />
+                                {{ item.unitCount }} {{ item.unitdict }}（共{{ item.weightCount
+                                }}{{ item.unitweight }}）<br />
                             </span>
                         </template>
                     </el-table-column>
@@ -107,6 +111,7 @@ export default {
         return {
             loading: false,
             searchKey: "", // 搜索关键词
+            carCount: 0,
             status: [ // 状态列表
                 {
                     title: '全部',
@@ -137,8 +142,18 @@ export default {
     },
     mounted() {
         this.getData();
+        this.getCarCount();
     },
     methods: {
+        // 获取购物车数量
+        getCarCount() {
+            return new Promise((a, b) => {
+                this.ajax.post("/api/v1/adam/agricultural/cart-count").then((r) => {
+                    this.carCount = r.data || "";
+                    a();
+                });
+            });
+        },
         // 获取数据列表  这个接口数据有问题，和需求不一致，后期再改
         getData (){
             this.loading = true;

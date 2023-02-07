@@ -202,6 +202,10 @@ export default {
                                 item.statusText = "不合格";
                                 item.color = "#FF4949";
                                 break;
+                            case 4:
+                                item.statusText = "打回";
+                                item.color = "#FF4949";
+                                break;
                         }
                         return item;
                     });

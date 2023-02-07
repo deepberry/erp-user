@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div class="item">
-                        <el-button size="small" type="primary" @click="showReg = true">
+                        <el-button size="small" type="primary" @click="add">
                             <i style="font-size: 12px; margin-right: 5px" class="erp erpicon_tianjia"></i> 添加
                         </el-button>
                     </div>
@@ -112,6 +112,7 @@
                     title="请选择要操作的农资"
                     v-if="showReg"
                     default="1"
+                    :selected="selected"
                     @onSubmit="onRegSubmit"
                     @closeReg="closeReg"
                 ></StockReg>
@@ -144,6 +145,7 @@ export default {
             imgs: [],
             percentage: 0, // 上传进度
             submitting: false,
+            selected: [], // 已选的农资
         };
     },
     components: {
@@ -200,8 +202,28 @@ export default {
                 clearTimeout(timer);
             }, 500);
         },
+        // 添加
+        add() {
+            this.selected = this.list.map((item) => {
+                return item.agriculturalBo.id;
+            });
+            this.showReg = true;
+        },
         onRegSubmit(v) {
-            this.list = [...this.list, ...v];
+            let r = [];
+            v.map((item) => {
+                let isset = false;
+                this.list.map((l) => {
+                    if (item.id == l.id) {
+                        isset = true;
+                    }
+                });
+                if (!isset) {
+                    item.agriculturalBo = JSON.parse(JSON.stringify(item));
+                    r.push(item);
+                }
+            });
+            this.list = [...this.list, ...r];
         },
         // 上传图片
         uploadFile() {

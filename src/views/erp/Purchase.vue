@@ -60,7 +60,6 @@ export default {
                 }else{
                     this.activeTabIndex = 1;
                 }
-                if (this.headTab.length > 0) this.$router.push(this.headTab[0].path);
                 clearInterval(timer);
             }
         }, 200);

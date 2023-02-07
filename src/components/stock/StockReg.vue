@@ -29,14 +29,27 @@
                             <el-input v-model="form.title" placeholder="请输入农资名称" />
                         </el-form-item>
                         <el-form-item label="农资类型">
-                            <el-select style="width: 450px" v-model="defaultType" placeholder="请选择农资类型">
-                                <el-option
-                                    v-for="item in typeList"
-                                    :key="item.id"
-                                    :label="item.title"
-                                    :value="item.id"
+                            <div style="display: flex; width: 450px">
+                                <el-select
+                                    @change="selectType"
+                                    style="width: 100%"
+                                    v-model="defaultType"
+                                    placeholder="请选择农资类型"
+                                >
+                                    <el-option
+                                        v-for="item in typeList"
+                                        :key="item.id"
+                                        :label="item.title"
+                                        :value="item.id"
+                                    />
+                                </el-select>
+                                <el-input
+                                    v-show="definition"
+                                    style="width: 180px; margin-left: 10px"
+                                    v-model="form.definition"
+                                    placeholder="请输入农资类型"
                                 />
-                            </el-select>
+                            </div>
                         </el-form-item>
                         <el-form-item label="生产厂家">
                             <el-input v-model="form.company" placeholder="请输入生产厂家" />
@@ -103,7 +116,7 @@
                     style="width: 100%"
                     v-loading="loading"
                 >
-                    <el-table-column type="selection" width="55" />
+                    <el-table-column :selectable="selectable" type="selection" width="55" />
                     <el-table-column prop="title" label="农资名称" />
                     <el-table-column prop="agriculturalCategory" label="农资类型" width="150" />
                     <el-table-column prop="manufacturers" label="生产厂家" />
@@ -124,7 +137,7 @@
 <script lang="js">
 export default {
     name: 'stockReg',
-    props: ['default', 'needSubmit', 'title'],
+    props: ['default', 'needSubmit', 'title', 'selected'],
     data (){
         return {
             loading: false,
@@ -141,7 +154,8 @@ export default {
             searchKey: '',
             tableData: [],
             saveing: false,
-            submitting: false
+            submitting: false,
+            definition: false, // 是否自定义农资类型
         }
     },
     mounted (){
@@ -153,6 +167,17 @@ export default {
         }
     },
     methods: {
+        selectable (row, index){
+            return !this.selected.includes(row.id);
+        },
+        // 选择农资类型时
+        selectType (v) {
+            this.typeList.map(item => {
+                if(item.id == v && item.title == '自定义'){
+                    this.definition = true;
+                }
+            })
+        },
         onClose (){
             this.$emit("closeReg", 0);
             this.showDetailBox = false;
@@ -175,7 +200,6 @@ export default {
             this.showDetailBox = false;
             this.showInput = false;
             this.showImport = true;
-            console.log(2)
             this.getData();
         },
         // 获取农资数据列表
@@ -194,6 +218,16 @@ export default {
                 this.tableData = r.data.map(item => {
                     item.agriculturalBo = item.agriculturalBo || {};
                     return item;
+                })
+                setTimeout(() => {
+
+                }, 2000);
+                this.$nextTick(() => {
+                    this.tableData.map(item => {
+                        if(this.selected.includes(item.id)){
+                            this.$refs.table.toggleRowSelection(item, true)
+                        }
+                    })
                 })
             })
         },
@@ -227,11 +261,17 @@ export default {
         // 提交农资表单
         submitA (){
             let agriculturalCategory = '';
-            this.typeList.map(item => {
-                if(item.id == this.defaultType){
-                    agriculturalCategory = item.title;
-                }
-            })
+            let agriculturalCategoryId = null;
+            if(this.definition){
+                agriculturalCategory = this.form.definition;
+            }else{
+                agriculturalCategoryId = this.defaultType;
+                this.typeList.map(item => {
+                    if(item.id == this.defaultType){
+                        agriculturalCategory = item.title;
+                    }
+                })
+            }
             let unitweight = '';
             this.weightList.map(item => {
                 if(item.id == this.defaultWeight){
@@ -246,14 +286,15 @@ export default {
             })
             let data = {
                 agriculturalCategory,
-                agriculturalCategoryId: this.defaultType,
+                agriculturalCategoryId,
                 title: this.form.title,
                 manufacturers: this.form.company,
                 agriculturalCount: this.form.weightNum,
                 unitweight,
                 unitweightid: this.defaultWeight,
                 unitmeasurement,
-                unitmeasurementid: this.defaultUnit
+                unitmeasurementid: this.defaultUnit,
+                definition: this.definition ? 1 : 0
             }
             this.saveing = true;
             this.ajax.post('/api/v1/adam/farmLand/saveDefinition', {
