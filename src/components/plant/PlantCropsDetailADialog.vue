@@ -61,6 +61,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="nz">
+                        <div class="title">需用农资：</div>
+                        <div class="nzlist">
+                            <div style="position: relative; top: 5px">
+                                <span v-if="detail.agricultural && detail.agricultural.length <= 0">暂无数据</span>
+                            </div>
+                            <div class="nzitem" v-for="item in detail.agricultural" :key="item.id">
+                                <p>
+                                    <span class="tag">{{ item.agriculturalType }}</span>
+                                </p>
+                                <p>{{ item.agricultural }}</p>
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <p>
                             指定执行人：<span style="margin: 0 5px" v-for="item in detail.executors" :key="item.id">{{
@@ -126,12 +140,21 @@
             @close="closeDetail"
             @load="getData"
         ></PlantCropsDetailCDialogDetail>
+        <PlantCropsDetailBDialogChose
+            @save="save"
+            @chose="chose"
+            v-if="showChose"
+            :selected="farmUseBos"
+            @close="closeChose"
+            neednum="no"
+        ></PlantCropsDetailBDialogChose>
     </div>
 </template>
 
 <script>
 import PlantCropsDetailBDialog from "@/components/plant/PlantCropsDetailBDialog";
 import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
+import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 import timer from "@/utils/timer";
 export default {
     name: "taskDetail",
@@ -153,6 +176,9 @@ export default {
             showDetail: false,
             detailTitle: "",
             detailId: "",
+            showChose: false,
+            farmUseBos: [],
+            agricultural: [], // 需用农资
         };
     },
     mounted() {
@@ -161,8 +187,46 @@ export default {
     components: {
         PlantCropsDetailBDialog,
         PlantCropsDetailCDialogDetail,
+        PlantCropsDetailBDialogChose,
     },
     methods: {
+        closeChose() {
+            setTimeout(() => {
+                this.showChose = false;
+            }, 300);
+        },
+        chose(v) {
+            console.log(v);
+            let data = [...this.farmUseBos, ...v].map((item) => {
+                item.agriculturalCount = Number(item.agriculturalCount);
+                return item;
+            });
+            var trans = function (v) {
+                var arr = [];
+                var list = [];
+                for (var i = 0; i < v.length; i++) {
+                    if (list.indexOf(v[i].agricultural) > -1) {
+                        arr[list.indexOf(v[i].agricultural)].agriculturalCount = v[i].agriculturalCount;
+                    } else {
+                        list.push(v[i].agricultural);
+                        v[i].isUse = 1;
+                        arr.push(v[i]);
+                    }
+                }
+                return arr;
+            };
+            this.farmUseBos = trans(data);
+        },
+        removeNz(index) {
+            this.farmUseBos.splice(index, 1);
+        },
+        // 保存农资
+        save(params) {
+            this.farmUseBos.push(params);
+        },
+        addNz() {
+            this.showChose = true;
+        },
         showDetailClick(id) {
             this.detailTitle = "农事记录详情";
             this.detailId = this.detail.farmRecordBo.id;
@@ -202,6 +266,15 @@ export default {
                     r.data.executors = JSON.parse(r.data.executors);
                     r.data.farmRecordBo = r.data.farmRecordBo || { farmUseBos: {} };
                     r.data.farmRecordBo.farmUseBos = r.data.farmRecordBo.farmUseBos || {};
+                    r.data.agricultural = r.data.agricultural ? JSON.parse(r.data.agricultural) : [];
+
+                    r.data.agricultural = r.data.agricultural.map((item) => {
+                        if (!item.agriculturalType && !item.agricultural) {
+                            item.agricultural = item.agriculturalBo.title;
+                            item.agriculturalType = item.agriculturalBo.agriculturalCategory;
+                        }
+                        return item;
+                    });
                     this.detail = r.data;
                 });
         },
@@ -282,6 +355,54 @@ export default {
                         border-radius: 10px;
                     }
                 }
+            }
+        }
+        .nz {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            .nzlist {
+                width: 570px;
+                position: relative;
+                top: -5px;
+                .nzitem {
+                    width: 100%;
+                    border: 1px solid rgb(236, 236, 236);
+                    padding: 7px 10px;
+                    margin-bottom: 3px;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    font-size: 13px;
+                    > p {
+                        width: 100%;
+                        font-size: 12px;
+                    }
+                    span.tag {
+                        background: #c3f8c7;
+                        color: #2ac726;
+                        display: inline-block;
+                        padding: 2px 10px;
+                        font-size: 12px;
+                        border-radius: 3px;
+                    }
+                }
+            }
+        }
+        .nzAdd {
+            width: 100%;
+            height: 35px;
+            color: #538dff;
+            line-height: 35px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            background: #edf1f8;
+            position: relative;
+            top: 0px;
+            i {
+                font-size: 13px;
             }
         }
     }

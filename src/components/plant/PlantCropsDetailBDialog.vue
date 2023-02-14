@@ -28,6 +28,64 @@
                     </el-input>
                 </div>
             </div>
+            <div class="item" v-if="showPests">
+                <div class="title"></div>
+                <div class="content nz">
+                    <el-form ref="pests" :model="form" label-width="70px">
+                        <el-form-item label="监测点">
+                            <el-input v-model="pests.name"></el-input>
+                        </el-form-item>
+                        <el-form-item label="虫子情况">
+                            <div style="width: 540px">
+                                <div class="nzItem" v-for="(item, index) in bugsList" :key="index">
+                                    <div class="pestsBox">
+                                        <span>
+                                            <span class="tag">{{ item.name }}</span>
+                                        </span>
+                                        <span>{{ item.num }}只</span>
+                                        <i class="erp erpshanchu" @click="removeBugs(index, 1)"></i>
+                                    </div>
+                                </div>
+                                <div class="nzAdd" style="width: 472px" @click="addPests(1)">
+                                    <i class="erp erpicon_tianjia"></i> 添加虫子
+                                </div>
+                            </div>
+                        </el-form-item>
+                        <el-form-item label="天敌情况">
+                            <div style="width: 540px">
+                                <div class="nzItem" v-for="(item, index) in enemyList" :key="index">
+                                    <div class="pestsBox">
+                                        <span>
+                                            <span class="tag">{{ item.name }}</span>
+                                        </span>
+                                        <span>{{ item.num }}个</span>
+                                        <i class="erp erpshanchu" @click="removeBugs(index, 0)"></i>
+                                    </div>
+                                </div>
+                                <div class="nzAdd" style="width: 472px" @click="addPests(0)">
+                                    <i class="erp erpicon_tianjia"></i> 添加天敌
+                                </div>
+                            </div>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </div>
+            <div class="item" v-if="showGrow">
+                <div class="title"></div>
+                <div class="content nz">
+                    <el-form ref="grow" :model="grow" label-width="70px">
+                        <el-form-item label="植株编号">
+                            <el-input v-model="grow.listId"></el-input>
+                        </el-form-item>
+                        <el-form-item label="株高">
+                            <el-input v-model="grow.height"><template #append>厘米</template></el-input>
+                        </el-form-item>
+                        <el-form-item label="节点数">
+                            <el-input v-model="grow.num"><template #append>个</template></el-input>
+                        </el-form-item>
+                    </el-form>
+                </div>
+            </div>
             <div class="item">
                 <div class="title">使用农资：</div>
                 <div class="content nz">
@@ -127,6 +185,12 @@
             :selected="farmUseBos"
             @close="closeChose"
         ></PlantCropsDetailBDialogChose>
+        <PlantCropsDetailBDialogAddPests
+            v-if="showAddPests"
+            :type="addPestsType"
+            @close="closePests"
+            @save="savePests"
+        ></PlantCropsDetailBDialogAddPests>
     </el-dialog>
 </template>
 
@@ -136,6 +200,7 @@ const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepbe
 import * as signalR from "@microsoft/signalr";
 import timer from "@/utils/timer";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
+import PlantCropsDetailBDialogAddPests from "@/components/plant/PlantCropsDetailBDialogAddPests";
 export default {
     props: ["taskId", "plantName"],
     emits: ["success", "close", "load", "finish"],
@@ -163,6 +228,14 @@ export default {
             pickCount: "", // 采摘重量
             showPickCount: false,
             pickCountText: "",
+            showPests: false,
+            pests: {}, // 病虫害
+            showAddPests: false,
+            addPestsType: 1,
+            bugsList: [],
+            enemyList: [],
+            showGrow: false,
+            grow: {}, // 生长观察
         };
     },
     mounted() {
@@ -177,8 +250,42 @@ export default {
     },
     components: {
         PlantCropsDetailBDialogChose,
+        PlantCropsDetailBDialogAddPests,
     },
     methods: {
+        // 添加虫子和天敌
+        addPests(type) {
+            this.showAddPests = true;
+            this.addPestsType = type;
+        },
+        removeBugs(index, type) {
+            if (type) {
+                this.bugsList.splice(index, 1);
+            } else {
+                this.enemyList.splice(index, 1);
+            }
+        },
+        savePests(v) {
+            // 病虫害
+            if (v.type) {
+                this.bugsList.push({
+                    name: v.name,
+                    num: v.num,
+                });
+            } else {
+                // 天敌
+                this.enemyList.push({
+                    name: v.name,
+                    num: v.num,
+                });
+            }
+        },
+        closePests() {
+            let t = setTimeout(() => {
+                this.showAddPests = false;
+                clearTimeout(t);
+            }, 500);
+        },
         addNz() {
             this.showChose = true;
         },
@@ -190,6 +297,8 @@ export default {
                 }
             });
             this.showPickCount = title == "采摘" || title == "自定义" ? true : false;
+            this.showPests = title == "病虫害监测" ? true : false;
+            this.showGrow = title == "生长观察" ? true : false;
             if (this.showPickCount) {
                 this.pickCountText = title == "采摘" ? "采摘重量" : "输入农事类型";
             }
@@ -239,8 +348,6 @@ export default {
             this.farmUseBos.push(params);
         },
         submit() {
-            console.log(1);
-            console.log(this.plantDetail);
             let t = this;
             if (t.plantDetail.smartDeviceBoList.length > 0) {
                 const token = localStorage.getItem("erp_token") || localStorage.getItem("TOKEN_TITAN");
@@ -278,15 +385,48 @@ export default {
             }
         },
         submitPost(device) {
+            let farmDetailBo = {};
+            if (this.farmId == 16) {
+                farmDetailBo.title = this.pests.name;
+                farmDetailBo.farmType = 0;
+                farmDetailBo.farmDetailListChongBoList = this.bugsList.map((item) => {
+                    return {
+                        count: item.num,
+                        farmDetailId: 0,
+                        title: item.name,
+                        type: 0,
+                    };
+                });
+                farmDetailBo.farmDetailListTianBoList = this.enemyList.map((item) => {
+                    return {
+                        count: item.num,
+                        farmDetailId: 0,
+                        title: item.name,
+                        type: 1,
+                    };
+                });
+            }
+            if (this.farmId == 17) {
+                farmDetailBo.title = this.grow.listId;
+                farmDetailBo.farmType = 1;
+                farmDetailBo.farmDetailListGrowBoList = [
+                    {
+                        count: this.grow.num,
+                        farmDetailId: 0,
+                        title: this.grow.height,
+                    },
+                ];
+            }
             let data = {
                 categoryTitle: this.categoryTitle,
                 farmId: this.farmId,
                 farmUseBos: this.farmUseBos,
+                farmDetailBo,
                 workHour: this.workHour,
                 image: this.imgs.join(","),
                 workText: this.workText,
                 workType: this.workType,
-                workTime: this.workTime + " 08:00:00",
+                workTime: this.workTime + " " + timer.time("h:i:s"),
                 taskId: this.taskId || "",
                 workAid: this.workAid,
                 plantsId: this.$route.query.id,
@@ -431,6 +571,32 @@ export default {
                     > span {
                         width: 160px;
                         text-align: left;
+                    }
+                    span.tag {
+                        background: #c3f8c7;
+                        color: #2ac726;
+                        display: inline-block;
+                        padding: 2px 10px;
+                        font-size: 12px;
+                        border-radius: 3px;
+                    }
+                }
+                .pestsBox {
+                    width: 450px;
+                    border: 1px solid rgb(236, 236, 236);
+                    padding: 0px 10px;
+                    margin-bottom: 5px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: 13px;
+                    line-height: normal !important;
+                    > span {
+                        width: 150px;
+                        text-align: left;
+                    }
+                    > span:last-child {
+                        text-align: right;
                     }
                     span.tag {
                         background: #c3f8c7;

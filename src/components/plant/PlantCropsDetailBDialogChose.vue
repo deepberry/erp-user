@@ -119,7 +119,7 @@
 
 <script>
 export default {
-    props: ["id", "selected"],
+    props: ["id", "selected", "neednum"],
     emits: ["close", "save", "chose"],
     data() {
         return {
@@ -150,15 +150,24 @@ export default {
         chose() {
             let arr = [];
             let err = null;
-            this.list.map((item) => {
-                if (item.use) {
-                    if (item.useNum) arr.push(item);
-                    else err = item;
+            if (this.neednum != "no") {
+                this.list.map((item) => {
+                    if (item.use) {
+                        if (item.useNum) arr.push(item);
+                        else err = item;
+                    }
+                });
+                if (err) {
+                    this.$message.warning(`请输入[${err.agriculturalBo.title}]的使用数量`);
+                    return;
                 }
-            });
-            if (err) {
-                this.$message.warning(`请输入[${err.agriculturalBo.title}]的使用数量`);
-                return;
+            }
+            if (this.neednum == "no") {
+                this.list.map((item) => {
+                    if (item.use) {
+                        arr.push(item);
+                    }
+                });
             }
             arr = arr.map((item) => {
                 return {
@@ -173,6 +182,7 @@ export default {
                     manufacturers: item.agriculturalBo.manufacturers,
                 };
             });
+            console.log(arr);
             this.$emit("chose", arr);
             this.onClose();
         },

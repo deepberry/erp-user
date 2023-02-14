@@ -33,18 +33,97 @@
                     </el-select>
                 </div>
             </div>
-            <div class="item">
-                <p class="title" v-if="form.title != '采摘'">使用农资：</p>
-                <div class="content" v-if="form.farmUseBos.length == 0 && !isEdit && form.title != '采摘'">
-                    <p class="text">暂无数据</p>
+            <div class="item" style="margin-top: 5px" v-if="form.farmId == 16">
+                <p class="title"></p>
+                <div class="content nz">
+                    <div
+                        class="nzItem"
+                        v-for="(item, index) in form.farmDetailBo.farmDetailListChongBoList"
+                        :key="item.id"
+                    >
+                        <div class="nzBox" :style="{ width: isEdit ? '400px' : '438px' }">
+                            <span>
+                                <span class="tag">{{ item.title }}</span>
+                            </span>
+                            <span>虫子</span>
+                            <span>{{ item.count }}只</span>
+                        </div>
+                        <i class="erp erpshanchu" v-if="isEdit" @click="removePests(index, 1)"></i>
+                    </div>
+                    <div
+                        class="nzItem"
+                        v-for="(item, index) in form.farmDetailBo.farmDetailListTianBoList"
+                        :key="item.id"
+                    >
+                        <div class="nzBox" :style="{ width: isEdit ? '400px' : '438px' }">
+                            <span>
+                                <span class="tag">{{ item.title }}</span>
+                            </span>
+                            <span>天敌</span>
+                            <span>{{ item.count }}只</span>
+                        </div>
+                        <i class="erp erpshanchu" v-if="isEdit" @click="removePests(index, 0)"></i>
+                    </div>
+                    <div class="nzAdd" @click="addPests(1)" v-if="isEdit && form.title != '采摘'">
+                        <i class="erp erpicon_tianjia"></i> 添加虫子
+                    </div>
+                    <div
+                        class="nzAdd"
+                        style="border-top: 1px solid rgba(0, 0, 0, 0.05)"
+                        @click="addPests(0)"
+                        v-if="isEdit && form.title != '采摘'"
+                    >
+                        <i class="erp erpicon_tianjia"></i> 添加天敌
+                    </div>
                 </div>
-                <p class="title" v-if="form.title == '采摘'">采摘重量：</p>
-                <div class="content" v-if="form.title == '采摘'">
+            </div>
+            <div class="item" style="margin-top: 5px" v-if="form.farmId == 17">
+                <p class="title"></p>
+                <div class="content nz">
+                    <div class="nzItem">
+                        <div class="nzBox" v-if="!isEdit" style="width: 438px">
+                            <span>观测点：{{ form.farmDetailBo.title }}</span>
+                            <span>{{ form.farmDetailBo.farmDetailListGrowBoList[0].title }}厘米</span>
+                            <span>{{ form.farmDetailBo.farmDetailListGrowBoList[0].count }}个节点</span>
+                        </div>
+                        <div class="nzBox" v-if="isEdit">
+                            <el-input
+                                v-model="form.farmDetailBo.title"
+                                placeholder="监测点"
+                                style="width: 35%"
+                            ></el-input>
+                            <el-input
+                                style="width: 35%"
+                                v-model="form.farmDetailBo.farmDetailListGrowBoList[0].title"
+                                placeholder="株高"
+                            >
+                                <template #append>厘米</template>
+                            </el-input>
+                            <el-input
+                                style="width: 30%"
+                                v-model="form.farmDetailBo.farmDetailListGrowBoList[0].count"
+                                placeholder="节点数"
+                            >
+                                <template #append>个</template>
+                            </el-input>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item" v-if="form.farmId == 13">
+                <p class="title">采摘重量：</p>
+                <div class="content">
                     <el-input :disabled="!isEdit" v-model="form.pickCount" placeholder="输入采摘重量">
                         <template #append>公斤</template>
                     </el-input>
                 </div>
-                <div class="content nz" v-if="form.farmUseBos.length > 0 || (isEdit && form.title != '采摘')">
+            </div>
+            <div class="item">
+                <p class="title">使用农资：</p>
+                <div class="content" v-if="form.farmUseBos.length == 0 && !isEdit">
+                    <p class="text">暂无数据</p>
+                </div>
+                <div class="content nz" v-if="form.farmUseBos.length > 0 || isEdit">
                     <div class="nzItem" v-for="(item, index) in form.farmUseBos" :key="item.id">
                         <div class="nzBox" :style="{ width: isEdit ? '400px' : '438px' }">
                             <span>
@@ -55,7 +134,7 @@
                         </div>
                         <i class="erp erpshanchu" v-if="isEdit" @click="removeNz(index)"></i>
                     </div>
-                    <div class="nzAdd" @click="showChose = true" v-if="isEdit && form.title != '采摘'">
+                    <div class="nzAdd" @click="showChose = true" v-if="isEdit">
                         <i class="erp erpicon_tianjia"></i> 添加农资
                     </div>
                 </div>
@@ -166,12 +245,19 @@
             v-if="showChose"
             @close="closeChose"
         ></PlantCropsDetailBDialogChose>
+        <PlantCropsDetailBDialogAddPests
+            v-if="showAddPests"
+            :type="addPestsType"
+            @close="closePests"
+            @save="savePests"
+        ></PlantCropsDetailBDialogAddPests>
     </el-dialog>
 </template>
 
 <script>
 import upload from "@/utils/upload.js";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
+import PlantCropsDetailBDialogAddPests from "@/components/plant/PlantCropsDetailBDialogAddPests";
 export default {
     props: ["title", "id"],
     emits: ["load", "success", "close"],
@@ -192,10 +278,13 @@ export default {
             uploading: false,
             percentage: 0,
             showChose: false,
+            showAddPests: false,
+            addPestsType: 0,
         };
     },
     components: {
         PlantCropsDetailBDialogChose,
+        PlantCropsDetailBDialogAddPests,
     },
     mounted() {
         let t = this;
@@ -215,6 +304,48 @@ export default {
         },
     },
     methods: {
+        // 保存生长观察数据
+        saveGrowData() {
+            this.isEdit = false;
+        },
+        // 添加虫子和天敌
+        addPests(type) {
+            this.showAddPests = true;
+            this.addPestsType = type;
+        },
+        savePests(v) {
+            // 病虫害
+            if (v.type) {
+                this.form.farmDetailBo.farmDetailListChongBoList.push({
+                    count: v.num,
+                    farmDetailId: 0,
+                    title: v.name,
+                    type: 0,
+                });
+            } else {
+                // 天敌
+                this.form.farmDetailBo.farmDetailListTianBoList.push({
+                    count: v.num,
+                    farmDetailId: 0,
+                    title: v.name,
+                    type: 1,
+                });
+            }
+        },
+        closePests() {
+            let t = setTimeout(() => {
+                this.showAddPests = false;
+                clearTimeout(t);
+            }, 500);
+        },
+        // 删除虫子和天敌
+        removePests(index, type) {
+            if (type == 1) {
+                this.form.farmDetailBo.farmDetailListChongBoList.splice(index, 1);
+            } else {
+                this.form.farmDetailBo.farmDetailListTianBoList.splice(index, 1);
+            }
+        },
         // 查看大图
         viewImg(img) {
             this.$nextTick(() => {
@@ -336,6 +467,11 @@ export default {
                 this.ajax.post("/api/v1/adam/farm/getFarmRecordById", { id: this.id }).then((r) => {
                     r.data.image = r.data.image.length > 0 ? r.data.image.split(",") : [];
                     r.data.smartDevice = JSON.parse(r.data.smartDevice) || [];
+                    r.data.farmDetailBo = r.data.farmDetailBo || {
+                        farmDetailListChongBoList: [],
+                        farmDetailListTianBoList: [],
+                        farmDetailListGrowBoList: [],
+                    };
                     this.form = r.data;
                     console.log(this.form);
                     a();

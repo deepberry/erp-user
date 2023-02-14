@@ -41,6 +41,22 @@
                     <p class="title">具体内容：</p>
                     <el-input v-model="taskContent" style="width: 650px" placeholder="请输入内容" />
                 </div>
+                <div class="item" style="align-items: flex-start">
+                    <p class="title">需用农资：</p>
+                    <div class="nz">
+                        <div class="nzItem" v-for="(item, index) in farmUseBos" :key="item.id">
+                            <div class="nzBox">
+                                <span>
+                                    <span class="tag">{{ item.agriculturalType }}</span>
+                                </span>
+                                <span></span>
+                                <span>{{ item.agricultural }}</span>
+                            </div>
+                            <i class="erp erpshanchu" @click="removeNz(index)"></i>
+                        </div>
+                        <div class="nzAdd" @click="addNz"><i class="erp erpicon_tianjia"></i> 添加农资</div>
+                    </div>
+                </div>
                 <div class="item">
                     <p class="title">操作指导：</p>
                     <div class="upload">
@@ -97,11 +113,20 @@
                 <el-button type="primary" @click="submit" :loading="submitting">确定</el-button>
             </div>
         </el-dialog>
+        <PlantCropsDetailBDialogChose
+            @save="save"
+            @chose="chose"
+            v-if="showChose"
+            :selected="farmUseBos"
+            @close="closeChose"
+            neednum="no"
+        ></PlantCropsDetailBDialogChose>
     </div>
 </template>
 
 <script>
 import upload from "../../utils/upload.js";
+import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
     name: "taskDetail",
     props: ["id"],
@@ -127,6 +152,9 @@ export default {
             percentage: 0, // 上传进度
             searchCropLoading: false, // 作物搜索中
             submitting: false,
+            showChose: false,
+            farmUseBos: [],
+            agricultural: [], // 需用农资
         };
     },
     mounted() {
@@ -151,7 +179,47 @@ export default {
                 });
         },
     },
+    components: {
+        PlantCropsDetailBDialogChose,
+    },
     methods: {
+        closeChose() {
+            setTimeout(() => {
+                this.showChose = false;
+            }, 300);
+        },
+        chose(v) {
+            console.log(v);
+            let data = [...this.farmUseBos, ...v].map((item) => {
+                item.agriculturalCount = Number(item.agriculturalCount);
+                return item;
+            });
+            var trans = function (v) {
+                var arr = [];
+                var list = [];
+                for (var i = 0; i < v.length; i++) {
+                    if (list.indexOf(v[i].agricultural) > -1) {
+                        arr[list.indexOf(v[i].agricultural)].agriculturalCount = v[i].agriculturalCount;
+                    } else {
+                        list.push(v[i].agricultural);
+                        v[i].isUse = 1;
+                        arr.push(v[i]);
+                    }
+                }
+                return arr;
+            };
+            this.farmUseBos = trans(data);
+        },
+        removeNz(index) {
+            this.farmUseBos.splice(index, 1);
+        },
+        // 保存农资
+        save(params) {
+            this.farmUseBos.push(params);
+        },
+        addNz() {
+            this.showChose = true;
+        },
         // 获取园区列表
         getGardenList() {
             return new Promise((a, b) => {
@@ -262,6 +330,7 @@ export default {
                     reWire: this.video,
                     startTime: this.startTime,
                     taskContent: this.taskContent,
+                    agricultural: JSON.stringify(this.farmUseBos),
                 })
                 .then((r) => {
                     this.submitting = false;
@@ -352,6 +421,87 @@ export default {
                     top: 5px;
                     z-index: 10;
                 }
+            }
+        }
+        .nz {
+            width: 100%;
+            position: relative;
+            top: -5px;
+            .nzItem {
+                width: 540px;
+                display: flex;
+                justify-content: space-between;
+                .nzBox {
+                    width: 480px;
+                    border: 1px solid rgb(236, 236, 236);
+                    padding: 7px 10px;
+                    margin-bottom: 5px;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    font-size: 13px;
+                    > span {
+                        width: 160px;
+                        text-align: left;
+                    }
+                    span.tag {
+                        background: #c3f8c7;
+                        color: #2ac726;
+                        display: inline-block;
+                        padding: 2px 10px;
+                        font-size: 12px;
+                        border-radius: 3px;
+                    }
+                }
+                .pestsBox {
+                    width: 450px;
+                    border: 1px solid rgb(236, 236, 236);
+                    padding: 0px 10px;
+                    margin-bottom: 5px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: 13px;
+                    line-height: normal !important;
+                    > span {
+                        width: 150px;
+                        text-align: left;
+                    }
+                    > span:last-child {
+                        text-align: right;
+                    }
+                    span.tag {
+                        background: #c3f8c7;
+                        color: #2ac726;
+                        display: inline-block;
+                        padding: 2px 10px;
+                        font-size: 12px;
+                        border-radius: 3px;
+                    }
+                }
+                i {
+                    width: 40px;
+                    font-size: 20px;
+                    color: #538dff;
+                    cursor: pointer;
+                    line-height: 35px;
+                    text-align: center;
+                }
+            }
+        }
+        .nzAdd {
+            width: 100%;
+            height: 35px;
+            color: #538dff;
+            line-height: 35px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            background: #edf1f8;
+            position: relative;
+            top: 0px;
+            i {
+                font-size: 13px;
             }
         }
     }

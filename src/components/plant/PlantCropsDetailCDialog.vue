@@ -21,6 +21,40 @@
                     <p>备注：{{ item.workText }}</p>
                     <p></p>
                 </div>
+                <div class="itemInner" v-if="item.title == '病虫害监测'">
+                    <p>监测点：{{ item.farmDetailBo.title }}</p>
+                </div>
+                <div class="itemInner" v-if="item.title == '病虫害监测'">
+                    <p>
+                        虫子情况：
+                        <span v-for="(bug, bugIndex) in item.farmDetailBo.farmDetailListChongBoList" :key="bug.id">
+                            {{ bug.title }}{{ bug.count }}只<span
+                                v-if="bugIndex < item.farmDetailBo.farmDetailListChongBoList.length - 1"
+                                >、</span
+                            >
+                        </span>
+                    </p>
+                </div>
+                <div class="itemInner" v-if="item.title == '病虫害监测'">
+                    <p>
+                        天敌情况：
+                        <span v-for="(enemy, enemyIndex) in item.farmDetailBo.farmDetailListTianBoList" :key="enemy.id">
+                            {{ enemy.title }}{{ enemy.count }}只<span
+                                v-if="enemyIndex < item.farmDetailBo.farmDetailListTianBoList.length - 1"
+                                >、</span
+                            >
+                        </span>
+                    </p>
+                </div>
+                <div class="itemInner" v-if="item.title == '生长观察'">
+                    <p>植株编号：{{ item.farmDetailBo.title }}</p>
+                </div>
+                <div class="itemInner" v-if="item.title == '生长观察'">
+                    <p>株高：{{ item.farmDetailBo.farmDetailListGrowBoList[0].title }}cm</p>
+                </div>
+                <div class="itemInner" v-if="item.title == '生长观察'">
+                    <p>节点数：{{ item.farmDetailBo.farmDetailListGrowBoList[0].count }}个</p>
+                </div>
                 <div class="itemInner btm">
                     <div>
                         <p v-for="itemSon in item.farmUseBos" :key="itemSon.id">

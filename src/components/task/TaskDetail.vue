@@ -61,6 +61,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="nz">
+                        <div class="title">需用农资：</div>
+                        <div class="nzlist">
+                            <div style="position: relative; top: 5px">
+                                <span v-if="detail.agricultural && detail.agricultural.length <= 0">暂无数据</span>
+                            </div>
+                            <div class="nzitem" v-for="item in detail.agricultural" :key="item.id">
+                                <p>
+                                    <span class="tag">{{ item.agriculturalType }}</span>
+                                </p>
+                                <p>{{ item.agricultural }}</p>
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <p>
                             指定执行人：<span style="margin: 0 5px" v-for="item in detail.executors" :key="item.id">{{
@@ -216,6 +230,15 @@ export default {
                     r.data.executors = JSON.parse(r.data.executors);
                     r.data.farmRecordBo = r.data.farmRecordBo || { farmUseBos: {} };
                     r.data.farmRecordBo.farmUseBos = r.data.farmRecordBo.farmUseBos || {};
+                    r.data.agricultural = r.data.agricultural ? JSON.parse(r.data.agricultural) : [];
+
+                    r.data.agricultural = r.data.agricultural.map((item) => {
+                        if (!item.agriculturalType && !item.agricultural) {
+                            item.agricultural = item.agriculturalBo.title;
+                            item.agriculturalType = item.agriculturalBo.agriculturalCategory;
+                        }
+                        return item;
+                    });
                     this.detail = r.data;
                 });
         },
@@ -294,6 +317,39 @@ export default {
                         height: 130px;
                         margin-left: 10px;
                         border-radius: 10px;
+                    }
+                }
+            }
+        }
+        .nz {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-top: 5px;
+            .nzlist {
+                width: 570px;
+                position: relative;
+                top: -5px;
+                .nzitem {
+                    width: 100%;
+                    border: 1px solid rgb(236, 236, 236);
+                    padding: 7px 10px;
+                    margin-bottom: 3px;
+                    display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    font-size: 13px;
+                    > p {
+                        width: 100%;
+                        font-size: 12px;
+                    }
+                    span.tag {
+                        background: #c3f8c7;
+                        color: #2ac726;
+                        display: inline-block;
+                        padding: 2px 10px;
+                        font-size: 12px;
+                        border-radius: 3px;
                     }
                 }
             }
