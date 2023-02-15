@@ -137,7 +137,7 @@
 <script lang="js">
 export default {
     name: 'stockReg',
-    props: ['default', 'needSubmit', 'title', 'selected'],
+    props: ['default', 'needSubmit', 'title', 'selected', 'kc'],
     data (){
         return {
             loading: false,
@@ -168,7 +168,11 @@ export default {
     },
     methods: {
         selectable (row, index){
-            return !this.selected.includes(row.id);
+            if(this.selected){
+                return !this.selected.includes(row.id);
+            }else{
+                return true;
+            }
         },
         // 选择农资类型时
         selectType (v) {
@@ -205,7 +209,8 @@ export default {
         // 获取农资数据列表
         getData (){
             this.loading = true;
-            this.ajax.post('/api/v1/adam/agricultural/platform-list', {
+            let url = this.kc == 1 ? '/api/v1/adam/farmLand/agriculturalSearch-list' : '/api/v1/adam/agricultural/platform-list';
+            this.ajax.post(url, {
                 "pageNum": 1,
                 "pageSize": 100,
                 "param": {
@@ -216,13 +221,15 @@ export default {
             }).then(r => {
                 this.loading = false;
                 this.tableData = r.data.map(item => {
-                    item.agriculturalBo = item.agriculturalBo || {};
-                    return item;
+                    if(this.kc == 1){
+                        item.agriculturalBo = item.agriculturalBo || {};
+                        return item.agriculturalBo;
+                    }else{
+                        item.agriculturalBo = item.agriculturalBo || {};
+                        return item;
+                    }
                 })
-                setTimeout(() => {
-
-                }, 2000);
-                this.$nextTick(() => {
+                if(this.selected) this.$nextTick(() => {
                     this.tableData.map(item => {
                         if(this.selected.includes(item.id)){
                             this.$refs.table.toggleRowSelection(item, true)

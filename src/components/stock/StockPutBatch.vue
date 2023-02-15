@@ -112,6 +112,7 @@
                     title="请选择要操作的农资"
                     v-if="showReg"
                     default="1"
+                    kc="1"
                     :selected="selected"
                     @onSubmit="onRegSubmit"
                     @closeReg="closeReg"

@@ -81,8 +81,8 @@
                 <div class="left">
                     <div class="title">作物相册</div>
                     <div class="imgs">
-                        <div class="pic" v-for="(item, index) in imgs" :key="index">
-                            <img :src="item" alt="" />
+                        <div class="pic" v-for="(item, index) in imgs" :key="index" @click="viewImg(item)">
+                            <img :src="item.url" alt="" />
                         </div>
                         <div class="space" v-for="(item, index) in imgSpace" :key="index"></div>
                         <el-empty description="暂无作物相册" style="margin: 0 auto" v-if="imgs.length == 0" />
@@ -90,12 +90,14 @@
                 </div>
             </div>
         </div>
+        <Imgview :img="view" v-if="showView"></Imgview>
     </div>
 </template>
 
 <script>
 const iourl = process.env["NODE_ENV"] == "development" ? "" : "https://io.deepberry.cn";
 import timer from "@/utils/timer";
+import Imgview from "@/components/common/Imgview.vue";
 import * as signalR from "@microsoft/signalr";
 import * as echarts from "echarts";
 export default {
@@ -104,6 +106,8 @@ export default {
             sceneSelected: [],
             scene: [],
             imgs: [],
+            view: {},
+            showView: false,
             plantDetail: {},
             ambient: [],
             ambientSelected: [],
@@ -183,7 +187,15 @@ export default {
             return r;
         },
     },
+    components: {
+        Imgview,
+    },
     methods: {
+        // 预览图片
+        viewImg(item) {
+            this.view = item;
+            this.showView = true;
+        },
         // 渲染图表
         setCharts(index = -1) {
             if (index > -1) this.activeCharts = index;
@@ -438,15 +450,15 @@ export default {
                 })
                 .then((r) => {
                     let imgs = [];
-                    r.data.map((item) => {
-                        item = item.split(",");
-                        imgs = [...imgs, ...item];
+                    r.data.images.map((item) => {
+                        imgs.push({
+                            url: item.image,
+                            time: timer.time(item.createTime),
+                            gardenTitle: r.data.gardenTitle,
+                            address: r.data.address,
+                        });
                     });
-                    let imgsResult = [];
-                    imgs.map((item) => {
-                        if (item) imgsResult.push(item);
-                    });
-                    this.imgs = imgsResult;
+                    this.imgs = imgs;
                 });
         },
     },
@@ -502,6 +514,7 @@ export default {
                     padding-bottom: 20px;
                     .pic {
                         width: calc(23% - 2px);
+                        cursor: pointer;
                         height: 120px;
                         overflow: hidden;
                         margin-right: 2%;
