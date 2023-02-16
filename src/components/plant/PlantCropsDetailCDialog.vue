@@ -10,7 +10,7 @@
                 class="item"
                 v-for="item in list"
                 :key="item.id"
-                :style="{ cursor: title == '农资使用统计' ? 'pointer' : '' }"
+                :style="{ cursor: 'pointer' }"
                 @click="detail(item.id)"
             >
                 <div class="itemInner">
@@ -103,12 +103,10 @@ export default {
             this.$emit("close");
         },
         detail(id) {
-            if (this.title == "农资使用统计") {
-                this.detailTitle = "施肥详情";
-                this.showDetail = true;
-                this.detailId = id;
-                console.log(id);
-            }
+            this.detailTitle = "统计详情";
+            this.showDetail = true;
+            this.detailId = id;
+            console.log(id);
         },
         closeDetail() {
             setTimeout(() => {

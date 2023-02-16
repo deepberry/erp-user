@@ -90,7 +90,7 @@
                 </div>
             </div>
         </div>
-        <Imgview :img="view" v-if="showView"></Imgview>
+        <Imgview :img="view" v-if="showView" @close="closeView"></Imgview>
     </div>
 </template>
 
@@ -194,7 +194,11 @@ export default {
         // 预览图片
         viewImg(item) {
             this.view = item;
+            console.log(item);
             this.showView = true;
+        },
+        closeView() {
+            this.showView = false;
         },
         // 渲染图表
         setCharts(index = -1) {

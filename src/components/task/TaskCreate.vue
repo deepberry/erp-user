@@ -319,6 +319,17 @@ export default {
                 return json;
             });
             this.submitting = true;
+            let farmUseBos = this.farmUseBos.map((item) => {
+                console.log(isNaN(item.agriculturalCount));
+                item.agriculturalCount = isNaN(item.agriculturalCount) ? 0 : item.agriculturalCount;
+                return {
+                    agriculturalBo: {
+                        title: item.agricultural,
+                        agriculturalCategory: item.agriculturalType,
+                        manufacturers: item.manufacturers,
+                    },
+                };
+            });
             this.ajax
                 .post("/api/v1/adam/task/createTask", {
                     endTime: this.endTime,
@@ -330,7 +341,7 @@ export default {
                     reWire: this.video,
                     startTime: this.startTime,
                     taskContent: this.taskContent,
-                    agricultural: JSON.stringify(this.farmUseBos),
+                    agricultural: JSON.stringify(farmUseBos),
                 })
                 .then((r) => {
                     this.submitting = false;

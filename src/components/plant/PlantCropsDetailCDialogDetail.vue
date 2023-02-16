@@ -17,7 +17,7 @@
             </div>
             <div class="item">
                 <p class="title">农事类型：</p>
-                <div class="content">
+                <div class="content" style="display: flex">
                     <el-select
                         :disabled="!isEdit"
                         style="width: 100%"
@@ -31,6 +31,12 @@
                             :value="item.id"
                         ></el-option>
                     </el-select>
+                    <el-input
+                        style="width: 140px; margin-left: 10px"
+                        v-if="form.farmId == 15"
+                        v-model="form.title"
+                        placeholder="请输入"
+                    ></el-input>
                 </div>
             </div>
             <div class="item" style="margin-top: 5px" v-if="form.farmId == 16">
@@ -258,6 +264,7 @@
 import upload from "@/utils/upload.js";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 import PlantCropsDetailBDialogAddPests from "@/components/plant/PlantCropsDetailBDialogAddPests";
+import timer from "@/utils/timer";
 export default {
     props: ["title", "id"],
     emits: ["load", "success", "close"],
@@ -360,9 +367,13 @@ export default {
                 })
                 .then((r) => {
                     let imgs = [];
-                    r.data.map((item) => {
-                        item = item.split(",");
-                        imgs = [...imgs, ...item];
+                    r.data.images.map((item) => {
+                        imgs.push({
+                            url: item.image,
+                            time: timer.time(item.createTime),
+                            gardenTitle: r.data.gardenTitle,
+                            address: r.data.address,
+                        });
                     });
                     this.imgs = imgs;
                 });
@@ -373,13 +384,21 @@ export default {
                 let data = JSON.parse(JSON.stringify(this.form));
                 data.smartDevice = JSON.stringify(data.smartDevice);
                 data.image = data.image.join(",");
+                if (data.farmDetailBo) {
+                    if (data.farmId == 16) {
+                        data.farmDetailBo.farmType = 0;
+                    }
+                    if (data.farmId == 17) {
+                        data.farmDetailBo.farmType = 1;
+                    }
+                }
                 this.ajax.post("/api/v1/adam/farm/editeFarm", data).then((r) => {
                     if (r.code == 200) {
                         this.$message.success("保存成功");
                         this.isEdit = false;
                         this.$emit("load");
                     } else {
-                        this.$message.error("编辑失败，请稍后再试");
+                        this.$message.error(r.message);
                     }
                 });
             } else {
@@ -472,8 +491,11 @@ export default {
                         farmDetailListTianBoList: [],
                         farmDetailListGrowBoList: [],
                     };
+                    r.data.farmDetailBo.farmDetailListGrowBoList = r.data.farmDetailBo.farmDetailListGrowBoList || [];
+                    r.data.farmDetailBo.farmDetailListGrowBoList = r.data.farmDetailBo.farmDetailListGrowBoList.length
+                        ? r.data.farmDetailBo.farmDetailListGrowBoList
+                        : [{}];
                     this.form = r.data;
-                    console.log(this.form);
                     a();
                 });
             });

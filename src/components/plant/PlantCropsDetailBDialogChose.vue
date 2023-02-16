@@ -32,7 +32,7 @@
                                     item.agriculturalCount
                                 }}{{ item.agriculturalBo.unitweight }}）
                             </span>
-                            <div>
+                            <div v-if="neednum != 'no'">
                                 使用量：<el-input
                                     style="width: 160px"
                                     @blur="item.useNum > item.agriculturalCount ? inputNum(index) : () => {}"
@@ -281,7 +281,6 @@ export default {
                     this.list = r.data.map((data) => {
                         this.selected &&
                             this.selected.map((item) => {
-                                console.log(item);
                                 if (data.agriculturalBo.id == item.agriculturalId) {
                                     data.selected = true;
                                     data.useNum = item.agriculturalCount;
