@@ -183,6 +183,7 @@
             @chose="chose"
             v-if="showChose"
             :selected="farmUseBos"
+            from="createNongshi"
             @close="closeChose"
         ></PlantCropsDetailBDialogChose>
         <PlantCropsDetailBDialogAddPests

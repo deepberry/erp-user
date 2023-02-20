@@ -52,8 +52,14 @@
                             <div>
                                 <p>操作视频：</p>
                                 <video
-                                    v-if="detail.reWire"
+                                    v-if="detail.reWire && detail.isVideo"
                                     controls
+                                    @click="view(detail.reWire)"
+                                    :src="detail.reWire"
+                                    alt=""
+                                />
+                                <img
+                                    v-if="detail.reWire && !detail.isVideo"
                                     @click="view(detail.reWire)"
                                     :src="detail.reWire"
                                     alt=""
@@ -163,6 +169,7 @@
 <script>
 import PlantCropsDetailCDialogDetail from "@/components/plant/PlantCropsDetailCDialogDetail";
 import timer from "@/utils/timer";
+import mins from "@/utils/mins.js";
 export default {
     name: "taskDetail",
     props: ["id"],
@@ -224,6 +231,7 @@ export default {
                 })
                 .then((r) => {
                     this.detailLoading = false;
+                    r.data.isVideo = mins.file.type(r.data.reWire) == "img" ? false : true;
                     r.data.startTime = timer.time("y-m-d h:i:s", r.data.startTime);
                     r.data.endTime = timer.time("y-m-d h:i:s", r.data.endTime);
                     r.data.createTime = timer.time("y-m-d h:i:s", r.data.createTime);
@@ -312,7 +320,8 @@ export default {
                     p {
                         width: auto;
                     }
-                    video {
+                    video,
+                    img {
                         width: 200px;
                         height: 130px;
                         margin-left: 10px;

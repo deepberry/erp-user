@@ -60,7 +60,8 @@
                 <div class="item">
                     <p class="title">操作指导：</p>
                     <div class="upload">
-                        <video v-if="video" controls :src="video" alt="" />
+                        <video v-if="video && isVideo" controls :src="video" alt="" />
+                        <img v-if="video && !isVideo" controls :src="video" alt="" />
                         <i class="erp erpguanbi" @click="video = ''" v-if="video"></i>
                         <div class="uploadBox" v-if="!video">
                             <input v-if="!uploading" @change="uploadFile" ref="file" type="file" />
@@ -119,6 +120,7 @@
             v-if="showChose"
             :selected="farmUseBos"
             @close="closeChose"
+            from="createTask"
             neednum="no"
         ></PlantCropsDetailBDialogChose>
     </div>
@@ -126,6 +128,7 @@
 
 <script>
 import upload from "../../utils/upload.js";
+import mins from "../../utils/mins.js";
 import PlantCropsDetailBDialogChose from "@/components/plant/PlantCropsDetailBDialogChose";
 export default {
     name: "taskDetail",
@@ -148,6 +151,7 @@ export default {
             startTime: "",
             endTime: "",
             video: "",
+            isVideo: false,
             uploading: false,
             percentage: 0, // 上传进度
             searchCropLoading: false, // 作物搜索中
@@ -263,6 +267,7 @@ export default {
             let file = this.$refs.file.files[0];
             upload(file, `erp/park/${file.name}`).then((r) => {
                 if (r.url) {
+                    this.isVideo = mins.file.type(r.url) == "img" ? false : true;
                     this.video = r.url;
                     this.uploading = false;
                     this.percentage = 0;

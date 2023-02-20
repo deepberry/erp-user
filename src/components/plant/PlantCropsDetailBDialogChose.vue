@@ -2,8 +2,8 @@
     <el-dialog :before-close="onClose" append-to-body v-model="showDetailBox" title="添加农资" width="740px">
         <div class="main">
             <div class="tab">
-                <span :class="tab == 0 ? 'active' : ''" @click="tab = 0">选择已领取农资</span>
-                <span :class="tab == 1 ? 'active' : ''" @click="tab = 1">手动输入农资信息</span>
+                <span :class="tab == 0 ? 'active' : ''" @click="tab = 0">请选择农资</span>
+                <span :class="tab == 1 ? 'active' : ''" @click="tab = 1" v-if="showTab2">手动输入农资信息</span>
             </div>
             <div class="tabbox tab1" v-show="tab == 0">
                 <el-empty description="暂无数据" v-if="list.length == 0" />
@@ -119,12 +119,13 @@
 
 <script>
 export default {
-    props: ["id", "selected", "neednum"],
+    props: ["id", "selected", "neednum", "from"],
     emits: ["close", "save", "chose"],
     data() {
         return {
             showDetailBox: true,
             tab: 0,
+            showTab2: true,
             list: [],
             title: "",
             agriculturalCategory: [],
@@ -140,6 +141,10 @@ export default {
         this.getAgriculturalUser();
         this.getAgriculturalCategory();
         this.getUnitMeasurement();
+        let fromArr = ["createTask", "createNongshi"];
+        if (fromArr.includes(this.from)) {
+            this.showTab2 = false;
+        }
     },
     methods: {
         inputNum(index) {
@@ -266,8 +271,12 @@ export default {
         },
         // 获取农资列表
         getAgriculturalUser() {
+            let url =
+                this.from == "createTask"
+                    ? "/api/v1/adam/farmLand/agriculturalSearch-list"
+                    : "/api/v1/adam/farmLand/agriculturalUser-list";
             this.ajax
-                .post("/api/v1/adam/farmLand/agriculturalUser-list", {
+                .post(url, {
                     pageNum: 1,
                     pageSize: 100,
                     param: {
@@ -307,7 +316,7 @@ export default {
         align-items: center;
         margin-top: 30px;
         span {
-            width: 50%;
+            width: 100%;
             height: 40px;
             line-height: 40px;
             background: #f4f7ff;

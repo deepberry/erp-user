@@ -17,7 +17,7 @@
                     </div>
                     <div class="contentItem">
                         <p><span>面积：</span>{{ item.area }}亩</p>
-                        <p>{{ item.plantTime }} 定值</p>
+                        <p>{{ item.plantTime }} 定植</p>
                     </div>
                 </div>
                 <div class="btn">
