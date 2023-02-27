@@ -160,6 +160,11 @@ export default {
                     id: this.id,
                 })
                 .then((r) => {
+                    if (r.code != 200) {
+                        this.$message.error(r.message);
+                        this.list = [];
+                        return;
+                    }
                     // 是否显示审核按钮
                     let user = JSON.parse(localStorage.getItem("erp_user")).id;
 

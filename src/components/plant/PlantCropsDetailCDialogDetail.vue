@@ -218,7 +218,13 @@
             <div class="item itemBig">
                 <p class="title">备注：</p>
                 <div class="content">
-                    <el-input :disabled="!isEdit" v-model="form.workText" placeholder="请输入备注" />
+                    <el-input
+                        :disabled="!isEdit"
+                        v-model="form.workText"
+                        rows="4"
+                        type="textarea"
+                        placeholder="请输入备注"
+                    />
                 </div>
             </div>
             <div class="item itemBig">

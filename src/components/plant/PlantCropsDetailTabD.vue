@@ -81,9 +81,11 @@
                 <div class="left">
                     <div class="title">作物相册</div>
                     <div class="imgs">
-                        <div class="pic" v-for="(item, index) in imgs" :key="index" @click="viewImg(item)">
-                            <img :src="item.url" alt="" />
-                        </div>
+                        <template v-for="(item, index) in imgs" :key="index">
+                            <div class="pic" v-if="item.url" @click="viewImg(item)">
+                                <img :src="item.url" alt="" />
+                            </div>
+                        </template>
                         <div class="space" v-for="(item, index) in imgSpace" :key="index"></div>
                         <el-empty description="暂无作物相册" style="margin: 0 auto" v-if="imgs.length == 0" />
                     </div>
@@ -455,12 +457,17 @@ export default {
                 .then((r) => {
                     let imgs = [];
                     r.data.images.map((item) => {
-                        imgs.push({
-                            url: item.image,
-                            time: timer.time(item.createTime),
-                            gardenTitle: r.data.gardenTitle,
-                            address: r.data.address,
-                        });
+                        let itemImg = item.image.split(",");
+                        if (itemImg.length >= 1) {
+                            itemImg.map((img) => {
+                                imgs.push({
+                                    url: img,
+                                    time: timer.time(item.createTime),
+                                    gardenTitle: r.data.gardenTitle,
+                                    address: r.data.address,
+                                });
+                            });
+                        }
                     });
                     this.imgs = imgs;
                 });
