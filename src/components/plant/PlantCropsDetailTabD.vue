@@ -82,7 +82,7 @@
                     <div class="title">作物相册</div>
                     <div class="imgs">
                         <template v-for="(item, index) in imgs" :key="index">
-                            <div class="pic" v-if="item.url" @click="viewImg(item)">
+                            <div class="pic" v-if="item.url" @click="viewImg(item, index)">
                                 <img :src="item.url" alt="" />
                             </div>
                         </template>
@@ -92,7 +92,7 @@
                 </div>
             </div>
         </div>
-        <Imgview :img="view" v-if="showView" @close="closeView"></Imgview>
+        <Imgview :list="imgs" :index="imgIndex" v-if="showView" @close="closeView"></Imgview>
     </div>
 </template>
 
@@ -108,6 +108,7 @@ export default {
             sceneSelected: [],
             scene: [],
             imgs: [],
+            imgIndex: 0,
             view: {},
             showView: false,
             plantDetail: {},
@@ -194,8 +195,9 @@ export default {
     },
     methods: {
         // 预览图片
-        viewImg(item) {
+        viewImg(item, index) {
             this.view = item;
+            this.imgIndex = index;
             console.log(item);
             this.showView = true;
         },

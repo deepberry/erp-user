@@ -1,24 +1,59 @@
 <template>
     <div class="view" v-show="show">
-        <img :src="img.url" alt="" />
+        <img :src="url" alt="" />
         <div class="viewInfo">
-            <span>{{ img.gardenTitle }} - {{ img.address }}</span>
-            <span>上传时间：{{ timer.time("y-m-d h:i:s", img.time) }}</span>
+            <span>{{ gardenTitle }} - {{ address }}</span>
+            <span>上传时间：{{ timer.time("y-m-d h:i:s", time) }}</span>
         </div>
         <i class="erp erpguanbi" @click="close"></i>
+        <i class="erp erpxiangyou1 left" @click="pre"></i>
+        <i class="erp erpxiangyou1 right" @click="next"></i>
     </div>
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from "vue";
+import { ref, defineProps, defineEmits, reactive, watch } from "vue";
 import timer from "@/utils/timer";
 
 const emits = defineEmits(["close"]);
 const getProps = defineProps({
-    img: Object,
+    list: Array,
+    index: Number,
 });
+const list = getProps.list.filter((item) => {
+    return item.url;
+});
+let currentIndex = ref(getProps.index);
+let url = ref(list[currentIndex.value].url);
+let gardenTitle = ref(list[currentIndex.value].gardenTitle);
+let address = ref(list[currentIndex.value].address);
+let time = ref(list[currentIndex.value].time);
 let show = ref(true);
 
+watch(currentIndex, (newValue, oldValue) => {
+    if (newValue < 0) {
+        currentIndex.value = list.length - 1;
+    }
+    if (newValue >= list.length) {
+        currentIndex.value = 0;
+    }
+    console.log(currentIndex.value);
+    url.value = list[currentIndex.value].url;
+    gardenTitle.value = list[currentIndex.value].gardenTitle;
+    address.value = list[currentIndex.value].address;
+    time.value = list[currentIndex.value].time;
+    console.log(url);
+});
+
+// 切换图片
+const pre = () => {
+    currentIndex.value--;
+};
+const next = () => {
+    currentIndex.value++;
+};
+
+// 关闭
 const close = () => {
     show.value = false;
     emits("close");
@@ -64,6 +99,20 @@ const close = () => {
         color: #ffffff;
         font-size: 24px;
         cursor: pointer;
+    }
+    .erpxiangyou1 {
+        font-size: 50px;
+        color: #ffffff;
+        position: absolute;
+        top: 400px;
+        cursor: pointer;
+    }
+    .erpxiangyou1.left {
+        left: 50px;
+        transform: rotate(180deg);
+    }
+    .erpxiangyou1.right {
+        right: 50px;
     }
 }
 </style>
