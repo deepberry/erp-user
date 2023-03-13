@@ -1,7 +1,7 @@
 <template>
     <div class="view" v-show="show">
         <img :src="url" alt="" v-show="mediaType == 'img'" />
-        <video :src="url" alt="" v-show="mediaType == 'video'" />
+        <video controls autoplay :src="url" alt="" v-show="mediaType == 'video'" />
         <div class="viewInfo">
             <span>{{ gardenTitle }} - {{ address }}</span>
             <span>上传时间：{{ timer.time("y-m-d h:i:s", time) }}</span>
@@ -45,6 +45,7 @@ watch(currentIndex, (newValue, oldValue) => {
     gardenTitle.value = list[currentIndex.value].gardenTitle;
     address.value = list[currentIndex.value].address;
     time.value = list[currentIndex.value].time;
+    mediaType.value = list[currentIndex.value].mediaType;
     console.log(url);
 });
 
@@ -76,6 +77,7 @@ const close = () => {
     justify-content: center;
     align-items: center;
 
+    video,
     img {
         max-width: 1500px;
         max-height: 760px;

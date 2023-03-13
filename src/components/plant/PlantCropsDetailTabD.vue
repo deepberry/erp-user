@@ -83,7 +83,8 @@
                     <div class="imgs">
                         <template v-for="(item, index) in imgs" :key="index">
                             <div class="pic" @click="viewImg(item, index)">
-                                <img :src="item.url" alt="" />
+                                <img :src="item.url" v-show="item.mediaType == 'img'" alt="" />
+                                <video :src="item.url" v-show="item.mediaType == 'video'" alt="" />
                             </div>
                         </template>
                         <div class="space" v-for="(item, index) in imgSpace" :key="index"></div>
@@ -542,7 +543,8 @@ export default {
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        img {
+                        img,
+                        video {
                             width: 100%;
                             height: auto;
                             border: 1px solid #f5f5f5;
