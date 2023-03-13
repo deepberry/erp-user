@@ -82,7 +82,7 @@
                     <div class="title">作物相册</div>
                     <div class="imgs">
                         <template v-for="(item, index) in imgs" :key="index">
-                            <div class="pic" v-if="item.url" @click="viewImg(item, index)">
+                            <div class="pic" @click="viewImg(item, index)">
                                 <img :src="item.url" alt="" />
                             </div>
                         </template>
@@ -102,6 +102,7 @@ import timer from "@/utils/timer";
 import Imgview from "@/components/common/Imgview.vue";
 import * as signalR from "@microsoft/signalr";
 import * as echarts from "echarts";
+import mins from "@/utils/mins.js";
 export default {
     data() {
         return {
@@ -467,11 +468,16 @@ export default {
                                     time: timer.time(item.createTime),
                                     gardenTitle: r.data.gardenTitle,
                                     address: r.data.address,
+                                    mediaType: mins.file.type(img),
                                 });
                             });
                         }
                     });
-                    this.imgs = imgs;
+
+                    this.imgs = imgs.filter((item) => {
+                        return item.url;
+                    });
+                    console.log(this.imgs);
                 });
         },
     },

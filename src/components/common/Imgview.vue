@@ -1,6 +1,7 @@
 <template>
     <div class="view" v-show="show">
-        <img :src="url" alt="" />
+        <img :src="url" alt="" v-show="mediaType == 'img'" />
+        <video :src="url" alt="" v-show="mediaType == 'video'" />
         <div class="viewInfo">
             <span>{{ gardenTitle }} - {{ address }}</span>
             <span>上传时间：{{ timer.time("y-m-d h:i:s", time) }}</span>
@@ -20,10 +21,12 @@ const getProps = defineProps({
     list: Array,
     index: Number,
 });
+console.log(getProps);
 const list = getProps.list.filter((item) => {
     return item.url;
 });
 let currentIndex = ref(getProps.index);
+let mediaType = ref(list[currentIndex.value].mediaType);
 let url = ref(list[currentIndex.value].url);
 let gardenTitle = ref(list[currentIndex.value].gardenTitle);
 let address = ref(list[currentIndex.value].address);
